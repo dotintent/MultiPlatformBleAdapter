@@ -6,13 +6,21 @@ interface BleAdapter {
 
     void destroyClient();
 
-    void enable(String transactionId, Callback<Void> callback);
+    void enable(
+            String transactionId,
+            OnSuccessCallback<Void> onSuccessCallback,
+            OnErrorCallback onErrorCallback);
 
     void disable(String transactionId);
 
     int getCurrentState();
 
-    void startDeviceScan(String[] filteredUUIDs, int scanMode, int callbackType);
+    void startDeviceScan(
+            String[] filteredUUIDs,
+            int scanMode,
+            int callbackType,
+            OnEventCallback<ScanResult> onEventCallback,
+            OnErrorCallback onErrorCallback);
 
     void stopDeviceScan();
 
@@ -20,65 +28,90 @@ interface BleAdapter {
             String deviceIdentifier,
             int connectionPriority,
             String transactionId,
-            Callback<BleDevice> callback);
+            OnSuccessCallback<BleDevice> onSuccessCallback,
+            OnErrorCallback onErrorCallback);
 
     void readRSSIForDevice(
             String deviceIdentifier,
             String transactionId,
-            Callback<BleDevice> callback);
+            OnSuccessCallback<BleDevice> onSuccessCallback,
+            OnErrorCallback onErrorCallback);
 
     void requestMTUForDevice(
             String deviceIdentifier,
             int mtu,
             String transactionId,
-            Callback<BleDevice> callback);
+            OnSuccessCallback<BleDevice> onSuccessCallback,
+            OnErrorCallback onErrorCallback);
 
-    void getKnownDevices(String[] deviceIdentifiers, Callback<BleDevice[]> callback);
+    void getKnownDevices(
+            String[] deviceIdentifiers,
+            OnSuccessCallback<BleDevice[]> onSuccessCallback,
+            OnErrorCallback onErrorCallback);
 
-    void getConnectedDevices(String[] serviceUUIDs, Callback<BleDevice> callback);
+    void getConnectedDevices(
+            String[] serviceUUIDs,
+            OnSuccessCallback<BleDevice> onSuccessCallback,
+            OnErrorCallback onErrorCallback);
 
     void connectToDevice(
             String deviceIdentifier,
             ConnectionOptions connectionOptions,
-            Callback<BleDevice> callback);
+            OnSuccessCallback<BleDevice> onSuccessCallback,
+            OnErrorCallback onErrorCallback);
 
-    void cancelDeviceConnection(String deviceIdentifier, Callback<BleDevice> callback);
+    void cancelDeviceConnection(
+            String deviceIdentifier,
+            OnSuccessCallback<BleDevice> onSuccessCallback,
+            OnErrorCallback onErrorCallback);
 
-    void isDeviceConnected(String deviceIdentifier, Callback<BleDevice> callback);
+    void isDeviceConnected(
+            String deviceIdentifier,
+            OnSuccessCallback<BleDevice> onSuccessCallback,
+            OnErrorCallback onErrorCallback);
 
     void discoverAllServicesAndCharacteristicsForDevice(
             String deviceIdentifier,
             String transactionId,
-            Callback<BleDevice> callback);
+            OnSuccessCallback<BleDevice> onSuccessCallback,
+            OnErrorCallback onErrorCallback);
 
-    void getServicesForDevice(String deviceIdentifier, Callback<Service[]> callback);
+    void getServicesForDevice(
+            String deviceIdentifier,
+            OnSuccessCallback<Service[]> onSuccessCallback,
+            OnErrorCallback onErrorCallback);
 
     void getCharacteristicsForDevice(
             String deviceIdentifier,
             String serviceUUID,
-            Callback<Characteristic[]> callback);
+            OnSuccessCallback<Characteristic[]> onSuccessCallback,
+            OnErrorCallback onErrorCallback);
 
     void getCharacteristicsForService(
             String serviceIdentifier,
-            Callback<Characteristic[]> callback);
+            OnSuccessCallback<Characteristic[]> onSuccessCallback,
+            OnErrorCallback onErrorCallback);
 
     void readCharacteristicForDevice(
             String deviceIdentifier,
             String serviceUUID,
             String characteristicUUID,
             String transactionId,
-            Callback<Characteristic> callback);
+            OnSuccessCallback<Characteristic> onSuccessCallback,
+            OnErrorCallback onErrorCallback);
 
     void readCharacteristicForService(
             int serviceIdentifier,
             String characteristicUUID,
             String transactionId,
-            Callback<Characteristic> callback);
+            OnSuccessCallback<Characteristic> onSuccessCallback,
+            OnErrorCallback onErrorCallback);
 
     void readCharacteristic(
             int characteristicIdentifer,
             String transactionId,
-            Callback<Characteristic> callback);
+            OnSuccessCallback<Characteristic> onSuccessCallback,
+            OnErrorCallback onErrorCallback);
 
     void writeCharacteristicForDevice(
             String deviceIdentifier,
@@ -87,7 +120,8 @@ interface BleAdapter {
             String valueBase64,
             boolean withResponse,
             String transactionId,
-            Callback<Characteristic> callback);
+            OnSuccessCallback<Characteristic> onSuccessCallback,
+            OnErrorCallback onErrorCallback);
 
     void writeCharacteristicForService(
             String serviceIdentifier,
@@ -95,36 +129,41 @@ interface BleAdapter {
             String valueBase64,
             boolean withResponse,
             String transactionId,
-            Callback<Characteristic> callback);
+            OnSuccessCallback<Characteristic> onSuccessCallback,
+            OnErrorCallback onErrorCallback);
 
     void writeCharacteristic(
             String characteristicIdentifier,
             String valueBase64,
             boolean withResponse,
             String transactionId,
-            Callback<Characteristic> callback);
+            OnSuccessCallback<Characteristic> onSuccessCallback,
+            OnErrorCallback onErrorCallback);
 
     void monitorCharacteristicForDevice(
             String deviceIdentifier,
             String serviceUUID,
             String characteristicUUID,
             String transactionId,
-            Callback<Void> callback);
+            OnEventCallback<Characteristic> onEventCallback,
+            OnErrorCallback onErrorCallback);
 
     void monitorCharacteristicForService(
             String serviceIdentifier,
             String characteristicUUID,
             String transactionId,
-            Callback<Void> callback);
+            OnEventCallback<Characteristic> onEventCallback,
+            OnErrorCallback onErrorCallback);
 
     void monitorCharacteristic(
             String characteristicIdentifier,
             String transactionId,
-            Callback<Characteristic> callback);
+            OnEventCallback<Characteristic> onEventCallback,
+            OnErrorCallback onErrorCallback);
 
     void cancelTransaction(String transactionId);
 
     void setLogLevel(String logLevel);
 
-    void getLogLevel(Callback<String> callback);
+    void getLogLevel(OnSuccessCallback<String> onSuccessCallback, OnErrorCallback onErrorCallback);
 }
