@@ -1,0 +1,42 @@
+stages:
+  - name: self-test
+    if: type = push
+  - name: integration
+    if: branch = master OR type = pull_request
+
+env:
+  global:
+    - SYS=22
+    - ABI="default;armeabi-v7a"
+    - ADB_INSTALL_TIMEOUT=10 # minutes
+
+_android_job_template: &android_job_template
+  language: android
+  android:
+    components:
+      - tools
+      - build-tools-28.0.3
+      - android-28
+      - extra-android-m2repository
+    licenses:
+      - 'android-sdk-license-.+'
+  env:
+    global:
+      - GRADLE_OPTS="-Xms128m"
+  before_cache:
+    - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+  cache:
+    directories:
+      - $HOME/.m2
+      - $HOME/.gradle/caches/
+      - $HOME/.gradle/wrapper/
+  script:
+    - cd android
+    - ./gradlew checkstyle assembleRelease test
+    
+
+matrix:
+  include:
+    - <<: *android_job_template
+      name: android
+      stage: self-test
