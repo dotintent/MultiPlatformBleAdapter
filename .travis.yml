@@ -4,12 +4,6 @@ stages:
   - name: integration
     if: branch = master OR type = pull_request
 
-env:
-  global:
-    - SYS=22
-    - ABI="default;armeabi-v7a"
-    - ADB_INSTALL_TIMEOUT=10 # minutes
-
 _android_job_template: &android_job_template
   language: android
   android:
@@ -23,6 +17,8 @@ _android_job_template: &android_job_template
   env:
     global:
       - GRADLE_OPTS="-Xms128m"
+      - ABI="default;armeabi-v7a"
+      - ADB_INSTALL_TIMEOUT=10 # minutes
   before_cache:
     - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
   cache:
@@ -32,7 +28,7 @@ _android_job_template: &android_job_template
       - $HOME/.gradle/wrapper/
   script:
     - cd android
-    - ./gradlew checkstyle assembleRelease test
+    - ./gradlew assembleRelease test
     
 
 matrix:
