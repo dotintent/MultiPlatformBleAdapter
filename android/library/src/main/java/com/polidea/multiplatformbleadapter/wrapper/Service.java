@@ -5,24 +5,14 @@ import android.bluetooth.BluetoothGattService;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.WritableMap;
 import com.polidea.multiplatformbleadapter.utils.IdGenerator;
 import com.polidea.multiplatformbleadapter.utils.IdGeneratorKey;
-import com.polidea.multiplatformbleadapter.utils.UUIDConverter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class Service {
-
-    private interface Metadata {
-        String ID = "id";
-        String UUID = "uuid";
-        String DEVICE_ID = "deviceID";
-        String IS_PRIMARY = "isPrimary";
-    }
 
     private Device device;
     private BluetoothGattService service;
@@ -59,14 +49,5 @@ public class Service {
             characteristics.add(new Characteristic(this, gattCharacteristic));
         }
         return characteristics;
-    }
-
-    public WritableMap toJSObject() {
-        WritableMap result = Arguments.createMap();
-        result.putInt(Metadata.ID, id);
-        result.putString(Metadata.UUID, UUIDConverter.fromUUID(service.getUuid()));
-        result.putString(Metadata.DEVICE_ID, device.getNativeDevice().getMacAddress());
-        result.putBoolean(Metadata.IS_PRIMARY, service.getType() == BluetoothGattService.SERVICE_TYPE_PRIMARY);
-        return result;
     }
 }

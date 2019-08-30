@@ -1,6 +1,5 @@
 package com.polidea.multiplatformbleadapter.utils;
 
-import com.facebook.react.bridge.ReadableArray;
 
 import java.util.UUID;
 
@@ -14,8 +13,7 @@ public class UUIDConverter {
 
         if (sUUID.length() == 4) {
             sUUID = baseUUIDPrefix + sUUID + baseUUIDSuffix;
-        }
-        else if (sUUID.length() == 8) {
+        } else if (sUUID.length() == 8) {
             sUUID = sUUID + baseUUIDSuffix;
         }
 
@@ -34,31 +32,12 @@ public class UUIDConverter {
 
             if (sUUIDs[i].length() == 4) {
                 sUUIDs[i] = baseUUIDPrefix + sUUIDs[i] + baseUUIDSuffix;
-            }
-            else if (sUUIDs[i].length() == 8) {
+            } else if (sUUIDs[i].length() == 8) {
                 sUUIDs[i] = sUUIDs[i] + baseUUIDSuffix;
             }
 
             try {
                 UUIDs[i] = UUID.fromString(sUUIDs[i]);
-            } catch (Throwable e) {
-                return null;
-            }
-        }
-        return UUIDs;
-    }
-
-    public static UUID[] convert(ReadableArray aUUIDs) {
-        UUID[] UUIDs = new UUID[aUUIDs.size()];
-        for (int i = 0; i < aUUIDs.size(); i++) {
-            try {
-                String sUUID = aUUIDs.getString(i);
-                if (sUUID.length() == 4) {
-                    sUUID = baseUUIDPrefix + sUUID + baseUUIDSuffix;
-                } else if (sUUID.length() == 8) {
-                    sUUID = sUUID + baseUUIDSuffix;
-                }
-                UUIDs[i] = UUID.fromString(sUUID);
             } catch (Throwable e) {
                 return null;
             }

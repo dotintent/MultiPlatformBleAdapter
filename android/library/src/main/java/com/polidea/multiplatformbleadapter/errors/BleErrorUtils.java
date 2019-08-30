@@ -1,8 +1,7 @@
 package com.polidea.multiplatformbleadapter.errors;
 
-import android.support.annotation.NonNull;
 
-import com.facebook.react.bridge.ReadableArray;
+import android.support.annotation.NonNull;
 
 public class BleErrorUtils {
 
@@ -10,21 +9,10 @@ public class BleErrorUtils {
         return new BleError(BleErrorCode.OperationCancelled, null, null);
     }
 
-    static public BleError invalidIdentifiers(@NonNull  String... identifiers) {
+    static public BleError invalidIdentifiers(@NonNull String... identifiers) {
         StringBuilder identifiersJoined = new StringBuilder();
         for (String identifier: identifiers) {
             identifiersJoined.append(identifier).append(", ");
-        }
-
-        BleError bleError = new BleError(BleErrorCode.InvalidIdentifiers, null, null);
-        bleError.internalMessage = identifiersJoined.toString();
-        return bleError;
-    }
-
-    static public BleError invalidIdentifiers(@NonNull ReadableArray readableArray) {
-        StringBuilder identifiersJoined = new StringBuilder();
-        for (int i = 0; i < readableArray.size(); i++) {
-            identifiersJoined.append(readableArray.getString(i)).append(", ");
         }
 
         BleError bleError = new BleError(BleErrorCode.InvalidIdentifiers, null, null);
