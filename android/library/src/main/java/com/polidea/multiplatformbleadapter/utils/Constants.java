@@ -1,6 +1,7 @@
 package com.polidea.multiplatformbleadapter.utils;
 
 
+import android.support.annotation.IntDef;
 import android.support.annotation.StringDef;
 
 import java.lang.annotation.Retention;
@@ -44,6 +45,19 @@ public interface Constants {
         String INFO = "Info";
         String WARNING = "Warning";
         String ERROR = "Error";
+    }
+
+    @IntDef({
+            ConnectionPriority.BALANCED,
+            ConnectionPriority.HIGH,
+            ConnectionPriority.LOW_POWER}
+    )
+    @Retention(RetentionPolicy.SOURCE)
+    @interface ConnectionPriority {
+
+        int BALANCED = 0;
+        int HIGH = 1;
+        int LOW_POWER = 2;
     }
 
     int MINIMUM_MTU = 23;

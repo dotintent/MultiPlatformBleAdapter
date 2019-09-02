@@ -2,7 +2,9 @@ package com.polidea.multiplatformbleadapter;
 
 interface BleAdapter {
 
-    void createClient(String restoreIdentifierKey);
+    void createClient(String restoreStateIdentifier,
+                      OnEventCallback<String> onAdapterStateChangeCallback,
+                      OnEventCallback<Integer> onStateRestored);
 
     void destroyClient();
 
@@ -11,9 +13,12 @@ interface BleAdapter {
             OnSuccessCallback<Void> onSuccessCallback,
             OnErrorCallback onErrorCallback);
 
-    void disable(String transactionId);
+    void disable(
+            String transactionId,
+            OnSuccessCallback<Void> onSuccessCallback,
+            OnErrorCallback onErrorCallback);
 
-    int getCurrentState();
+    String getCurrentState();
 
     void startDeviceScan(
             String[] filteredUUIDs,
@@ -51,7 +56,7 @@ interface BleAdapter {
 
     void getConnectedDevices(
             String[] serviceUUIDs,
-            OnSuccessCallback<BleDevice> onSuccessCallback,
+            OnSuccessCallback<BleDevice[]> onSuccessCallback,
             OnErrorCallback onErrorCallback);
 
     void connectToDevice(
@@ -67,7 +72,7 @@ interface BleAdapter {
 
     void isDeviceConnected(
             String deviceIdentifier,
-            OnSuccessCallback<BleDevice> onSuccessCallback,
+            OnSuccessCallback<Boolean> onSuccessCallback,
             OnErrorCallback onErrorCallback);
 
     void discoverAllServicesAndCharacteristicsForDevice(
@@ -88,7 +93,7 @@ interface BleAdapter {
             OnErrorCallback onErrorCallback);
 
     void getCharacteristicsForService(
-            String serviceIdentifier,
+            int serviceIdentifier,
             OnSuccessCallback<Characteristic[]> onSuccessCallback,
             OnErrorCallback onErrorCallback);
 
@@ -124,7 +129,7 @@ interface BleAdapter {
             OnErrorCallback onErrorCallback);
 
     void writeCharacteristicForService(
-            String serviceIdentifier,
+            int serviceIdentifier,
             String characteristicUUID,
             String valueBase64,
             boolean withResponse,
@@ -133,7 +138,7 @@ interface BleAdapter {
             OnErrorCallback onErrorCallback);
 
     void writeCharacteristic(
-            String characteristicIdentifier,
+            int characteristicIdentifier,
             String valueBase64,
             boolean withResponse,
             String transactionId,
@@ -149,14 +154,14 @@ interface BleAdapter {
             OnErrorCallback onErrorCallback);
 
     void monitorCharacteristicForService(
-            String serviceIdentifier,
+            int serviceIdentifier,
             String characteristicUUID,
             String transactionId,
             OnEventCallback<Characteristic> onEventCallback,
             OnErrorCallback onErrorCallback);
 
     void monitorCharacteristic(
-            String characteristicIdentifier,
+            int characteristicIdentifier,
             String transactionId,
             OnEventCallback<Characteristic> onEventCallback,
             OnErrorCallback onErrorCallback);
@@ -165,5 +170,5 @@ interface BleAdapter {
 
     void setLogLevel(String logLevel);
 
-    void getLogLevel(OnSuccessCallback<String> onSuccessCallback, OnErrorCallback onErrorCallback);
+    String getLogLevel();
 }
