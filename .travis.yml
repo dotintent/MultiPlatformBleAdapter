@@ -18,7 +18,6 @@ _android_job_template: &android_job_template
     global:
       - GRADLE_OPTS="-Xms128m"
       - ABI="default;armeabi-v7a"
-      - ADB_INSTALL_TIMEOUT=10 # minutes
   before_cache:
     - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
   cache:
@@ -28,11 +27,11 @@ _android_job_template: &android_job_template
       - $HOME/.gradle/wrapper/
   script:
     - cd android
-    - ./gradlew assembleRelease test
+    - ./gradlew buildRelease
     
 
 matrix:
   include:
     - <<: *android_job_template
-      name: android
-      stage: self-test
+      name: Android build
+      stage: integration
