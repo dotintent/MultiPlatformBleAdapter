@@ -28,10 +28,22 @@ _android_job_template: &android_job_template
   script:
     - cd android
     - ./gradlew buildRelease
-    
+
+_ios_job_template: &ios_job_template
+  language: objective-c
+  os: osx
+  osx_image: xcode11
+  xcode_project: iOS/MultiPlatformBLEAdapter.xcodeproj
+  xcode_scheme: MultiplatformBLEAdapter
+  script:
+    - cd ios
+    - xcodebuild
 
 matrix:
   include:
     - <<: *android_job_template
-      name: Android build
+      name: Build Android
+      stage: integration
+    - <<: *ios_job_template
+      name: Build iOS
       stage: integration
