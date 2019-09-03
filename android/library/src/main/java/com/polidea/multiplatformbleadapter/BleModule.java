@@ -895,7 +895,7 @@ public class BleModule implements BleAdapter {
                     @Override
                     public void call() {
                         onErrorCallback.onError(BleErrorUtils.cancelled());
-                        onDeviceDisconnected(device, null);
+                        onDeviceDisconnected(device);
                     }
                 });
 
@@ -969,7 +969,7 @@ public class BleModule implements BleAdapter {
                     public void onError(Throwable e) {
                         BleError bleError = errorConverter.toError(e);
                         onErrorCallback.onError(bleError);
-                        onDeviceDisconnected(device, bleError);
+                        onDeviceDisconnected(device);
                     }
 
                     @Override
@@ -985,7 +985,7 @@ public class BleModule implements BleAdapter {
         connectingDevices.replaceSubscription(device.getMacAddress(), subscription);
     }
 
-    private void onDeviceDisconnected(RxBleDevice rxDevice, BleError bleError) {
+    private void onDeviceDisconnected(RxBleDevice rxDevice) {
         activeConnections.remove(rxDevice.getMacAddress());
         Device device = rxBleDeviceToDeviceMapper.map(connectedDevices.remove(rxDevice.getMacAddress()));
         if (device == null) {
@@ -993,7 +993,6 @@ public class BleModule implements BleAdapter {
         }
 
         cleanServicesAndCharacteristicsForDevice(device);
-        //TODO Send disconnection event
         connectingDevices.removeSubscription(device.getId());
     }
 
