@@ -1,15 +1,15 @@
 package com.polidea.multiplatformbleadapter.exceptions;
 
-import android.bluetooth.BluetoothGattCharacteristic;
+import com.polidea.multiplatformbleadapter.Characteristic;
 
 public class CannotMonitorCharacteristicException extends RuntimeException {
-    private BluetoothGattCharacteristic characteristic;
+    private Characteristic characteristic;
 
-    public CannotMonitorCharacteristicException(BluetoothGattCharacteristic characteristic) {
+    public CannotMonitorCharacteristicException(Characteristic characteristic) {
         this.characteristic = characteristic;
     }
 
-    public BluetoothGattCharacteristic getCharacteristic() {
+    public Characteristic getCharacteristic() {
         return characteristic;
     }
 }

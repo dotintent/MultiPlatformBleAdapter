@@ -1,4 +1,4 @@
-package com.polidea.multiplatformbleadapter.advertisement;
+package com.polidea.multiplatformbleadapter;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

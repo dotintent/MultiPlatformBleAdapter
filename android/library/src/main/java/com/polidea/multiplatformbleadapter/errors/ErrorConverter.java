@@ -3,6 +3,7 @@ package com.polidea.multiplatformbleadapter.errors;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 
+import com.polidea.multiplatformbleadapter.Characteristic;
 import com.polidea.multiplatformbleadapter.exceptions.CannotMonitorCharacteristicException;
 import com.polidea.multiplatformbleadapter.utils.UUIDConverter;
 import com.polidea.rxandroidble.exceptions.BleAlreadyConnectedException;
@@ -30,14 +31,13 @@ public class ErrorConverter {
 
         if (throwable instanceof CannotMonitorCharacteristicException) {
             CannotMonitorCharacteristicException exception = (CannotMonitorCharacteristicException) throwable;
-            BluetoothGattCharacteristic gattCharacteristic = exception.getCharacteristic();
-            BluetoothGattService gattService = gattCharacteristic.getService();
+            Characteristic characteristic = exception.getCharacteristic();
             // TODO: Missing deviceID
             return BleErrorUtils.cannotMonitorCharacteristic(
                     throwable.getMessage(),
                     null,
-                    UUIDConverter.fromUUID(gattService.getUuid()),
-                    UUIDConverter.fromUUID(gattCharacteristic.getUuid()));
+                    UUIDConverter.fromUUID(characteristic.getServiceUUID()),
+                    UUIDConverter.fromUUID(characteristic.getUuid()));
         }
 
         // RxSwift exceptions ----------------------------------------------------------------------
