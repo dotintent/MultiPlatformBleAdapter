@@ -20,14 +20,15 @@ import com.polidea.multiplatformbleadapter.errors.BleErrorUtils;
 import com.polidea.multiplatformbleadapter.errors.ErrorConverter;
 import com.polidea.multiplatformbleadapter.exceptions.CannotMonitorCharacteristicException;
 import com.polidea.multiplatformbleadapter.utils.Base64Converter;
+import com.polidea.multiplatformbleadapter.utils.Constants;
 import com.polidea.multiplatformbleadapter.utils.DisposableMap;
 import com.polidea.multiplatformbleadapter.utils.IdGenerator;
 import com.polidea.multiplatformbleadapter.utils.LogLevel;
 import com.polidea.multiplatformbleadapter.utils.RefreshGattCustomOperation;
+import com.polidea.multiplatformbleadapter.utils.ServiceFactory;
 import com.polidea.multiplatformbleadapter.utils.UUIDConverter;
-import com.polidea.multiplatformbleadapter.wrapper.Characteristic;
-import com.polidea.multiplatformbleadapter.wrapper.Device;
-import com.polidea.multiplatformbleadapter.wrapper.Service;
+import com.polidea.multiplatformbleadapter.utils.mapper.RxBleDeviceToDeviceMapper;
+import com.polidea.multiplatformbleadapter.utils.mapper.RxScanResultToScanResultMapper;
 import com.polidea.rxandroidble.NotificationSetupMode;
 import com.polidea.rxandroidble.RxBleAdapterStateObservable;
 import com.polidea.rxandroidble.RxBleClient;
@@ -37,7 +38,6 @@ import com.polidea.rxandroidble.RxBleDeviceServices;
 import com.polidea.rxandroidble.exceptions.BleCharacteristicNotFoundException;
 import com.polidea.rxandroidble.internal.RxBleLog;
 import com.polidea.rxandroidble.scan.ScanFilter;
-import com.polidea.rxandroidble.scan.ScanResult;
 import com.polidea.rxandroidble.scan.ScanSettings;
 
 import java.util.ArrayList;
@@ -72,7 +72,9 @@ public class BleModule implements BleAdapter {
     private HashMap<String, Device> discoveredDevices = new HashMap<>();
 
     // Map of connected devices.
-    private HashMap<String, Device> connectedDevices = new HashMap<>();
+    private HashMap<String, RxBleDevice> connectedDevices = new HashMap<>();
+
+    private HashMap<String, RxBleConnection> activeConnections = new HashMap<>();
 
     // Map of discovered services
     private SparseArray<Service> discoveredServices = new SparseArray<>();
@@ -99,6 +101,12 @@ public class BleModule implements BleAdapter {
     // State subscription
     @Nullable
     private Subscription adapterStateChangesSubscription;
+
+    private RxBleDeviceToDeviceMapper rxBleDeviceToDeviceMapper = new RxBleDeviceToDeviceMapper();
+
+    private RxScanResultToScanResultMapper rxScanResultToScanResultMapper = new RxScanResultToScanResultMapper();
+
+    private ServiceFactory serviceFactory = new ServiceFactory();
 
     // Current native library log level.
     private int currentLogLevel = RxBleLog.NONE;
@@ -142,6 +150,7 @@ public class BleModule implements BleAdapter {
         discoveredServices.clear();
         discoveredCharacteristics.clear();
         connectedDevices.clear();
+        activeConnections.clear();
         discoveredDevices.clear();
 
         // Clear client
@@ -184,7 +193,7 @@ public class BleModule implements BleAdapter {
     public void startDeviceScan(String[] filteredUUIDs,
                                 int scanMode,
                                 int callbackType,
-                                OnEventCallback<com.polidea.multiplatformbleadapter.ScanResult> onEventCallback,
+                                OnEventCallback<ScanResult> onEventCallback,
                                 OnErrorCallback onErrorCallback) {
         UUID[] uuids = null;
 
@@ -211,14 +220,14 @@ public class BleModule implements BleAdapter {
     public void requestConnectionPriorityForDevice(String deviceIdentifier,
                                                    int connectionPriority,
                                                    final String transactionId,
-                                                   final OnSuccessCallback<BleDevice> onSuccessCallback,
+                                                   final OnSuccessCallback<Device> onSuccessCallback,
                                                    final OnErrorCallback onErrorCallback) {
         final Device device = getDeviceOrEmitError(deviceIdentifier, onErrorCallback);
         if (device == null) {
             return;
         }
 
-        final RxBleConnection connection = getConnectionOrEmitError(device, onErrorCallback);
+        final RxBleConnection connection = getConnectionOrEmitError(device.getId(), onErrorCallback);
         if (connection == null) {
             return;
         }
@@ -235,7 +244,7 @@ public class BleModule implements BleAdapter {
                     }).subscribe(new Action0() {
                         @Override
                         public void call() {
-                            //TODO Convert to local objects onSuccessCallback.onSuccess(device);
+                            onSuccessCallback.onSuccess(device);
                             transactions.removeSubscription(transactionId);
                         }
                     }, new Action1<Throwable>() {
@@ -248,20 +257,20 @@ public class BleModule implements BleAdapter {
 
             transactions.replaceSubscription(transactionId, subscription);
         } else {
-            //TODO onSuccessCallback.onSuccess(device);
+            onSuccessCallback.onSuccess(device);
         }
     }
 
     @Override
     public void readRSSIForDevice(String deviceIdentifier,
                                   final String transactionId,
-                                  final OnSuccessCallback<BleDevice> onSuccessCallback,
+                                  final OnSuccessCallback<Device> onSuccessCallback,
                                   final OnErrorCallback onErrorCallback) {
         final Device device = getDeviceOrEmitError(deviceIdentifier, onErrorCallback);
         if (device == null) {
             return;
         }
-        final RxBleConnection connection = getConnectionOrEmitError(device, onErrorCallback);
+        final RxBleConnection connection = getConnectionOrEmitError(device.getId(), onErrorCallback);
         if (connection == null) {
             return;
         }
@@ -289,7 +298,8 @@ public class BleModule implements BleAdapter {
 
                     @Override
                     public void onNext(Integer rssi) {
-                        //TODO Convert to local objects onSuccessCallback.onSuccess(device.toJSObject(rssi));
+                        device.setRssi(rssi);
+                        onSuccessCallback.onSuccess(device);
                     }
                 });
 
@@ -299,14 +309,14 @@ public class BleModule implements BleAdapter {
     @Override
     public void requestMTUForDevice(String deviceIdentifier, int mtu,
                                     final String transactionId,
-                                    final OnSuccessCallback<BleDevice> onSuccessCallback,
+                                    final OnSuccessCallback<Device> onSuccessCallback,
                                     final OnErrorCallback onErrorCallback) {
         final Device device = getDeviceOrEmitError(deviceIdentifier, onErrorCallback);
         if (device == null) {
             return;
         }
 
-        final RxBleConnection connection = getConnectionOrEmitError(device, onErrorCallback);
+        final RxBleConnection connection = getConnectionOrEmitError(device.getId(), onErrorCallback);
         if (connection == null) {
             return;
         }
@@ -333,26 +343,27 @@ public class BleModule implements BleAdapter {
                         }
 
                         @Override
-                        public void onNext(Integer integer) {
-                            //TODO Convert to local objects onSuccessCallback.onSuccess(device.toJSObject(null));
+                        public void onNext(Integer mtu) {
+                            device.setMtu(mtu);
+                            onSuccessCallback.onSuccess(device);
                         }
                     });
 
             transactions.replaceSubscription(transactionId, subscription);
         } else {
-            //TODO Convert to local objects onSuccessCallback.onSuccess(device.toJSObject(null));
+            onSuccessCallback.onSuccess(device);
         }
     }
 
     @Override
     public void getKnownDevices(String[] deviceIdentifiers,
-                                OnSuccessCallback<BleDevice[]> onSuccessCallback,
+                                OnSuccessCallback<Device[]> onSuccessCallback,
                                 OnErrorCallback onErrorCallback) {
         if (rxBleClient == null) {
             throw new IllegalStateException("BleManager not created when tried connecting to device");
         }
 
-        BleDevice[] knownDevices = new BleDevice[deviceIdentifiers.length];
+        Device[] knownDevices = new Device[deviceIdentifiers.length];
         int knownDevicesCount = 0;
         for (final String deviceId : deviceIdentifiers) {
             if (deviceId == null) {
@@ -362,7 +373,7 @@ public class BleModule implements BleAdapter {
 
             final Device device = discoveredDevices.get(deviceId);
             if (device != null) {
-                //TODO Convert to local objects knownDevices[++knownDevicesCount] = device;
+                knownDevices[++knownDevicesCount] = device;
             }
         }
 
@@ -371,7 +382,7 @@ public class BleModule implements BleAdapter {
 
     @Override
     public void getConnectedDevices(String[] serviceUUIDs,
-                                    OnSuccessCallback<BleDevice[]> onSuccessCallback,
+                                    OnSuccessCallback<Device[]> onSuccessCallback,
                                     OnErrorCallback onErrorCallback) {
         if (rxBleClient == null) {
             throw new IllegalStateException("BleManager not created when tried connecting to device");
@@ -389,22 +400,25 @@ public class BleModule implements BleAdapter {
             uuids[i] = uuid;
         }
 
-        /*for (Device device : connectedDevices.values()) {
+        Device[] localConnectedDevices = new Device[connectedDevices.size()];
+        int connectedDevicesCount = 0;
+        for (RxBleDevice device : connectedDevices.values()) {
             for (UUID uuid : uuids) {
-                if (device.getServiceByUUID(uuid) != null) {
-                    writableArray.pushMap(device.toJSObject(null));
+                Device localDevice = rxBleDeviceToDeviceMapper.map(device);
+                if (localDevice.getServiceByUUID(uuid) != null) {
+                    localConnectedDevices[connectedDevicesCount++] = localDevice;
                     break;
                 }
             }
-        }*/
+        }
 
-        //TODO Convert to local objects onSuccessCallback.onSuccess();
+        onSuccessCallback.onSuccess(localConnectedDevices);
     }
 
     @Override
     public void connectToDevice(String deviceIdentifier,
                                 ConnectionOptions connectionOptions,
-                                OnSuccessCallback<BleDevice> onSuccessCallback,
+                                OnSuccessCallback<Device> onSuccessCallback,
                                 OnErrorCallback onErrorCallback) {
         if (rxBleClient == null) {
             throw new IllegalStateException("BleManager not created when tried connecting to device");
@@ -428,7 +442,7 @@ public class BleModule implements BleAdapter {
 
     @Override
     public void cancelDeviceConnection(String deviceIdentifier,
-                                       OnSuccessCallback<BleDevice> onSuccessCallback,
+                                       OnSuccessCallback<Device> onSuccessCallback,
                                        OnErrorCallback onErrorCallback) {
         if (rxBleClient == null) {
             throw new IllegalStateException("BleManager not created when tried cancel device connection");
@@ -437,7 +451,7 @@ public class BleModule implements BleAdapter {
         final RxBleDevice device = rxBleClient.getBleDevice(deviceIdentifier);
 
         if (connectingDevices.removeSubscription(deviceIdentifier) && device != null) {
-            //TODO Convert to local objects onSuccessCallback.onSuccess(new Device(device, null).toJSObject(null));
+            onSuccessCallback.onSuccess(rxBleDeviceToDeviceMapper.map(device));
         } else {
             if (device == null) {
                 onErrorCallback.onError(BleErrorUtils.deviceNotFound(deviceIdentifier));
@@ -467,7 +481,10 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public void discoverAllServicesAndCharacteristicsForDevice(String deviceIdentifier, String transactionId, OnSuccessCallback<BleDevice> onSuccessCallback, OnErrorCallback onErrorCallback) {
+    public void discoverAllServicesAndCharacteristicsForDevice(String deviceIdentifier,
+                                                               String transactionId,
+                                                               OnSuccessCallback<Device> onSuccessCallback,
+                                                               OnErrorCallback onErrorCallback) {
         final Device device = getDeviceOrEmitError(deviceIdentifier, onErrorCallback);
         if (device == null) {
             return;
@@ -478,7 +495,7 @@ public class BleModule implements BleAdapter {
 
     @Override
     public void getServicesForDevice(String deviceIdentifier,
-                                     OnSuccessCallback<com.polidea.multiplatformbleadapter.Service[]> onSuccessCallback,
+                                     OnSuccessCallback<Service[]> onSuccessCallback,
                                      OnErrorCallback onErrorCallback) {
         final Device device = getDeviceOrEmitError(deviceIdentifier, onErrorCallback);
         if (device == null) {
@@ -488,13 +505,13 @@ public class BleModule implements BleAdapter {
         if (services == null) {
             return;
         }
-        //TODO Convert to local objects onSuccessCallback.onSuccess(services.toArray());
+        onSuccessCallback.onSuccess(services.toArray(new Service[]{}));
     }
 
     @Override
     public void getCharacteristicsForDevice(String deviceIdentifier,
                                             String serviceUUID,
-                                            OnSuccessCallback<com.polidea.multiplatformbleadapter.Characteristic[]> onSuccessCallback,
+                                            OnSuccessCallback<Characteristic[]> onSuccessCallback,
                                             OnErrorCallback onErrorCallback) {
         final UUID convertedServiceUUID = UUIDConverter.convert(serviceUUID);
         if (convertedServiceUUID == null) {
@@ -518,7 +535,7 @@ public class BleModule implements BleAdapter {
 
     @Override
     public void getCharacteristicsForService(int serviceIdentifier,
-                                             OnSuccessCallback<com.polidea.multiplatformbleadapter.Characteristic[]> onSuccessCallback,
+                                             OnSuccessCallback<Characteristic[]> onSuccessCallback,
                                              OnErrorCallback onErrorCallback) {
         Service service = discoveredServices.get(serviceIdentifier);
         if (service == null) {
@@ -534,7 +551,7 @@ public class BleModule implements BleAdapter {
                                             String serviceUUID,
                                             String characteristicUUID,
                                             String transactionId,
-                                            OnSuccessCallback<com.polidea.multiplatformbleadapter.Characteristic> onSuccessCallback,
+                                            OnSuccessCallback<Characteristic> onSuccessCallback,
                                             OnErrorCallback onErrorCallback) {
         final Characteristic characteristic = getCharacteristicOrEmitError(
                 deviceIdentifier, serviceUUID, characteristicUUID, onErrorCallback);
@@ -549,7 +566,7 @@ public class BleModule implements BleAdapter {
     public void readCharacteristicForService(int serviceIdentifier,
                                              String characteristicUUID,
                                              String transactionId,
-                                             OnSuccessCallback<com.polidea.multiplatformbleadapter.Characteristic> onSuccessCallback,
+                                             OnSuccessCallback<Characteristic> onSuccessCallback,
                                              OnErrorCallback onErrorCallback) {
         final Characteristic characteristic = getCharacteristicOrEmitError(
                 serviceIdentifier, characteristicUUID, onErrorCallback);
@@ -561,7 +578,10 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public void readCharacteristic(int characteristicIdentifier, String transactionId, OnSuccessCallback<com.polidea.multiplatformbleadapter.Characteristic> onSuccessCallback, OnErrorCallback onErrorCallback) {
+    public void readCharacteristic(int characteristicIdentifier,
+                                   String transactionId,
+                                   OnSuccessCallback<Characteristic> onSuccessCallback,
+                                   OnErrorCallback onErrorCallback) {
         final Characteristic characteristic = getCharacteristicOrEmitError(characteristicIdentifier, onErrorCallback);
         if (characteristic == null) {
             return;
@@ -577,7 +597,7 @@ public class BleModule implements BleAdapter {
                                              String valueBase64,
                                              boolean withResponse,
                                              String transactionId,
-                                             OnSuccessCallback<com.polidea.multiplatformbleadapter.Characteristic> onSuccessCallback,
+                                             OnSuccessCallback<Characteristic> onSuccessCallback,
                                              OnErrorCallback onErrorCallback) {
         final Characteristic characteristic = getCharacteristicOrEmitError(
                 deviceIdentifier, serviceUUID, characteristicUUID, onErrorCallback);
@@ -600,7 +620,7 @@ public class BleModule implements BleAdapter {
                                               String valueBase64,
                                               boolean withResponse,
                                               String transactionId,
-                                              OnSuccessCallback<com.polidea.multiplatformbleadapter.Characteristic> onSuccessCallback,
+                                              OnSuccessCallback<Characteristic> onSuccessCallback,
                                               OnErrorCallback onErrorCallback) {
         final Characteristic characteristic = getCharacteristicOrEmitError(
                 serviceIdentifier, characteristicUUID, onErrorCallback);
@@ -622,7 +642,7 @@ public class BleModule implements BleAdapter {
                                     String valueBase64,
                                     boolean withResponse,
                                     String transactionId,
-                                    OnSuccessCallback<com.polidea.multiplatformbleadapter.Characteristic> onSuccessCallback,
+                                    OnSuccessCallback<Characteristic> onSuccessCallback,
                                     OnErrorCallback onErrorCallback) {
         final Characteristic characteristic = getCharacteristicOrEmitError(characteristicIdentifier, onErrorCallback);
         if (characteristic == null) {
@@ -644,7 +664,7 @@ public class BleModule implements BleAdapter {
                                                String serviceUUID,
                                                String characteristicUUID,
                                                String transactionId,
-                                               OnEventCallback<com.polidea.multiplatformbleadapter.Characteristic> onEventCallback,
+                                               OnEventCallback<Characteristic> onEventCallback,
                                                OnErrorCallback onErrorCallback) {
         final Characteristic characteristic = getCharacteristicOrEmitError(
                 deviceIdentifier, serviceUUID, characteristicUUID, onErrorCallback);
@@ -659,7 +679,7 @@ public class BleModule implements BleAdapter {
     public void monitorCharacteristicForService(int serviceIdentifier,
                                                 String characteristicUUID,
                                                 String transactionId,
-                                                OnEventCallback<com.polidea.multiplatformbleadapter.Characteristic> onEventCallback,
+                                                OnEventCallback<Characteristic> onEventCallback,
                                                 OnErrorCallback onErrorCallback) {
         final Characteristic characteristic = getCharacteristicOrEmitError(
                 serviceIdentifier, characteristicUUID, onErrorCallback);
@@ -672,7 +692,7 @@ public class BleModule implements BleAdapter {
 
     @Override
     public void monitorCharacteristic(int characteristicIdentifier, String transactionId,
-                                      OnEventCallback<com.polidea.multiplatformbleadapter.Characteristic> onEventCallback,
+                                      OnEventCallback<Characteristic> onEventCallback,
                                       OnErrorCallback onErrorCallback) {
         final Characteristic characteristic = getCharacteristicOrEmitError(characteristicIdentifier, onErrorCallback);
         if (characteristic == null) {
@@ -802,7 +822,7 @@ public class BleModule implements BleAdapter {
     private void safeStartDeviceScan(final UUID[] uuids,
                                      final int scanMode,
                                      int callbackType,
-                                     final OnEventCallback<com.polidea.multiplatformbleadapter.ScanResult> onEventCallback,
+                                     final OnEventCallback<ScanResult> onEventCallback,
                                      final OnErrorCallback onErrorCallback) {
         if (rxBleClient == null) {
             throw new IllegalStateException("BleManager not created when tried to start device scan");
@@ -821,14 +841,14 @@ public class BleModule implements BleAdapter {
 
         scanSubscription = rxBleClient
                 .scanBleDevices(scanSettings, filters)
-                .subscribe(new Action1<ScanResult>() {
+                .subscribe(new Action1<com.polidea.rxandroidble.scan.ScanResult>() {
                     @Override
-                    public void call(ScanResult scanResult) {
+                    public void call(com.polidea.rxandroidble.scan.ScanResult scanResult) {
                         String deviceId = scanResult.getBleDevice().getMacAddress();
                         if (!discoveredDevices.containsKey(deviceId)) {
-                            discoveredDevices.put(deviceId, new Device(scanResult.getBleDevice(), null));
+                            discoveredDevices.put(deviceId, rxBleDeviceToDeviceMapper.map(scanResult.getBleDevice()));
                         }
-                        //TODO Convert to local objects onEventCallback.onEvent(scanResult);
+                        onEventCallback.onEvent(rxScanResultToScanResultMapper.map(scanResult));
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -841,7 +861,7 @@ public class BleModule implements BleAdapter {
     @Nullable
     private Device getDeviceOrEmitError(@NonNull final String deviceId,
                                         final OnErrorCallback onErrorCallback) {
-        final Device device = connectedDevices.get(deviceId);
+        final Device device = rxBleDeviceToDeviceMapper.map(connectedDevices.get(deviceId));
         if (device == null) {
             onErrorCallback.onError(BleErrorUtils.deviceNotConnected(deviceId));
             return null;
@@ -850,11 +870,11 @@ public class BleModule implements BleAdapter {
     }
 
     @Nullable
-    private RxBleConnection getConnectionOrEmitError(@NonNull final Device device,
+    private RxBleConnection getConnectionOrEmitError(@NonNull final String deviceId,
                                                      @NonNull OnErrorCallback onErrorCallback) {
-        final RxBleConnection connection = device.getConnection();
+        final RxBleConnection connection = activeConnections.get(deviceId);
         if (connection == null) {
-            onErrorCallback.onError(BleErrorUtils.deviceNotConnected(device.getNativeDevice().getMacAddress()));
+            onErrorCallback.onError(BleErrorUtils.deviceNotConnected(deviceId));
             return null;
         }
         return connection;
@@ -866,7 +886,7 @@ public class BleModule implements BleAdapter {
                                      final RefreshGattMoment refreshGattMoment,
                                      final Long timeout,
                                      final int connectionPriority,
-                                     final OnSuccessCallback<BleDevice> onSuccessCallback,
+                                     final OnSuccessCallback<Device> onSuccessCallback,
                                      final OnErrorCallback onErrorCallback) {
 
         Observable<RxBleConnection> connect = device
@@ -954,32 +974,34 @@ public class BleModule implements BleAdapter {
 
                     @Override
                     public void onNext(RxBleConnection connection) {
-                        Device jsDevice = new Device(device, connection);
-                        cleanServicesAndCharacteristicsForDevice(jsDevice);
-                        connectedDevices.put(device.getMacAddress(), jsDevice);
-                        //TODO Convert to local objects onSuccessCallback.onSuccess(jsDevice.toJSObject(null));
+                        Device localDevice = rxBleDeviceToDeviceMapper.map(device);
+                        cleanServicesAndCharacteristicsForDevice(localDevice);
+                        connectedDevices.put(device.getMacAddress(), device);
+                        activeConnections.put(device.getMacAddress(), connection);
+                        onSuccessCallback.onSuccess(localDevice);
                     }
                 });
 
         connectingDevices.replaceSubscription(device.getMacAddress(), subscription);
     }
 
-    private void onDeviceDisconnected(RxBleDevice device, BleError bleError) {
-        Device jsDevice = connectedDevices.remove(device.getMacAddress());
-        if (jsDevice == null) {
+    private void onDeviceDisconnected(RxBleDevice rxDevice, BleError bleError) {
+        activeConnections.remove(rxDevice.getMacAddress());
+        Device device = rxBleDeviceToDeviceMapper.map(connectedDevices.remove(rxDevice.getMacAddress()));
+        if (device == null) {
             return;
         }
 
-        cleanServicesAndCharacteristicsForDevice(jsDevice);
+        cleanServicesAndCharacteristicsForDevice(device);
         //TODO Send disconnection event
-        connectingDevices.removeSubscription(device.getMacAddress());
+        connectingDevices.removeSubscription(device.getId());
     }
 
     private void safeDiscoverAllServicesAndCharacteristicsForDevice(final Device device,
                                                                     final String transactionId,
-                                                                    final OnSuccessCallback<BleDevice> onSuccessCallback,
+                                                                    final OnSuccessCallback<Device> onSuccessCallback,
                                                                     final OnErrorCallback onErrorCallback) {
-        final RxBleConnection connection = getConnectionOrEmitError(device, onErrorCallback);
+        final RxBleConnection connection = getConnectionOrEmitError(device.getId(), onErrorCallback);
         if (connection == null) {
             return;
         }
@@ -996,7 +1018,7 @@ public class BleModule implements BleAdapter {
                 .subscribe(new Observer<RxBleDeviceServices>() {
                     @Override
                     public void onCompleted() {
-                        //TODO Convert to local objects onSuccessCallback.onSuccess(device.toJSObject(null));
+                        onSuccessCallback.onSuccess(device);
                         transactions.removeSubscription(transactionId);
                     }
 
@@ -1010,7 +1032,7 @@ public class BleModule implements BleAdapter {
                     public void onNext(RxBleDeviceServices rxBleDeviceServices) {
                         ArrayList<Service> services = new ArrayList<>();
                         for (BluetoothGattService gattService : rxBleDeviceServices.getBluetoothGattServices()) {
-                            Service service = new Service(device, gattService);
+                            Service service = serviceFactory.create(device.getId(), gattService);
                             discoveredServices.put(service.getId(), service);
                             services.add(service);
 
@@ -1027,21 +1049,21 @@ public class BleModule implements BleAdapter {
     }
 
     private void characteristicsForService(final Service service,
-                                           OnSuccessCallback<com.polidea.multiplatformbleadapter.Characteristic[]> onSuccessCallback) {
-        //TODO Convert to local objects onSuccessCallback.onSuccess(service.getCharacteristics().toArray());
+                                           OnSuccessCallback<Characteristic[]> onSuccessCallback) {
+        onSuccessCallback.onSuccess(service.getCharacteristics().toArray(new Characteristic[]{}));
     }
 
     private void safeReadCharacteristicForDevice(final Characteristic characteristic,
                                                  final String transactionId,
-                                                 final OnSuccessCallback<com.polidea.multiplatformbleadapter.Characteristic> onSuccessCallback,
+                                                 final OnSuccessCallback<Characteristic> onSuccessCallback,
                                                  final OnErrorCallback onErrorCallback) {
-        final RxBleConnection connection = getConnectionOrEmitError(characteristic.getService().getDevice(), onErrorCallback);
+        final RxBleConnection connection = getConnectionOrEmitError(characteristic.getDeviceID(), onErrorCallback);
         if (connection == null) {
             return;
         }
 
         final Subscription subscription = connection
-                .readCharacteristic(characteristic.getNativeCharacteristic())
+                .readCharacteristic(characteristic.getUuid())
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {
@@ -1060,8 +1082,7 @@ public class BleModule implements BleAdapter {
                         if (error instanceof BleCharacteristicNotFoundException) {
                             onErrorCallback.onError(
                                     BleErrorUtils.characteristicNotFound(
-                                            UUIDConverter.fromUUID(
-                                                    characteristic.getNativeCharacteristic().getUuid())));
+                                            UUIDConverter.fromUUID(characteristic.getUuid())));
                             return;
                         }
                         onErrorCallback.onError(errorConverter.toError(error));
@@ -1071,7 +1092,8 @@ public class BleModule implements BleAdapter {
                     @Override
                     public void onNext(byte[] bytes) {
                         characteristic.logValue("Read from", bytes);
-                        //TODO Convert to local objects onSuccessCallback(characteristic.toJSObject(bytes));
+                        characteristic.setValue(bytes);
+                        onSuccessCallback.onSuccess(characteristic);
                     }
                 });
 
@@ -1082,7 +1104,7 @@ public class BleModule implements BleAdapter {
                                               final String valueBase64,
                                               final Boolean response,
                                               final String transactionId,
-                                              OnSuccessCallback<com.polidea.multiplatformbleadapter.Characteristic> onSuccessCallback,
+                                              OnSuccessCallback<Characteristic> onSuccessCallback,
                                               OnErrorCallback onErrorCallback) {
         final byte[] value;
         try {
@@ -1090,14 +1112,13 @@ public class BleModule implements BleAdapter {
         } catch (Throwable error) {
             onErrorCallback.onError(
                     BleErrorUtils.invalidWriteDataForCharacteristic(valueBase64,
-                            UUIDConverter.fromUUID(characteristic.getNativeCharacteristic().getUuid())));
+                            UUIDConverter.fromUUID(characteristic.getUuid())));
             return;
         }
 
-        characteristic.getNativeCharacteristic()
-                .setWriteType(response ?
-                        BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT :
-                        BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+        characteristic.setWriteType(response ?
+                BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT :
+                BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
 
         safeWriteCharacteristicForDevice(
                 characteristic,
@@ -1110,14 +1131,14 @@ public class BleModule implements BleAdapter {
     private void safeWriteCharacteristicForDevice(final Characteristic characteristic,
                                                   final byte[] value,
                                                   final String transactionId,
-                                                  final OnSuccessCallback<com.polidea.multiplatformbleadapter.Characteristic> onSuccessCallback,
+                                                  final OnSuccessCallback<Characteristic> onSuccessCallback,
                                                   final OnErrorCallback onErrorCallback) {
-        final RxBleConnection connection = getConnectionOrEmitError(characteristic.getService().getDevice(), onErrorCallback);
+        final RxBleConnection connection = getConnectionOrEmitError(characteristic.getDeviceID(), onErrorCallback);
         if (connection == null) {
             return;
         }
         final Subscription subscription = connection
-                .writeCharacteristic(characteristic.getNativeCharacteristic(), value)
+                .writeCharacteristic(characteristic.getUuid(), value)
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {
@@ -1137,7 +1158,7 @@ public class BleModule implements BleAdapter {
                             onErrorCallback.onError(
                                     BleErrorUtils.characteristicNotFound(
                                             UUIDConverter.fromUUID(
-                                                    characteristic.getNativeCharacteristic().getUuid())));
+                                                    characteristic.getUuid())));
                             return;
                         }
                         onErrorCallback.onError(errorConverter.toError(e));
@@ -1147,7 +1168,8 @@ public class BleModule implements BleAdapter {
                     @Override
                     public void onNext(byte[] bytes) {
                         characteristic.logValue("Write to", bytes);
-                        //TODO Convert to local objects onSuccessCallback.onSuccess(characteristic.toJSObject(bytes));
+                        characteristic.setValue(bytes);
+                        onSuccessCallback.onSuccess(characteristic);
                     }
                 });
 
@@ -1156,32 +1178,30 @@ public class BleModule implements BleAdapter {
 
     private void safeMonitorCharacteristicForDevice(final Characteristic characteristic,
                                                     final String transactionId,
-                                                    final OnEventCallback<com.polidea.multiplatformbleadapter.Characteristic> onEventCallback,
+                                                    final OnEventCallback<Characteristic> onEventCallback,
                                                     final OnErrorCallback onErrorCallback) {
-        final RxBleConnection connection = getConnectionOrEmitError(characteristic.getService().getDevice(), onErrorCallback);
+        final RxBleConnection connection = getConnectionOrEmitError(characteristic.getDeviceID(), onErrorCallback);
         if (connection == null) {
             return;
         }
 
-        final BluetoothGattCharacteristic gattCharacteristic = characteristic.getNativeCharacteristic();
 
         final Subscription subscription = Observable.defer(new Func0<Observable<Observable<byte[]>>>() {
             @Override
             public Observable<Observable<byte[]>> call() {
-                int properties = gattCharacteristic.getProperties();
-                BluetoothGattDescriptor cccDescriptor = gattCharacteristic.getDescriptor(Characteristic.CLIENT_CHARACTERISTIC_CONFIG_UUID);
+                BluetoothGattDescriptor cccDescriptor = characteristic.getGattDescriptor(Constants.CLIENT_CHARACTERISTIC_CONFIG_UUID);
                 NotificationSetupMode setupMode = cccDescriptor != null
                         ? NotificationSetupMode.QUICK_SETUP
                         : NotificationSetupMode.COMPAT;
-                if ((properties & BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0) {
-                    return connection.setupNotification(gattCharacteristic, setupMode);
+                if (characteristic.isNotifiable()) {
+                    return connection.setupNotification(characteristic.getUuid(), setupMode);
                 }
 
-                if ((properties & BluetoothGattCharacteristic.PROPERTY_INDICATE) != 0) {
-                    return connection.setupIndication(gattCharacteristic, setupMode);
+                if (characteristic.isIndicatable()) {
+                    return connection.setupIndication(characteristic.getUuid(), setupMode);
                 }
 
-                return Observable.error(new CannotMonitorCharacteristicException(gattCharacteristic));
+                return Observable.error(new CannotMonitorCharacteristicException(characteristic));
             }
         })
                 .flatMap(new Func1<Observable<byte[]>, Observable<byte[]>>() {
@@ -1211,7 +1231,8 @@ public class BleModule implements BleAdapter {
                     @Override
                     public void onNext(byte[] bytes) {
                         characteristic.logValue("Notification from", bytes);
-                        //TODO Convert to local objects onEventCallback.onEvent(jsResult);
+                        characteristic.setValue(bytes);
+                        onEventCallback.onEvent(characteristic);
                     }
                 });
 
@@ -1230,7 +1251,7 @@ public class BleModule implements BleAdapter {
             return null;
         }
 
-        final Device device = connectedDevices.get(deviceId);
+        final Device device = rxBleDeviceToDeviceMapper.map(connectedDevices.get(deviceId));
         if (device == null) {
             onErrorCallback.onError(BleErrorUtils.deviceNotConnected(deviceId));
             return null;
@@ -1295,7 +1316,7 @@ public class BleModule implements BleAdapter {
                                               @NonNull OnErrorCallback onErrorCallback) {
         final List<Service> services = device.getServices();
         if (services == null) {
-            onErrorCallback.onError(BleErrorUtils.deviceServicesNotDiscovered(device.getNativeDevice().getMacAddress()));
+            onErrorCallback.onError(BleErrorUtils.deviceServicesNotDiscovered(device.getId()));
             return null;
         }
         return services;
@@ -1306,7 +1327,7 @@ public class BleModule implements BleAdapter {
             int key = discoveredServices.keyAt(i);
             Service service = discoveredServices.get(key);
 
-            if (service.getDevice().getNativeDevice().getMacAddress().equals(device.getNativeDevice().getMacAddress())) {
+            if (service.getDeviceID().equals(device.getId())) {
                 discoveredServices.remove(key);
             }
         }
@@ -1314,7 +1335,7 @@ public class BleModule implements BleAdapter {
             int key = discoveredCharacteristics.keyAt(i);
             Characteristic characteristic = discoveredCharacteristics.get(key);
 
-            if (characteristic.getService().getDevice().getNativeDevice().getMacAddress().equals(device.getNativeDevice().getMacAddress())) {
+            if (characteristic.getDeviceID().equals(device.getId())) {
                 discoveredCharacteristics.remove(key);
             }
         }

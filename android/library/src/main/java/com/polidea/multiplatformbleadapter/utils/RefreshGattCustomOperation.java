@@ -2,12 +2,15 @@ package com.polidea.multiplatformbleadapter.utils;
 
 import android.bluetooth.BluetoothGatt;
 import android.support.annotation.NonNull;
+
 import com.polidea.rxandroidble.RxBleCustomOperation;
 import com.polidea.rxandroidble.internal.RxBleLog;
 import com.polidea.rxandroidble.internal.connection.RxBleGattCallback;
+
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+
 import rx.Observable;
 import rx.Scheduler;
 

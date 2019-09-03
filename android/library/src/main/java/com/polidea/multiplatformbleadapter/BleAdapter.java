@@ -33,41 +33,41 @@ interface BleAdapter {
             String deviceIdentifier,
             int connectionPriority,
             String transactionId,
-            OnSuccessCallback<BleDevice> onSuccessCallback,
+            OnSuccessCallback<Device> onSuccessCallback,
             OnErrorCallback onErrorCallback);
 
     void readRSSIForDevice(
             String deviceIdentifier,
             String transactionId,
-            OnSuccessCallback<BleDevice> onSuccessCallback,
+            OnSuccessCallback<Device> onSuccessCallback,
             OnErrorCallback onErrorCallback);
 
     void requestMTUForDevice(
             String deviceIdentifier,
             int mtu,
             String transactionId,
-            OnSuccessCallback<BleDevice> onSuccessCallback,
+            OnSuccessCallback<Device> onSuccessCallback,
             OnErrorCallback onErrorCallback);
 
     void getKnownDevices(
             String[] deviceIdentifiers,
-            OnSuccessCallback<BleDevice[]> onSuccessCallback,
+            OnSuccessCallback<Device[]> onSuccessCallback,
             OnErrorCallback onErrorCallback);
 
     void getConnectedDevices(
             String[] serviceUUIDs,
-            OnSuccessCallback<BleDevice[]> onSuccessCallback,
+            OnSuccessCallback<Device[]> onSuccessCallback,
             OnErrorCallback onErrorCallback);
 
     void connectToDevice(
             String deviceIdentifier,
             ConnectionOptions connectionOptions,
-            OnSuccessCallback<BleDevice> onSuccessCallback,
+            OnSuccessCallback<Device> onSuccessCallback,
             OnErrorCallback onErrorCallback);
 
     void cancelDeviceConnection(
             String deviceIdentifier,
-            OnSuccessCallback<BleDevice> onSuccessCallback,
+            OnSuccessCallback<Device> onSuccessCallback,
             OnErrorCallback onErrorCallback);
 
     void isDeviceConnected(
@@ -78,7 +78,7 @@ interface BleAdapter {
     void discoverAllServicesAndCharacteristicsForDevice(
             String deviceIdentifier,
             String transactionId,
-            OnSuccessCallback<BleDevice> onSuccessCallback,
+            OnSuccessCallback<Device> onSuccessCallback,
             OnErrorCallback onErrorCallback);
 
     void getServicesForDevice(

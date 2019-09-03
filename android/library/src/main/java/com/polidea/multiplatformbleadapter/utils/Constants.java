@@ -6,6 +6,7 @@ import android.support.annotation.StringDef;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.UUID;
 
 public interface Constants {
 
@@ -61,4 +62,5 @@ public interface Constants {
     }
 
     int MINIMUM_MTU = 23;
+    UUID CLIENT_CHARACTERISTIC_CONFIG_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 }
