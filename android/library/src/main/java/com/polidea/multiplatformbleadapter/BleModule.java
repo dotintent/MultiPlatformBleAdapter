@@ -26,6 +26,7 @@ import com.polidea.multiplatformbleadapter.utils.IdGenerator;
 import com.polidea.multiplatformbleadapter.utils.LogLevel;
 import com.polidea.multiplatformbleadapter.utils.RefreshGattCustomOperation;
 import com.polidea.multiplatformbleadapter.utils.ServiceFactory;
+import com.polidea.multiplatformbleadapter.utils.OneTimeActionExecutor;
 import com.polidea.multiplatformbleadapter.utils.UUIDConverter;
 import com.polidea.multiplatformbleadapter.utils.mapper.RxBleDeviceToDeviceMapper;
 import com.polidea.multiplatformbleadapter.utils.mapper.RxScanResultToScanResultMapper;
@@ -213,13 +214,20 @@ public class BleModule implements BleAdapter {
             return;
         }
 
+        final OneTimeActionExecutor<BleError> oneTimeErrorCallback = new OneTimeActionExecutor<BleError>() {
+            @Override
+            public void action(BleError error) {
+                onErrorCallback.onError(error);
+            }
+        };
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             final Subscription subscription = connection
                     .requestConnectionPriority(connectionPriority, 1, TimeUnit.MILLISECONDS)
                     .doOnUnsubscribe(new Action0() {
                         @Override
                         public void call() {
-                            onErrorCallback.onError(BleErrorUtils.cancelled());
+                            oneTimeErrorCallback.execute(BleErrorUtils.cancelled());
                             pendingTransactions.removeSubscription(transactionId);
                         }
                     }).subscribe(new Action0() {
@@ -231,7 +239,7 @@ public class BleModule implements BleAdapter {
                     }, new Action1<Throwable>() {
                         @Override
                         public void call(Throwable error) {
-                            onErrorCallback.onError(errorConverter.toError(error));
+                            oneTimeErrorCallback.execute(errorConverter.toError(error));
                             pendingTransactions.removeSubscription(transactionId);
                         }
                     });
@@ -256,12 +264,19 @@ public class BleModule implements BleAdapter {
             return;
         }
 
+        final OneTimeActionExecutor<BleError> oneTimeErrorCallback = new OneTimeActionExecutor<BleError>() {
+            @Override
+            public void action(BleError error) {
+                onErrorCallback.onError(error);
+            }
+        };
+
         final Subscription subscription = connection
                 .readRssi()
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {
-                        onErrorCallback.onError(BleErrorUtils.cancelled());
+                        oneTimeErrorCallback.execute(BleErrorUtils.cancelled());
                         pendingTransactions.removeSubscription(transactionId);
                     }
                 })
@@ -273,7 +288,7 @@ public class BleModule implements BleAdapter {
 
                     @Override
                     public void onError(Throwable error) {
-                        onErrorCallback.onError(errorConverter.toError(error));
+                        oneTimeErrorCallback.execute(errorConverter.toError(error));
                         pendingTransactions.removeSubscription(transactionId);
                     }
 
@@ -302,13 +317,20 @@ public class BleModule implements BleAdapter {
             return;
         }
 
+        final OneTimeActionExecutor<BleError> oneTimeErrorCallback = new OneTimeActionExecutor<BleError>() {
+            @Override
+            public void action(BleError error) {
+                onErrorCallback.onError(error);
+            }
+        };
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             final Subscription subscription = connection
                     .requestMtu(mtu)
                     .doOnUnsubscribe(new Action0() {
                         @Override
                         public void call() {
-                            onErrorCallback.onError(BleErrorUtils.cancelled());
+                            oneTimeErrorCallback.execute(BleErrorUtils.cancelled());
                             pendingTransactions.removeSubscription(transactionId);
                         }
                     }).subscribe(new Observer<Integer>() {
@@ -319,7 +341,7 @@ public class BleModule implements BleAdapter {
 
                         @Override
                         public void onError(Throwable error) {
-                            onErrorCallback.onError(errorConverter.toError(error));
+                            oneTimeErrorCallback.execute(errorConverter.toError(error));
                             pendingTransactions.removeSubscription(transactionId);
                         }
 
@@ -744,6 +766,14 @@ public class BleModule implements BleAdapter {
             onErrorCallback.onError(new BleError(BleErrorCode.BluetoothStateChangeFailed, "BluetoothManager is null", null));
             return;
         }
+
+        final OneTimeActionExecutor<BleError> oneTimeErrorCallback = new OneTimeActionExecutor<BleError>() {
+            @Override
+            public void action(BleError error) {
+                onErrorCallback.onError(error);
+            }
+        };
+
         final Subscription subscription = new RxBleAdapterStateObservable(context)
                 .takeUntil(new Func1<RxBleAdapterStateObservable.BleAdapterState, Boolean>() {
                     @Override
@@ -755,7 +785,7 @@ public class BleModule implements BleAdapter {
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {
-                        onErrorCallback.onError(BleErrorUtils.cancelled());
+                        oneTimeErrorCallback.execute(BleErrorUtils.cancelled());
                         pendingTransactions.removeSubscription(transactionId);
                     }
                 })
@@ -768,7 +798,7 @@ public class BleModule implements BleAdapter {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable error) {
-                        onErrorCallback.onError(errorConverter.toError(error));
+                        oneTimeErrorCallback.execute(errorConverter.toError(error));
                         pendingTransactions.removeSubscription(transactionId);
                     }
                 });
@@ -870,12 +900,19 @@ public class BleModule implements BleAdapter {
                                      final OnSuccessCallback<Device> onSuccessCallback,
                                      final OnErrorCallback onErrorCallback) {
 
+        final OneTimeActionExecutor<BleError> oneTimeErrorCallback = new OneTimeActionExecutor<BleError>() {
+            @Override
+            public void action(BleError error) {
+                onErrorCallback.onError(error);
+            }
+        };
+
         Observable<RxBleConnection> connect = device
                 .establishConnection(autoConnect)
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {
-                        onErrorCallback.onError(BleErrorUtils.cancelled());
+                        oneTimeErrorCallback.execute(BleErrorUtils.cancelled());
                         onDeviceDisconnected(device);
                     }
                 });
@@ -949,7 +986,7 @@ public class BleModule implements BleAdapter {
                     @Override
                     public void onError(Throwable e) {
                         BleError bleError = errorConverter.toError(e);
-                        onErrorCallback.onError(bleError);
+                        oneTimeErrorCallback.execute(bleError);
                         onDeviceDisconnected(device);
                     }
 
@@ -986,12 +1023,19 @@ public class BleModule implements BleAdapter {
             return;
         }
 
+        final OneTimeActionExecutor<BleError> oneTimeErrorCallback = new OneTimeActionExecutor<BleError>() {
+            @Override
+            public void action(BleError error) {
+                onErrorCallback.onError(error);
+            }
+        };
+
         final Subscription subscription = connection
                 .discoverServices()
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {
-                        onErrorCallback.onError(BleErrorUtils.cancelled());
+                        oneTimeErrorCallback.execute(BleErrorUtils.cancelled());
                         pendingTransactions.removeSubscription(transactionId);
                     }
                 })
@@ -1004,7 +1048,7 @@ public class BleModule implements BleAdapter {
 
                     @Override
                     public void onError(Throwable error) {
-                        onErrorCallback.onError(errorConverter.toError(error));
+                        oneTimeErrorCallback.execute(errorConverter.toError(error));
                         pendingTransactions.removeSubscription(transactionId);
                     }
 
@@ -1042,12 +1086,19 @@ public class BleModule implements BleAdapter {
             return;
         }
 
+        final OneTimeActionExecutor<BleError> oneTimeErrorCallback = new OneTimeActionExecutor<BleError>() {
+            @Override
+            public void action(BleError error) {
+                onErrorCallback.onError(error);
+            }
+        };
+
         final Subscription subscription = connection
                 .readCharacteristic(characteristic.getUuid())
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {
-                        onErrorCallback.onError(BleErrorUtils.cancelled());
+                        oneTimeErrorCallback.execute(BleErrorUtils.cancelled());
                         pendingTransactions.removeSubscription(transactionId);
                     }
                 })
@@ -1060,12 +1111,12 @@ public class BleModule implements BleAdapter {
                     @Override
                     public void onError(Throwable error) {
                         if (error instanceof BleCharacteristicNotFoundException) {
-                            onErrorCallback.onError(
+                            oneTimeErrorCallback.execute(
                                     BleErrorUtils.characteristicNotFound(
                                             UUIDConverter.fromUUID(characteristic.getUuid())));
                             return;
                         }
-                        onErrorCallback.onError(errorConverter.toError(error));
+                        oneTimeErrorCallback.execute(errorConverter.toError(error));
                         pendingTransactions.removeSubscription(transactionId);
                     }
 
@@ -1117,12 +1168,20 @@ public class BleModule implements BleAdapter {
         if (connection == null) {
             return;
         }
+
+        final OneTimeActionExecutor<BleError> oneTimeErrorCallback = new OneTimeActionExecutor<BleError>() {
+            @Override
+            public void action(BleError error) {
+                onErrorCallback.onError(error);
+            }
+        };
+
         final Subscription subscription = connection
                 .writeCharacteristic(characteristic.getUuid(), value)
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {
-                        onErrorCallback.onError(BleErrorUtils.cancelled());
+                        oneTimeErrorCallback.execute(BleErrorUtils.cancelled());
                         pendingTransactions.removeSubscription(transactionId);
                     }
                 })
@@ -1135,13 +1194,13 @@ public class BleModule implements BleAdapter {
                     @Override
                     public void onError(Throwable e) {
                         if (e instanceof BleCharacteristicNotFoundException) {
-                            onErrorCallback.onError(
+                            oneTimeErrorCallback.execute(
                                     BleErrorUtils.characteristicNotFound(
                                             UUIDConverter.fromUUID(
                                                     characteristic.getUuid())));
                             return;
                         }
-                        onErrorCallback.onError(errorConverter.toError(e));
+                        oneTimeErrorCallback.execute(errorConverter.toError(e));
                         pendingTransactions.removeSubscription(transactionId);
                     }
 
@@ -1158,6 +1217,7 @@ public class BleModule implements BleAdapter {
 
     private void safeMonitorCharacteristicForDevice(final Characteristic characteristic,
                                                     final String transactionId,
+                                                    //OnSuccessCallback<Void> onScanCompleteCallback
                                                     final OnEventCallback<Characteristic> onEventCallback,
                                                     final OnErrorCallback onErrorCallback) {
         final RxBleConnection connection = getConnectionOrEmitError(characteristic.getDeviceID(), onErrorCallback);
