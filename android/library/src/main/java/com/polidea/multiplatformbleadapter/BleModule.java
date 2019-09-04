@@ -58,34 +58,23 @@ import static com.polidea.multiplatformbleadapter.utils.Constants.BluetoothState
 
 public class BleModule implements BleAdapter {
 
-    // Name of module
-    private static final String NAME = "BleClientManager";
-
-    // Value converters
     private final ErrorConverter errorConverter = new ErrorConverter();
 
-    // Manager
     @Nullable
     private RxBleClient rxBleClient;
 
-    // Map of discovered devices.
     private HashMap<String, Device> discoveredDevices = new HashMap<>();
 
-    // Map of connected devices.
     private HashMap<String, RxBleDevice> connectedDevices = new HashMap<>();
 
     private HashMap<String, RxBleConnection> activeConnections = new HashMap<>();
 
-    // Map of discovered services
     private SparseArray<Service> discoveredServices = new SparseArray<>();
 
-    // Map of discovered characteristics
     private SparseArray<Characteristic> discoveredCharacteristics = new SparseArray<>();
 
-    // Currently pending transactions
-    private final DisposableMap transactions = new DisposableMap();
+    private final DisposableMap pendingTransactions = new DisposableMap();
 
-    // Currently connecting devices
     private final DisposableMap connectingDevices = new DisposableMap();
 
     private BluetoothManager bluetoothManager;
@@ -94,11 +83,9 @@ public class BleModule implements BleAdapter {
 
     private Context context;
 
-    // Scan subscription
     @Nullable
     private Subscription scanSubscription;
 
-    // State subscription
     @Nullable
     private Subscription adapterStateChangesSubscription;
 
@@ -108,7 +95,6 @@ public class BleModule implements BleAdapter {
 
     private ServiceFactory serviceFactory = new ServiceFactory();
 
-    // Current native library log level.
     private int currentLogLevel = RxBleLog.NONE;
 
     public BleModule(Context context) {
@@ -116,8 +102,6 @@ public class BleModule implements BleAdapter {
         bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
     }
-
-    // Lifecycle -----------------------------------------------------------------------------------
 
     @Override
     public void createClient(String restoreStateIdentifier,
@@ -134,7 +118,6 @@ public class BleModule implements BleAdapter {
 
     @Override
     public void destroyClient() {
-        // Subscriptions
         if (adapterStateChangesSubscription != null) {
             adapterStateChangesSubscription.unsubscribe();
             adapterStateChangesSubscription = null;
@@ -143,17 +126,15 @@ public class BleModule implements BleAdapter {
             scanSubscription.unsubscribe();
             scanSubscription = null;
         }
-        transactions.removeAllSubscriptions();
+        pendingTransactions.removeAllSubscriptions();
         connectingDevices.removeAllSubscriptions();
 
-        // Caches
         discoveredServices.clear();
         discoveredCharacteristics.clear();
         connectedDevices.clear();
         activeConnections.clear();
         discoveredDevices.clear();
 
-        // Clear client
         rxBleClient = null;
         IdGenerator.clear();
     }
@@ -239,23 +220,23 @@ public class BleModule implements BleAdapter {
                         @Override
                         public void call() {
                             onErrorCallback.onError(BleErrorUtils.cancelled());
-                            transactions.removeSubscription(transactionId);
+                            pendingTransactions.removeSubscription(transactionId);
                         }
                     }).subscribe(new Action0() {
                         @Override
                         public void call() {
                             onSuccessCallback.onSuccess(device);
-                            transactions.removeSubscription(transactionId);
+                            pendingTransactions.removeSubscription(transactionId);
                         }
                     }, new Action1<Throwable>() {
                         @Override
                         public void call(Throwable error) {
                             onErrorCallback.onError(errorConverter.toError(error));
-                            transactions.removeSubscription(transactionId);
+                            pendingTransactions.removeSubscription(transactionId);
                         }
                     });
 
-            transactions.replaceSubscription(transactionId, subscription);
+            pendingTransactions.replaceSubscription(transactionId, subscription);
         } else {
             onSuccessCallback.onSuccess(device);
         }
@@ -281,19 +262,19 @@ public class BleModule implements BleAdapter {
                     @Override
                     public void call() {
                         onErrorCallback.onError(BleErrorUtils.cancelled());
-                        transactions.removeSubscription(transactionId);
+                        pendingTransactions.removeSubscription(transactionId);
                     }
                 })
                 .subscribe(new Observer<Integer>() {
                     @Override
                     public void onCompleted() {
-                        transactions.removeSubscription(transactionId);
+                        pendingTransactions.removeSubscription(transactionId);
                     }
 
                     @Override
                     public void onError(Throwable error) {
                         onErrorCallback.onError(errorConverter.toError(error));
-                        transactions.removeSubscription(transactionId);
+                        pendingTransactions.removeSubscription(transactionId);
                     }
 
                     @Override
@@ -303,7 +284,7 @@ public class BleModule implements BleAdapter {
                     }
                 });
 
-        transactions.replaceSubscription(transactionId, subscription);
+        pendingTransactions.replaceSubscription(transactionId, subscription);
     }
 
     @Override
@@ -328,18 +309,18 @@ public class BleModule implements BleAdapter {
                         @Override
                         public void call() {
                             onErrorCallback.onError(BleErrorUtils.cancelled());
-                            transactions.removeSubscription(transactionId);
+                            pendingTransactions.removeSubscription(transactionId);
                         }
                     }).subscribe(new Observer<Integer>() {
                         @Override
                         public void onCompleted() {
-                            transactions.removeSubscription(transactionId);
+                            pendingTransactions.removeSubscription(transactionId);
                         }
 
                         @Override
                         public void onError(Throwable error) {
                             onErrorCallback.onError(errorConverter.toError(error));
-                            transactions.removeSubscription(transactionId);
+                            pendingTransactions.removeSubscription(transactionId);
                         }
 
                         @Override
@@ -349,7 +330,7 @@ public class BleModule implements BleAdapter {
                         }
                     });
 
-            transactions.replaceSubscription(transactionId, subscription);
+            pendingTransactions.replaceSubscription(transactionId, subscription);
         } else {
             onSuccessCallback.onSuccess(device);
         }
@@ -704,7 +685,7 @@ public class BleModule implements BleAdapter {
 
     @Override
     public void cancelTransaction(String transactionId) {
-        transactions.removeSubscription(transactionId);
+        pendingTransactions.removeSubscription(transactionId);
     }
 
     public void setLogLevel(String logLevel) {
@@ -775,20 +756,20 @@ public class BleModule implements BleAdapter {
                     @Override
                     public void call() {
                         onErrorCallback.onError(BleErrorUtils.cancelled());
-                        transactions.removeSubscription(transactionId);
+                        pendingTransactions.removeSubscription(transactionId);
                     }
                 })
                 .subscribe(new Action0() {
                     @Override
                     public void call() {
                         onSuccessCallback.onSuccess(null);
-                        transactions.removeSubscription(transactionId);
+                        pendingTransactions.removeSubscription(transactionId);
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable error) {
                         onErrorCallback.onError(errorConverter.toError(error));
-                        transactions.removeSubscription(transactionId);
+                        pendingTransactions.removeSubscription(transactionId);
                     }
                 });
 
@@ -799,7 +780,7 @@ public class BleModule implements BleAdapter {
                     String.format("Couldn't set bluetooth adapter state to %s", desiredAdapterState.toString()),
                     null));
         } else {
-            transactions.replaceSubscription(transactionId, subscription);
+            pendingTransactions.replaceSubscription(transactionId, subscription);
         }
     }
 
@@ -1011,20 +992,20 @@ public class BleModule implements BleAdapter {
                     @Override
                     public void call() {
                         onErrorCallback.onError(BleErrorUtils.cancelled());
-                        transactions.removeSubscription(transactionId);
+                        pendingTransactions.removeSubscription(transactionId);
                     }
                 })
                 .subscribe(new Observer<RxBleDeviceServices>() {
                     @Override
                     public void onCompleted() {
                         onSuccessCallback.onSuccess(device);
-                        transactions.removeSubscription(transactionId);
+                        pendingTransactions.removeSubscription(transactionId);
                     }
 
                     @Override
                     public void onError(Throwable error) {
                         onErrorCallback.onError(errorConverter.toError(error));
-                        transactions.removeSubscription(transactionId);
+                        pendingTransactions.removeSubscription(transactionId);
                     }
 
                     @Override
@@ -1044,7 +1025,7 @@ public class BleModule implements BleAdapter {
                     }
                 });
 
-        transactions.replaceSubscription(transactionId, subscription);
+        pendingTransactions.replaceSubscription(transactionId, subscription);
     }
 
     private void characteristicsForService(final Service service,
@@ -1067,13 +1048,13 @@ public class BleModule implements BleAdapter {
                     @Override
                     public void call() {
                         onErrorCallback.onError(BleErrorUtils.cancelled());
-                        transactions.removeSubscription(transactionId);
+                        pendingTransactions.removeSubscription(transactionId);
                     }
                 })
                 .subscribe(new Observer<byte[]>() {
                     @Override
                     public void onCompleted() {
-                        transactions.removeSubscription(transactionId);
+                        pendingTransactions.removeSubscription(transactionId);
                     }
 
                     @Override
@@ -1085,7 +1066,7 @@ public class BleModule implements BleAdapter {
                             return;
                         }
                         onErrorCallback.onError(errorConverter.toError(error));
-                        transactions.removeSubscription(transactionId);
+                        pendingTransactions.removeSubscription(transactionId);
                     }
 
                     @Override
@@ -1096,7 +1077,7 @@ public class BleModule implements BleAdapter {
                     }
                 });
 
-        transactions.replaceSubscription(transactionId, subscription);
+        pendingTransactions.replaceSubscription(transactionId, subscription);
     }
 
     private void writeCharacteristicWithValue(final Characteristic characteristic,
@@ -1142,13 +1123,13 @@ public class BleModule implements BleAdapter {
                     @Override
                     public void call() {
                         onErrorCallback.onError(BleErrorUtils.cancelled());
-                        transactions.removeSubscription(transactionId);
+                        pendingTransactions.removeSubscription(transactionId);
                     }
                 })
                 .subscribe(new Observer<byte[]>() {
                     @Override
                     public void onCompleted() {
-                        transactions.removeSubscription(transactionId);
+                        pendingTransactions.removeSubscription(transactionId);
                     }
 
                     @Override
@@ -1161,7 +1142,7 @@ public class BleModule implements BleAdapter {
                             return;
                         }
                         onErrorCallback.onError(errorConverter.toError(e));
-                        transactions.removeSubscription(transactionId);
+                        pendingTransactions.removeSubscription(transactionId);
                     }
 
                     @Override
@@ -1172,7 +1153,7 @@ public class BleModule implements BleAdapter {
                     }
                 });
 
-        transactions.replaceSubscription(transactionId, subscription);
+        pendingTransactions.replaceSubscription(transactionId, subscription);
     }
 
     private void safeMonitorCharacteristicForDevice(final Characteristic characteristic,
@@ -1212,19 +1193,19 @@ public class BleModule implements BleAdapter {
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {
-                        transactions.removeSubscription(transactionId);
+                        pendingTransactions.removeSubscription(transactionId);
                     }
                 })
                 .subscribe(new Observer<byte[]>() {
                     @Override
                     public void onCompleted() {
-                        transactions.removeSubscription(transactionId);
+                        pendingTransactions.removeSubscription(transactionId);
                     }
 
                     @Override
                     public void onError(Throwable error) {
                         onErrorCallback.onError(errorConverter.toError(error));
-                        transactions.removeSubscription(transactionId);
+                        pendingTransactions.removeSubscription(transactionId);
                     }
 
                     @Override
@@ -1235,7 +1216,7 @@ public class BleModule implements BleAdapter {
                     }
                 });
 
-        transactions.replaceSubscription(transactionId, subscription);
+        pendingTransactions.replaceSubscription(transactionId, subscription);
     }
 
     @Nullable
