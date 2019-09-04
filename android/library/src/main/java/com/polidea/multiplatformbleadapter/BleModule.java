@@ -1217,7 +1217,6 @@ public class BleModule implements BleAdapter {
 
     private void safeMonitorCharacteristicForDevice(final Characteristic characteristic,
                                                     final String transactionId,
-                                                    //OnSuccessCallback<Void> onScanCompleteCallback
                                                     final OnEventCallback<Characteristic> onEventCallback,
                                                     final OnErrorCallback onErrorCallback) {
         final RxBleConnection connection = getConnectionOrEmitError(characteristic.getDeviceID(), onErrorCallback);
@@ -1225,6 +1224,12 @@ public class BleModule implements BleAdapter {
             return;
         }
 
+        final OneTimeActionExecutor<BleError> oneTimeErrorCallback = new OneTimeActionExecutor<BleError>() {
+            @Override
+            public void action(BleError error) {
+                onErrorCallback.onError(error);
+            }
+        };
 
         final Subscription subscription = Observable.defer(new Func0<Observable<Observable<byte[]>>>() {
             @Override
@@ -1253,6 +1258,7 @@ public class BleModule implements BleAdapter {
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {
+                        oneTimeErrorCallback.execute(BleErrorUtils.cancelled());
                         pendingTransactions.removeSubscription(transactionId);
                     }
                 })
@@ -1264,7 +1270,7 @@ public class BleModule implements BleAdapter {
 
                     @Override
                     public void onError(Throwable error) {
-                        onErrorCallback.onError(errorConverter.toError(error));
+                        oneTimeErrorCallback.execute(errorConverter.toError(error));
                         pendingTransactions.removeSubscription(transactionId);
                     }
 
