@@ -1,6 +1,8 @@
 package com.polidea.multiplatformbleadapter;
 
+import com.polidea.multiplatformbleadapter.errors.BleError;
+
 public interface OnErrorCallback {
 
-    void onError(BleException error);
+    void onError(BleError error);
 }
