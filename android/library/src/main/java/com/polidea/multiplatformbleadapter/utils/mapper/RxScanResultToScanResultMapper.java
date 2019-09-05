@@ -12,8 +12,8 @@ public class RxScanResultToScanResultMapper {
                 rxScanResult.getBleDevice().getName(),
                 rxScanResult.getRssi(),
                 Constants.MINIMUM_MTU,
-                false, //Not available on Android
-                null, //Not available on Android
+                false, //isConnectable flag is not available on Android
+                null, //overflowServiceUUIDs are not available on Android
                 AdvertisementData.parseScanResponseData(rxScanResult.getScanRecord().getBytes())
         );
     }
