@@ -1,7 +1,28 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.4.2'
+    }
+}
+
+repositories {
+    google()
+    jcenter()
+}
 
 android {
     compileSdkVersion 28
+
+    sourceSets.each {
+        it.java.srcDirs += "src/$it.name/java"
+    }
+
     defaultConfig {
         minSdkVersion 18
         targetSdkVersion 28
@@ -9,6 +30,9 @@ android {
         versionName "1.0"
     }
     buildTypes {
+        debug {
+            minifyEnabled false
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
