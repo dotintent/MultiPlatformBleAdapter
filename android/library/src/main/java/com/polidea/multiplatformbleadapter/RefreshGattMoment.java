@@ -1,7 +1,7 @@
 package com.polidea.multiplatformbleadapter;
 
 
-enum RefreshGattMoment {
+public enum RefreshGattMoment {
 
     ON_CONNECTED("OnConnected");
 
@@ -9,5 +9,12 @@ enum RefreshGattMoment {
 
     RefreshGattMoment(String name) {
         this.name = name;
+    }
+
+    public static RefreshGattMoment getByName(String name) {
+        for (RefreshGattMoment refreshGattMoment : RefreshGattMoment.values()) {
+            if (refreshGattMoment.name.equals(name)) return refreshGattMoment;
+        }
+        return null;
     }
 }
