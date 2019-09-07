@@ -10,8 +10,10 @@ public class Device {
 
     private String id;
     private String name;
-    private int rssi;
-    private int mtu;
+    @Nullable
+    private Integer rssi;
+    @Nullable
+    private Integer mtu;
     @Nullable
     private List<Service> services;
 
@@ -36,19 +38,21 @@ public class Device {
         this.name = name;
     }
 
-    public int getRssi() {
+    @Nullable
+    public Integer getRssi() {
         return rssi;
     }
 
-    public void setRssi(int rssi) {
+    public void setRssi(Integer rssi) {
         this.rssi = rssi;
     }
 
-    public int getMtu() {
+    @Nullable
+    public Integer getMtu() {
         return mtu;
     }
 
-    public void setMtu(int mtu) {
+    public void setMtu(Integer mtu) {
         this.mtu = mtu;
     }
 

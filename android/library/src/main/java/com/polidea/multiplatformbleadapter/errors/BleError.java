@@ -3,10 +3,9 @@ package com.polidea.multiplatformbleadapter.errors;
 
 public class BleError {
 
-    private BleErrorCode errorCode;
-    private Integer androidCode;
-    private String reason;
-
+    public BleErrorCode errorCode;
+    public Integer androidCode;
+    public String reason;
     public String deviceID;
     public String serviceUUID;
     public String characteristicUUID;

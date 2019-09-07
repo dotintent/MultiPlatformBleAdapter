@@ -4,7 +4,7 @@ import android.support.annotation.Nullable;
 
 import com.polidea.multiplatformbleadapter.utils.Constants.ConnectionPriority;
 
-class ConnectionOptions {
+public class ConnectionOptions {
 
     /**
      * Whether to directly connect to the remote device (false) or to automatically connect as soon
