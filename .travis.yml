@@ -27,7 +27,7 @@ _android_job_template: &android_job_template
       - $HOME/.gradle/wrapper/
   script:
     - cd android
-    - ./gradlew buildRelease
+    - ./gradlew build
 
 _ios_job_template: &ios_job_template
   language: objective-c

@@ -1,6 +1,6 @@
 package com.polidea.multiplatformbleadapter;
 
-interface BleAdapter {
+public interface BleAdapter {
 
     void createClient(String restoreStateIdentifier,
                       OnEventCallback<String> onAdapterStateChangeCallback,
