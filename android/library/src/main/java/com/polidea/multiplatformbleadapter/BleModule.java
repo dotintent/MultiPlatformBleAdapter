@@ -66,7 +66,7 @@ public class BleModule implements BleAdapter {
 
     private HashMap<String, Device> discoveredDevices = new HashMap<>();
 
-    private HashMap<String, RxBleDevice> connectedDevices = new HashMap<>();
+    private HashMap<String, Device> connectedDevices = new HashMap<>();
 
     private HashMap<String, RxBleConnection> activeConnections = new HashMap<>();
 
@@ -405,11 +405,10 @@ public class BleModule implements BleAdapter {
 
         Device[] localConnectedDevices = new Device[connectedDevices.size()];
         int connectedDevicesCount = 0;
-        for (RxBleDevice device : connectedDevices.values()) {
+        for (Device device : connectedDevices.values()) {
             for (UUID uuid : uuids) {
-                Device localDevice = rxBleDeviceToDeviceMapper.map(device);
-                if (localDevice.getServiceByUUID(uuid) != null) {
-                    localConnectedDevices[connectedDevicesCount++] = localDevice;
+                if (device.getServiceByUUID(uuid) != null) {
+                    localConnectedDevices[connectedDevicesCount++] = device;
                     break;
                 }
             }
@@ -872,7 +871,7 @@ public class BleModule implements BleAdapter {
     @Nullable
     private Device getDeviceOrEmitError(@NonNull final String deviceId,
                                         final OnErrorCallback onErrorCallback) {
-        final Device device = rxBleDeviceToDeviceMapper.map(connectedDevices.get(deviceId));
+        final Device device = connectedDevices.get(deviceId);
         if (device == null) {
             onErrorCallback.onError(BleErrorUtils.deviceNotConnected(deviceId));
             return null;
@@ -994,7 +993,7 @@ public class BleModule implements BleAdapter {
                     public void onNext(RxBleConnection connection) {
                         Device localDevice = rxBleDeviceToDeviceMapper.map(device);
                         cleanServicesAndCharacteristicsForDevice(localDevice);
-                        connectedDevices.put(device.getMacAddress(), device);
+                        connectedDevices.put(device.getMacAddress(), localDevice);
                         activeConnections.put(device.getMacAddress(), connection);
                         onSuccessCallback.onSuccess(localDevice);
                     }
@@ -1005,7 +1004,7 @@ public class BleModule implements BleAdapter {
 
     private void onDeviceDisconnected(RxBleDevice rxDevice) {
         activeConnections.remove(rxDevice.getMacAddress());
-        Device device = rxBleDeviceToDeviceMapper.map(connectedDevices.remove(rxDevice.getMacAddress()));
+        Device device = connectedDevices.remove(rxDevice.getMacAddress());
         if (device == null) {
             return;
         }
@@ -1297,7 +1296,7 @@ public class BleModule implements BleAdapter {
             return null;
         }
 
-        final Device device = rxBleDeviceToDeviceMapper.map(connectedDevices.get(deviceId));
+        final Device device = connectedDevices.get(deviceId);
         if (device == null) {
             onErrorCallback.onError(BleErrorUtils.deviceNotConnected(deviceId));
             return null;
