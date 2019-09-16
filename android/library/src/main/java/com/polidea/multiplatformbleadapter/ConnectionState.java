@@ -4,9 +4,9 @@ public enum ConnectionState {
 
     CONNECTING("connecting"), CONNECTED("connected"), DISCONNECTING("disconnecting"), DISCONNECTED("disconnected");
 
-    String name;
+    public final String value;
 
-    ConnectionState(String name) {
-        this.name = name;
+    ConnectionState(String value) {
+        this.value = value;
     }
 }
