@@ -63,7 +63,7 @@ public interface BleAdapter {
             String deviceIdentifier,
             ConnectionOptions connectionOptions,
             OnSuccessCallback<Device> onSuccessCallback,
-            OnEventCallback<ConnectionState> onConnectionChangedCallback,
+            OnEventCallback<ConnectionState> onConnectionStateChangedCallback,
             OnErrorCallback onErrorCallback);
 
     void cancelDeviceConnection(
