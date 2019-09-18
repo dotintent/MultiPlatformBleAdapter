@@ -995,7 +995,6 @@ public class BleModule implements BleAdapter {
                     public void onError(Throwable e) {
                         BleError bleError = errorConverter.toError(e);
                         oneTimeErrorCallback.execute(bleError);
-                        onConnectionStateChangedCallback.onEvent(ConnectionState.DISCONNECTED);
                         onDeviceDisconnected(device);
                     }
 
