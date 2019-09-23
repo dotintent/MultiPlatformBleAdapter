@@ -42,6 +42,7 @@ import com.polidea.rxandroidble.scan.ScanFilter;
 import com.polidea.rxandroidble.scan.ScanSettings;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -203,11 +204,8 @@ public class BleModule implements BleAdapter {
                                                    int connectionPriority,
                                                    final String transactionId,
                                                    final OnSuccessCallback<Device> onSuccessCallback,
-                                                   final OnErrorCallback onErrorCallback) {
-        final Device device = getDeviceOrEmitError(deviceIdentifier, onErrorCallback);
-        if (device == null) {
-            return;
-        }
+                                                   final OnErrorCallback onErrorCallback) throws BleError {
+        final Device device = getDeviceById(deviceIdentifier);
 
         final RxBleConnection connection = getConnectionOrEmitError(device.getId(), onErrorCallback);
         if (connection == null) {
@@ -254,8 +252,8 @@ public class BleModule implements BleAdapter {
     public void readRSSIForDevice(String deviceIdentifier,
                                   final String transactionId,
                                   final OnSuccessCallback<Device> onSuccessCallback,
-                                  final OnErrorCallback onErrorCallback) {
-        final Device device = getDeviceOrEmitError(deviceIdentifier, onErrorCallback);
+                                  final OnErrorCallback onErrorCallback) throws BleError {
+        final Device device = getDeviceById(deviceIdentifier);
         if (device == null) {
             return;
         }
@@ -306,11 +304,8 @@ public class BleModule implements BleAdapter {
     public void requestMTUForDevice(String deviceIdentifier, int mtu,
                                     final String transactionId,
                                     final OnSuccessCallback<Device> onSuccessCallback,
-                                    final OnErrorCallback onErrorCallback) {
-        final Device device = getDeviceOrEmitError(deviceIdentifier, onErrorCallback);
-        if (device == null) {
-            return;
-        }
+                                    final OnErrorCallback onErrorCallback) throws BleError {
+        final Device device = getDeviceById(deviceIdentifier);
 
         final RxBleConnection connection = getConnectionOrEmitError(device.getId(), onErrorCallback);
         if (connection == null) {
@@ -488,8 +483,11 @@ public class BleModule implements BleAdapter {
                                                                String transactionId,
                                                                OnSuccessCallback<Device> onSuccessCallback,
                                                                OnErrorCallback onErrorCallback) {
-        final Device device = getDeviceOrEmitError(deviceIdentifier, onErrorCallback);
-        if (device == null) {
+        final Device device;
+        try {
+            device = getDeviceById(deviceIdentifier);
+        } catch (BleError error) {
+            onErrorCallback.onError(error);
             return;
         }
 
@@ -497,56 +495,40 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public void getServicesForDevice(String deviceIdentifier,
-                                     OnSuccessCallback<Service[]> onSuccessCallback,
-                                     OnErrorCallback onErrorCallback) {
-        final Device device = getDeviceOrEmitError(deviceIdentifier, onErrorCallback);
-        if (device == null) {
-            return;
-        }
-        final List<Service> services = getServicesOrReject(device, onErrorCallback);
+    public Service[] getServicesForDevice(String deviceIdentifier) throws BleError {
+        final Device device = getDeviceById(deviceIdentifier);
+        final List<Service> services = device.getServices();
         if (services == null) {
-            return;
+            throw BleErrorUtils.deviceServicesNotDiscovered(device.getId());
         }
-        onSuccessCallback.onSuccess(services.toArray(new Service[]{}));
+        return services.toArray(new Service[]{});
     }
 
     @Override
-    public void getCharacteristicsForDevice(String deviceIdentifier,
-                                            String serviceUUID,
-                                            OnSuccessCallback<Characteristic[]> onSuccessCallback,
-                                            OnErrorCallback onErrorCallback) {
+    public Characteristic[] getCharacteristicsForDevice(String deviceIdentifier,
+                                                        String serviceUUID) throws BleError {
         final UUID convertedServiceUUID = UUIDConverter.convert(serviceUUID);
         if (convertedServiceUUID == null) {
-            onErrorCallback.onError(BleErrorUtils.invalidIdentifiers(serviceUUID));
-            return;
+            throw BleErrorUtils.invalidIdentifiers(serviceUUID);
         }
 
-        final Device device = getDeviceOrEmitError(deviceIdentifier, onErrorCallback);
-        if (device == null) {
-            return;
-        }
+        final Device device = getDeviceById(deviceIdentifier);
 
         final Service service = device.getServiceByUUID(convertedServiceUUID);
         if (service == null) {
-            onErrorCallback.onError(BleErrorUtils.serviceNotFound(serviceUUID));
-            return;
+            throw BleErrorUtils.serviceNotFound(serviceUUID);
         }
 
-        characteristicsForService(service, onSuccessCallback);
+        return service.getCharacteristics().toArray(new Characteristic[]{});
     }
 
     @Override
-    public void getCharacteristicsForService(int serviceIdentifier,
-                                             OnSuccessCallback<Characteristic[]> onSuccessCallback,
-                                             OnErrorCallback onErrorCallback) {
+    public Characteristic[] getCharacteristicsForService(int serviceIdentifier) throws BleError {
         Service service = discoveredServices.get(serviceIdentifier);
         if (service == null) {
-            onErrorCallback.onError(BleErrorUtils.serviceNotFound(Integer.toString(serviceIdentifier)));
-            return;
+            throw BleErrorUtils.serviceNotFound(Integer.toString(serviceIdentifier));
         }
-
-        characteristicsForService(service, onSuccessCallback);
+        return service.getCharacteristics().toArray(new Characteristic[]{});
     }
 
     @Override
@@ -869,13 +851,11 @@ public class BleModule implements BleAdapter {
                 });
     }
 
-    @Nullable
-    private Device getDeviceOrEmitError(@NonNull final String deviceId,
-                                        final OnErrorCallback onErrorCallback) {
+    @NonNull
+    private Device getDeviceById(@NonNull final String deviceId) throws BleError {
         final Device device = connectedDevices.get(deviceId);
         if (device == null) {
-            onErrorCallback.onError(BleErrorUtils.deviceNotConnected(deviceId));
-            return null;
+            throw BleErrorUtils.deviceNotConnected(deviceId);
         }
         return device;
     }
@@ -1079,11 +1059,6 @@ public class BleModule implements BleAdapter {
                 });
 
         pendingTransactions.replaceSubscription(transactionId, subscription);
-    }
-
-    private void characteristicsForService(final Service service,
-                                           OnSuccessCallback<Characteristic[]> onSuccessCallback) {
-        onSuccessCallback.onSuccess(service.getCharacteristics().toArray(new Characteristic[]{}));
     }
 
     private void safeReadCharacteristicForDevice(final Characteristic characteristic,
@@ -1364,17 +1339,6 @@ public class BleModule implements BleAdapter {
         }
 
         return characteristic;
-    }
-
-    @Nullable
-    private List<Service> getServicesOrReject(@NonNull final Device device,
-                                              @NonNull OnErrorCallback onErrorCallback) {
-        final List<Service> services = device.getServices();
-        if (services == null) {
-            onErrorCallback.onError(BleErrorUtils.deviceServicesNotDiscovered(device.getId()));
-            return null;
-        }
-        return services;
     }
 
     private void cleanServicesAndCharacteristicsForDevice(@NonNull Device device) {

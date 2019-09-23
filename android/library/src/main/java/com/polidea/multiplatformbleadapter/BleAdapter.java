@@ -1,5 +1,9 @@
 package com.polidea.multiplatformbleadapter;
 
+import com.polidea.multiplatformbleadapter.errors.BleError;
+
+import java.util.List;
+
 public interface BleAdapter {
 
     void createClient(String restoreStateIdentifier,
@@ -34,20 +38,20 @@ public interface BleAdapter {
             int connectionPriority,
             String transactionId,
             OnSuccessCallback<Device> onSuccessCallback,
-            OnErrorCallback onErrorCallback);
+            OnErrorCallback onErrorCallback) throws BleError;
 
     void readRSSIForDevice(
             String deviceIdentifier,
             String transactionId,
             OnSuccessCallback<Device> onSuccessCallback,
-            OnErrorCallback onErrorCallback);
+            OnErrorCallback onErrorCallback) throws BleError;
 
     void requestMTUForDevice(
             String deviceIdentifier,
             int mtu,
             String transactionId,
             OnSuccessCallback<Device> onSuccessCallback,
-            OnErrorCallback onErrorCallback);
+            OnErrorCallback onErrorCallback) throws BleError;
 
     void getKnownDevices(
             String[] deviceIdentifiers,
@@ -82,21 +86,13 @@ public interface BleAdapter {
             OnSuccessCallback<Device> onSuccessCallback,
             OnErrorCallback onErrorCallback);
 
-    void getServicesForDevice(
-            String deviceIdentifier,
-            OnSuccessCallback<Service[]> onSuccessCallback,
-            OnErrorCallback onErrorCallback);
+    Service[] getServicesForDevice(String deviceIdentifier) throws BleError;
 
-    void getCharacteristicsForDevice(
+    Characteristic[] getCharacteristicsForDevice(
             String deviceIdentifier,
-            String serviceUUID,
-            OnSuccessCallback<Characteristic[]> onSuccessCallback,
-            OnErrorCallback onErrorCallback);
+            String serviceUUID) throws BleError;
 
-    void getCharacteristicsForService(
-            int serviceIdentifier,
-            OnSuccessCallback<Characteristic[]> onSuccessCallback,
-            OnErrorCallback onErrorCallback);
+    Characteristic[] getCharacteristicsForService(int serviceIdentifier) throws BleError;
 
     void readCharacteristicForDevice(
             String deviceIdentifier,
