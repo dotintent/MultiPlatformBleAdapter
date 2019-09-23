@@ -421,6 +421,7 @@ public class BleModule implements BleAdapter {
     public void connectToDevice(String deviceIdentifier,
                                 ConnectionOptions connectionOptions,
                                 OnSuccessCallback<Device> onSuccessCallback,
+                                OnEventCallback<ConnectionState> onConnectionStateChangedCallback,
                                 OnErrorCallback onErrorCallback) {
         if (rxBleClient == null) {
             throw new IllegalStateException("BleManager not created when tried connecting to device");
@@ -439,7 +440,7 @@ public class BleModule implements BleAdapter {
                 connectionOptions.getRefreshGattMoment(),
                 connectionOptions.getTimeoutInMillis(),
                 connectionOptions.getConnectionPriority(),
-                onSuccessCallback, onErrorCallback);
+                onSuccessCallback, onConnectionStateChangedCallback, onErrorCallback);
     }
 
     @Override
@@ -897,6 +898,7 @@ public class BleModule implements BleAdapter {
                                      final Long timeout,
                                      final int connectionPriority,
                                      final OnSuccessCallback<Device> onSuccessCallback,
+                                     final OnEventCallback<ConnectionState> onConnectionStateChangedCallback,
                                      final OnErrorCallback onErrorCallback) {
 
         final OneTimeActionExecutor<BleError> oneTimeErrorCallback = new OneTimeActionExecutor<BleError>() {
@@ -908,11 +910,18 @@ public class BleModule implements BleAdapter {
 
         Observable<RxBleConnection> connect = device
                 .establishConnection(autoConnect)
+                .doOnSubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        onConnectionStateChangedCallback.onEvent(ConnectionState.CONNECTING);
+                    }
+                })
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {
                         oneTimeErrorCallback.execute(BleErrorUtils.cancelled());
                         onDeviceDisconnected(device);
+                        onConnectionStateChangedCallback.onEvent(ConnectionState.DISCONNECTED);
                     }
                 });
 
@@ -992,6 +1001,7 @@ public class BleModule implements BleAdapter {
                     @Override
                     public void onNext(RxBleConnection connection) {
                         Device localDevice = rxBleDeviceToDeviceMapper.map(device);
+                        onConnectionStateChangedCallback.onEvent(ConnectionState.CONNECTED);
                         cleanServicesAndCharacteristicsForDevice(localDevice);
                         connectedDevices.put(device.getMacAddress(), localDevice);
                         activeConnections.put(device.getMacAddress(), connection);
