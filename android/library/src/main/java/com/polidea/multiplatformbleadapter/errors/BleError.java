@@ -20,6 +20,13 @@ public class BleError extends Throwable {
 
     @Override
     public String getMessage() {
-        return reason;
+        return "Error code: " + errorCode +
+                ", android code: " + androidCode +
+                ", reason" + reason +
+                ", deviceId" + deviceID +
+                ", serviceUuid" + serviceUUID +
+                ", characteristicUuid" + characteristicUUID +
+                ", descriptorUuid" + descriptorUUID +
+                ", internalMessage" + internalMessage;
     }
 }
