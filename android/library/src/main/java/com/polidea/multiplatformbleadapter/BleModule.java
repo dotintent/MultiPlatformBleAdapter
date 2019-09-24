@@ -799,7 +799,15 @@ public class BleModule implements BleAdapter {
                     }
                 });
 
-        if (!bluetoothAdapter.enable()) {
+
+        boolean desiredAndInitialStateAreSame;
+        if (desiredAdapterState == RxBleAdapterStateObservable.BleAdapterState.STATE_ON) {
+            desiredAndInitialStateAreSame = !bluetoothAdapter.enable();
+        } else {
+            desiredAndInitialStateAreSame = !bluetoothAdapter.disable();
+        }
+
+        if (desiredAndInitialStateAreSame) {
             subscription.unsubscribe();
             onErrorCallback.onError(new BleError(
                     BleErrorCode.BluetoothStateChangeFailed,
