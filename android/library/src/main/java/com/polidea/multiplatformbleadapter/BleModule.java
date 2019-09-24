@@ -24,9 +24,9 @@ import com.polidea.multiplatformbleadapter.utils.Constants;
 import com.polidea.multiplatformbleadapter.utils.DisposableMap;
 import com.polidea.multiplatformbleadapter.utils.IdGenerator;
 import com.polidea.multiplatformbleadapter.utils.LogLevel;
+import com.polidea.multiplatformbleadapter.utils.OneTimeActionExecutor;
 import com.polidea.multiplatformbleadapter.utils.RefreshGattCustomOperation;
 import com.polidea.multiplatformbleadapter.utils.ServiceFactory;
-import com.polidea.multiplatformbleadapter.utils.OneTimeActionExecutor;
 import com.polidea.multiplatformbleadapter.utils.UUIDConverter;
 import com.polidea.multiplatformbleadapter.utils.mapper.RxBleDeviceToDeviceMapper;
 import com.polidea.multiplatformbleadapter.utils.mapper.RxScanResultToScanResultMapper;
@@ -42,7 +42,6 @@ import com.polidea.rxandroidble.scan.ScanFilter;
 import com.polidea.rxandroidble.scan.ScanSettings;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -204,8 +203,14 @@ public class BleModule implements BleAdapter {
                                                    int connectionPriority,
                                                    final String transactionId,
                                                    final OnSuccessCallback<Device> onSuccessCallback,
-                                                   final OnErrorCallback onErrorCallback) throws BleError {
-        final Device device = getDeviceById(deviceIdentifier);
+                                                   final OnErrorCallback onErrorCallback) {
+        final Device device;
+        try {
+            device = getDeviceById(deviceIdentifier);
+        } catch (BleError error) {
+            onErrorCallback.onError(error);
+            return;
+        }
 
         final RxBleConnection connection = getConnectionOrEmitError(device.getId(), onErrorCallback);
         if (connection == null) {
@@ -252,9 +257,12 @@ public class BleModule implements BleAdapter {
     public void readRSSIForDevice(String deviceIdentifier,
                                   final String transactionId,
                                   final OnSuccessCallback<Device> onSuccessCallback,
-                                  final OnErrorCallback onErrorCallback) throws BleError {
-        final Device device = getDeviceById(deviceIdentifier);
-        if (device == null) {
+                                  final OnErrorCallback onErrorCallback) {
+        final Device device;
+        try {
+            device = getDeviceById(deviceIdentifier);
+        } catch (BleError error) {
+            onErrorCallback.onError(error);
             return;
         }
         final RxBleConnection connection = getConnectionOrEmitError(device.getId(), onErrorCallback);
@@ -304,8 +312,14 @@ public class BleModule implements BleAdapter {
     public void requestMTUForDevice(String deviceIdentifier, int mtu,
                                     final String transactionId,
                                     final OnSuccessCallback<Device> onSuccessCallback,
-                                    final OnErrorCallback onErrorCallback) throws BleError {
-        final Device device = getDeviceById(deviceIdentifier);
+                                    final OnErrorCallback onErrorCallback) {
+        final Device device;
+        try {
+            device = getDeviceById(deviceIdentifier);
+        } catch (BleError error) {
+            onErrorCallback.onError(error);
+            return;
+        }
 
         final RxBleConnection connection = getConnectionOrEmitError(device.getId(), onErrorCallback);
         if (connection == null) {

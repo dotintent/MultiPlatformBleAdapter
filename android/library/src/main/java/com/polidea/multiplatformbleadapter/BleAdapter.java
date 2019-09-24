@@ -2,8 +2,6 @@ package com.polidea.multiplatformbleadapter;
 
 import com.polidea.multiplatformbleadapter.errors.BleError;
 
-import java.util.List;
-
 public interface BleAdapter {
 
     void createClient(String restoreStateIdentifier,
@@ -38,20 +36,20 @@ public interface BleAdapter {
             int connectionPriority,
             String transactionId,
             OnSuccessCallback<Device> onSuccessCallback,
-            OnErrorCallback onErrorCallback) throws BleError;
+            OnErrorCallback onErrorCallback);
 
     void readRSSIForDevice(
             String deviceIdentifier,
             String transactionId,
             OnSuccessCallback<Device> onSuccessCallback,
-            OnErrorCallback onErrorCallback) throws BleError;
+            OnErrorCallback onErrorCallback);
 
     void requestMTUForDevice(
             String deviceIdentifier,
             int mtu,
             String transactionId,
             OnSuccessCallback<Device> onSuccessCallback,
-            OnErrorCallback onErrorCallback) throws BleError;
+            OnErrorCallback onErrorCallback);
 
     void getKnownDevices(
             String[] deviceIdentifiers,
