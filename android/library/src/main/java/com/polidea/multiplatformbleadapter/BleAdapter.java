@@ -1,5 +1,7 @@
 package com.polidea.multiplatformbleadapter;
 
+import com.polidea.multiplatformbleadapter.errors.BleError;
+
 public interface BleAdapter {
 
     void createClient(String restoreStateIdentifier,
@@ -82,21 +84,13 @@ public interface BleAdapter {
             OnSuccessCallback<Device> onSuccessCallback,
             OnErrorCallback onErrorCallback);
 
-    void getServicesForDevice(
-            String deviceIdentifier,
-            OnSuccessCallback<Service[]> onSuccessCallback,
-            OnErrorCallback onErrorCallback);
+    Service[] getServicesForDevice(String deviceIdentifier) throws BleError;
 
-    void getCharacteristicsForDevice(
+    Characteristic[] getCharacteristicsForDevice(
             String deviceIdentifier,
-            String serviceUUID,
-            OnSuccessCallback<Characteristic[]> onSuccessCallback,
-            OnErrorCallback onErrorCallback);
+            String serviceUUID) throws BleError;
 
-    void getCharacteristicsForService(
-            int serviceIdentifier,
-            OnSuccessCallback<Characteristic[]> onSuccessCallback,
-            OnErrorCallback onErrorCallback);
+    Characteristic[] getCharacteristicsForService(int serviceIdentifier) throws BleError;
 
     void readCharacteristicForDevice(
             String deviceIdentifier,

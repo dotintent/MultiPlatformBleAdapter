@@ -1,7 +1,7 @@
 package com.polidea.multiplatformbleadapter.errors;
 
 
-public class BleError {
+public class BleError extends Throwable {
 
     public BleErrorCode errorCode;
     public Integer androidCode;
@@ -16,5 +16,17 @@ public class BleError {
         this.errorCode = errorCode;
         this.reason = reason;
         this.androidCode = androidCode;
+    }
+
+    @Override
+    public String getMessage() {
+        return "Error code: " + errorCode +
+                ", android code: " + androidCode +
+                ", reason" + reason +
+                ", deviceId" + deviceID +
+                ", serviceUuid" + serviceUUID +
+                ", characteristicUuid" + characteristicUUID +
+                ", descriptorUuid" + descriptorUUID +
+                ", internalMessage" + internalMessage;
     }
 }
