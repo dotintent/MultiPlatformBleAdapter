@@ -18,7 +18,7 @@ public class AdvertisementData {
     private ArrayList<UUID> solicitedServiceUUIDs;
 
     private static final long BLUETOOTH_BASE_UUID_LSB = 0x800000805F9B34FBL;
-    private static final int  BLUETOOTH_BASE_UUID_MSB = 0x00001000;
+    private static final int BLUETOOTH_BASE_UUID_MSB = 0x00001000;
 
     public String getLocalName() {
         return localName;
@@ -42,6 +42,22 @@ public class AdvertisementData {
 
     public ArrayList<UUID> getSolicitedServiceUUIDs() {
         return solicitedServiceUUIDs;
+    }
+
+    private AdvertisementData() {}
+
+    public AdvertisementData(byte[] manufacturerData,
+                             Map<UUID, byte[]> serviceData,
+                             ArrayList<UUID> serviceUUIDs,
+                             String localName,
+                             Integer txPowerLevel,
+                             ArrayList<UUID> solicitedServiceUUIDs) {
+        this.manufacturerData = manufacturerData;
+        this.serviceData = serviceData;
+        this.serviceUUIDs = serviceUUIDs;
+        this.localName = localName;
+        this.txPowerLevel = txPowerLevel;
+        this.solicitedServiceUUIDs = solicitedServiceUUIDs;
     }
 
     public static AdvertisementData parseScanResponseData(byte[] advertisement) {
@@ -167,7 +183,7 @@ public class AdvertisementData {
 
     private static void parseTxPowerLevel(AdvertisementData advData, int adLength, ByteBuffer data) {
         if (adLength != 1) return;
-        advData.txPowerLevel = (int)data.get();
+        advData.txPowerLevel = (int) data.get();
     }
 
     private static void parseManufacturerData(AdvertisementData advData, int adLength, ByteBuffer data) {
