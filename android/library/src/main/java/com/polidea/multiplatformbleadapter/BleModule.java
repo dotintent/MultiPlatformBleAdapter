@@ -375,8 +375,7 @@ public class BleModule implements BleAdapter {
             throw new IllegalStateException("BleManager not created when tried connecting to device");
         }
 
-        Device[] knownDevices = new Device[deviceIdentifiers.length];
-        int knownDevicesCount = 0;
+        List<Device> knownDevices = new ArrayList<>();
         for (final String deviceId : deviceIdentifiers) {
             if (deviceId == null) {
                 onErrorCallback.onError(BleErrorUtils.invalidIdentifiers(deviceIdentifiers));
@@ -385,11 +384,11 @@ public class BleModule implements BleAdapter {
 
             final Device device = discoveredDevices.get(deviceId);
             if (device != null) {
-                knownDevices[++knownDevicesCount] = device;
+                knownDevices.add(device);
             }
         }
 
-        onSuccessCallback.onSuccess(knownDevices);
+        onSuccessCallback.onSuccess(knownDevices.toArray(new Device[knownDevices.size()]));
     }
 
     @Override
@@ -398,6 +397,11 @@ public class BleModule implements BleAdapter {
                                     OnErrorCallback onErrorCallback) {
         if (rxBleClient == null) {
             throw new IllegalStateException("BleManager not created when tried connecting to device");
+        }
+
+        if (serviceUUIDs.length == 0) {
+            onSuccessCallback.onSuccess(connectedDevices.values().toArray(new Device[connectedDevices.size()]));
+            return;
         }
 
         UUID[] uuids = new UUID[serviceUUIDs.length];
@@ -412,18 +416,18 @@ public class BleModule implements BleAdapter {
             uuids[i] = uuid;
         }
 
-        Device[] localConnectedDevices = new Device[connectedDevices.size()];
-        int connectedDevicesCount = 0;
+       List<Device> localConnectedDevices = new ArrayList<>();
         for (Device device : connectedDevices.values()) {
             for (UUID uuid : uuids) {
                 if (device.getServiceByUUID(uuid) != null) {
-                    localConnectedDevices[connectedDevicesCount++] = device;
+                    localConnectedDevices.add(device);
                     break;
                 }
             }
         }
 
-        onSuccessCallback.onSuccess(localConnectedDevices);
+        onSuccessCallback.onSuccess(localConnectedDevices.toArray(new Device[localConnectedDevices.size()]));
+
     }
 
     @Override
