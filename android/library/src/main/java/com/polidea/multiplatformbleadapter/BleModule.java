@@ -400,7 +400,7 @@ public class BleModule implements BleAdapter {
         }
 
         if (serviceUUIDs.length == 0) {
-            onSuccessCallback.onSuccess(connectedDevices.values().toArray(new Device[connectedDevices.size()]));
+            onSuccessCallback.onSuccess(new Device[0]);
             return;
         }
 
