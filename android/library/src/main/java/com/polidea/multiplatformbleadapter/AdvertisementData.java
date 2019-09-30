@@ -5,6 +5,7 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -12,13 +13,13 @@ public class AdvertisementData {
 
     private byte[] manufacturerData;
     private Map<UUID, byte[]> serviceData;
-    private ArrayList<UUID> serviceUUIDs;
+    private List<UUID> serviceUUIDs;
     private String localName;
     private Integer txPowerLevel;
-    private ArrayList<UUID> solicitedServiceUUIDs;
+    private List<UUID> solicitedServiceUUIDs;
 
     private static final long BLUETOOTH_BASE_UUID_LSB = 0x800000805F9B34FBL;
-    private static final int  BLUETOOTH_BASE_UUID_MSB = 0x00001000;
+    private static final int BLUETOOTH_BASE_UUID_MSB = 0x00001000;
 
     public String getLocalName() {
         return localName;
@@ -32,7 +33,7 @@ public class AdvertisementData {
         return serviceData;
     }
 
-    public ArrayList<UUID> getServiceUUIDs() {
+    public List<UUID> getServiceUUIDs() {
         return serviceUUIDs;
     }
 
@@ -40,8 +41,24 @@ public class AdvertisementData {
         return txPowerLevel;
     }
 
-    public ArrayList<UUID> getSolicitedServiceUUIDs() {
+    public List<UUID> getSolicitedServiceUUIDs() {
         return solicitedServiceUUIDs;
+    }
+
+    private AdvertisementData() {}
+
+    public AdvertisementData(byte[] manufacturerData,
+                             Map<UUID, byte[]> serviceData,
+                             List<UUID> serviceUUIDs,
+                             String localName,
+                             Integer txPowerLevel,
+                             List<UUID> solicitedServiceUUIDs) {
+        this.manufacturerData = manufacturerData;
+        this.serviceData = serviceData;
+        this.serviceUUIDs = serviceUUIDs;
+        this.localName = localName;
+        this.txPowerLevel = txPowerLevel;
+        this.solicitedServiceUUIDs = solicitedServiceUUIDs;
     }
 
     public static AdvertisementData parseScanResponseData(byte[] advertisement) {
@@ -167,7 +184,7 @@ public class AdvertisementData {
 
     private static void parseTxPowerLevel(AdvertisementData advData, int adLength, ByteBuffer data) {
         if (adLength != 1) return;
-        advData.txPowerLevel = (int)data.get();
+        advData.txPowerLevel = (int) data.get();
     }
 
     private static void parseManufacturerData(AdvertisementData advData, int adLength, ByteBuffer data) {
