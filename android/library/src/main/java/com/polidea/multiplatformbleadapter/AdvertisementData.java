@@ -5,6 +5,7 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -12,10 +13,10 @@ public class AdvertisementData {
 
     private byte[] manufacturerData;
     private Map<UUID, byte[]> serviceData;
-    private ArrayList<UUID> serviceUUIDs;
+    private List<UUID> serviceUUIDs;
     private String localName;
     private Integer txPowerLevel;
-    private ArrayList<UUID> solicitedServiceUUIDs;
+    private List<UUID> solicitedServiceUUIDs;
 
     private static final long BLUETOOTH_BASE_UUID_LSB = 0x800000805F9B34FBL;
     private static final int BLUETOOTH_BASE_UUID_MSB = 0x00001000;
@@ -32,7 +33,7 @@ public class AdvertisementData {
         return serviceData;
     }
 
-    public ArrayList<UUID> getServiceUUIDs() {
+    public List<UUID> getServiceUUIDs() {
         return serviceUUIDs;
     }
 
@@ -40,7 +41,7 @@ public class AdvertisementData {
         return txPowerLevel;
     }
 
-    public ArrayList<UUID> getSolicitedServiceUUIDs() {
+    public List<UUID> getSolicitedServiceUUIDs() {
         return solicitedServiceUUIDs;
     }
 
@@ -48,10 +49,10 @@ public class AdvertisementData {
 
     public AdvertisementData(byte[] manufacturerData,
                              Map<UUID, byte[]> serviceData,
-                             ArrayList<UUID> serviceUUIDs,
+                             List<UUID> serviceUUIDs,
                              String localName,
                              Integer txPowerLevel,
-                             ArrayList<UUID> solicitedServiceUUIDs) {
+                             List<UUID> solicitedServiceUUIDs) {
         this.manufacturerData = manufacturerData;
         this.serviceData = serviceData;
         this.serviceUUIDs = serviceUUIDs;
