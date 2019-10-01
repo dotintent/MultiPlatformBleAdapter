@@ -395,7 +395,7 @@ public class BleClientManager : NSObject {
         var peripheralToConnect : Peripheral? = nil
         let connectionDisposable = connectionObservable
             .do(onSubscribe: { [weak self] in
-                self?.dispatchEvent(BleConnectionEvent.connectingEvent, value: deviceId.uuidString)
+                self?.dispatchEvent(BleEvent.connectingEvent, value: deviceId.uuidString)
             })
             .subscribe(
                 onNext: { [weak self] peripheral in
@@ -403,7 +403,7 @@ public class BleClientManager : NSObject {
                     peripheralToConnect = peripheral
                     self?.connectedPeripherals[deviceId] = peripheral
                     self?.clearCacheForPeripheral(peripheral: peripheral)
-                    self?.dispatchEvent(BleConnectionEvent.connectedEvent, value: deviceId.uuidString)
+                    self?.dispatchEvent(BleEvent.connectedEvent, value: deviceId.uuidString)
                 },
                 onError: {  [weak self] error in
                     if let rxerror = error as? RxError,
