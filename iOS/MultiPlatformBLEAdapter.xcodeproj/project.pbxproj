@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		81E08F2A23425F050074D295 /* BleConnectionEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81E08F2923425F050074D295 /* BleConnectionEvent.swift */; };
 		A8F13C2A2316ADE700A70E91 /* MultiPlatformBLEAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = A8F13C292316ADE700A70E91 /* MultiPlatformBLEAdapter.m */; };
 		A8F13C2B2316ADE700A70E91 /* MultiPlatformBLEAdapter.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = A8F13C282316ADE700A70E91 /* MultiPlatformBLEAdapter.h */; };
 		A8F13D072316AF7600A70E91 /* RxCBCharacteristic.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F13C442316AF7600A70E91 /* RxCBCharacteristic.swift */; };
@@ -211,7 +210,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		81E08F2923425F050074D295 /* BleConnectionEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BleConnectionEvent.swift; sourceTree = "<group>"; };
 		A8F13C252316ADE700A70E91 /* libMultiPlatformBLEAdapter.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMultiPlatformBLEAdapter.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8F13C282316ADE700A70E91 /* MultiPlatformBLEAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MultiPlatformBLEAdapter.h; sourceTree = "<group>"; };
 		A8F13C292316ADE700A70E91 /* MultiPlatformBLEAdapter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MultiPlatformBLEAdapter.m; sourceTree = "<group>"; };
@@ -445,7 +443,6 @@
 				A8F13DF92316BDFB00A70E91 /* BleClientManager.h */,
 				A8F13DF62316BDFA00A70E91 /* BleError.swift */,
 				A8F13DF52316BDFA00A70E91 /* BleEvent.swift */,
-				81E08F2923425F050074D295 /* BleConnectionEvent.swift */,
 				A8F13DF82316BDFA00A70E91 /* BleExtensions.swift */,
 				A8F13DFA2316BDFB00A70E91 /* BleModule.swift */,
 				A8F13DF72316BDFA00A70E91 /* BleUtils.swift */,
@@ -945,7 +942,6 @@
 				A8F13D102316AF7600A70E91 /* RxServiceType.swift in Sources */,
 				A8F13D6F2316AF7700A70E91 /* Window.swift in Sources */,
 				A8F13D3D2316AF7700A70E91 /* SubscriptionDisposable.swift in Sources */,
-				81E08F2A23425F050074D295 /* BleConnectionEvent.swift in Sources */,
 				A8F13D332316AF7700A70E91 /* Bag.swift in Sources */,
 				A8F13D5B2316AF7700A70E91 /* Empty.swift in Sources */,
 				A8F13DFB2316BDFB00A70E91 /* BleEvent.swift in Sources */,
