@@ -25,11 +25,19 @@ public class BleEvent: NSObject {
     static public let disconnectionEvent = "DisconnectionEvent"
 
     @objc
+    static public let connectingEvent = "ConnectingEvent"
+
+    @objc
+    static public let connectedEvent = "ConnectedEvent"
+
+    @objc
     static public let events = [
         scanEvent,
         readEvent,
         stateChangeEvent,
         restoreStateEvent,
-        disconnectionEvent
+        disconnectionEvent,
+        connectingEvent,
+        connectedEvent
     ]
 }
