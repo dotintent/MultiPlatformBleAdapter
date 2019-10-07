@@ -65,7 +65,7 @@ public class BleClientManager : NSObject {
     // MARK: Lifecycle -------------------------------------------------------------------------------------------------
 
     @objc
-    public init(queue: DispatchQueue, restoreIdentifierKey: String?) {
+    required public init(queue: DispatchQueue, restoreIdentifierKey: String?) {
         self.queue = queue
 
         if let key = restoreIdentifierKey {
