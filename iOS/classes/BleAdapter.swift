@@ -1,6 +1,6 @@
 import Foundation
 
-@objc protocol BleAdapter {
+@objc public protocol BleAdapter {
 
     // MARK: - Properties
 
