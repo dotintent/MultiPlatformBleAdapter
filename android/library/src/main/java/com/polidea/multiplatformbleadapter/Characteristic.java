@@ -34,6 +34,14 @@ public class Characteristic {
         this.id = IdGenerator.getIdForKey(new IdGeneratorKey(service.getDeviceID(), gattCharacteristic.getUuid(), gattCharacteristic.getInstanceId()));
     }
 
+    public Characteristic(int id, @NonNull Service service, BluetoothGattCharacteristic gattCharacteristic) {
+        this.id = id;
+        this.deviceID = service.getDeviceID();
+        this.serviceUUID = service.getUuid();
+        this.serviceID = service.getId();
+        this.gattCharacteristic = gattCharacteristic;
+    }
+
     public int getId() {
         return this.id;
     }
