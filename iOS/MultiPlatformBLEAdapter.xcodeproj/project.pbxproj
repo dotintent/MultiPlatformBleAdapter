@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		816FE39B234F29B3008BF70D /* BleAdapterFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816FE39A234F29B3008BF70D /* BleAdapterFactory.swift */; };
+		81B95B92234B256000D96D28 /* BleAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B95B91234B256000D96D28 /* BleAdapter.swift */; };
 		A8F13C2A2316ADE700A70E91 /* MultiPlatformBLEAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = A8F13C292316ADE700A70E91 /* MultiPlatformBLEAdapter.m */; };
 		A8F13C2B2316ADE700A70E91 /* MultiPlatformBLEAdapter.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = A8F13C282316ADE700A70E91 /* MultiPlatformBLEAdapter.h */; };
 		A8F13D072316AF7600A70E91 /* RxCBCharacteristic.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F13C442316AF7600A70E91 /* RxCBCharacteristic.swift */; };
@@ -210,6 +212,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		816FE39A234F29B3008BF70D /* BleAdapterFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BleAdapterFactory.swift; sourceTree = "<group>"; };
+		81B95B91234B256000D96D28 /* BleAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BleAdapter.swift; sourceTree = "<group>"; };
 		A8F13C252316ADE700A70E91 /* libMultiPlatformBLEAdapter.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMultiPlatformBLEAdapter.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8F13C282316ADE700A70E91 /* MultiPlatformBLEAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MultiPlatformBLEAdapter.h; sourceTree = "<group>"; };
 		A8F13C292316ADE700A70E91 /* MultiPlatformBLEAdapter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MultiPlatformBLEAdapter.m; sourceTree = "<group>"; };
@@ -448,6 +452,8 @@
 				A8F13DF72316BDFA00A70E91 /* BleUtils.swift */,
 				A8F13C282316ADE700A70E91 /* MultiPlatformBLEAdapter.h */,
 				A8F13C292316ADE700A70E91 /* MultiPlatformBLEAdapter.m */,
+				81B95B91234B256000D96D28 /* BleAdapter.swift */,
+				816FE39A234F29B3008BF70D /* BleAdapterFactory.swift */,
 			);
 			path = classes;
 			sourceTree = "<group>";
@@ -838,6 +844,7 @@
 				A8F13D912316AF7700A70E91 /* SynchronizedDisposeType.swift in Sources */,
 				A8F13D4B2316AF7700A70E91 /* Deferred.swift in Sources */,
 				A8F13D1E2316AF7600A70E91 /* ScannedPeripheral.swift in Sources */,
+				81B95B92234B256000D96D28 /* BleAdapter.swift in Sources */,
 				A8F13D622316AF7700A70E91 /* Sink.swift in Sources */,
 				A8F13D302316AF7700A70E91 /* Platform.Darwin.swift in Sources */,
 				A8F13D7C2316AF7700A70E91 /* Map.swift in Sources */,
@@ -951,6 +958,7 @@
 				A8F13D082316AF7600A70E91 /* RxCBService.swift in Sources */,
 				A8F13DFE2316BDFB00A70E91 /* BleExtensions.swift in Sources */,
 				A8F13DA42316AF7700A70E91 /* ObserverBase.swift in Sources */,
+				816FE39B234F29B3008BF70D /* BleAdapterFactory.swift in Sources */,
 				A8F13D582316AF7700A70E91 /* CombineLatest.swift in Sources */,
 				A8F13D8E2316AF7700A70E91 /* String+Rx.swift in Sources */,
 				A8F13D3C2316AF7700A70E91 /* NopDisposable.swift in Sources */,
