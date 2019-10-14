@@ -110,47 +110,47 @@ import Foundation
                             resolve: @escaping Resolve,
                             reject: @escaping Reject)
 
-    func writeCharacteristicForDevice(  _ deviceIdentifier: String,
+    func writeCharacteristicForDevice(_ deviceIdentifier: String,
+                                      serviceUUID: String,
+                                      characteristicUUID: String,
+                                      valueBase64: String,
+                                      response: Bool,
+                                      transactionId: String,
+                                      resolve: @escaping Resolve,
+                                      reject: @escaping Reject)
+
+    func writeCharacteristicForService(_ serviceIdentifier: Double,
+                                       characteristicUUID: String,
+                                       valueBase64: String,
+                                       response: Bool,
+                                       transactionId: String,
+                                       resolve: @escaping Resolve,
+                                       reject: @escaping Reject)
+
+    func writeCharacteristic(_ characteristicIdentifier: Double,
+                             valueBase64: String,
+                             response: Bool,
+                             transactionId: String,
+                             resolve: @escaping Resolve,
+                             reject: @escaping Reject)
+
+    func monitorCharacteristicForDevice(_ deviceIdentifier: String,
                                         serviceUUID: String,
                                         characteristicUUID: String,
-                                        valueBase64: String,
-                                        response: Bool,
                                         transactionId: String,
                                         resolve: @escaping Resolve,
                                         reject: @escaping Reject)
 
-    func writeCharacteristicForService(  _ serviceIdentifier: Double,
+    func monitorCharacteristicForService(_ serviceIdentifier: Double,
                                          characteristicUUID: String,
-                                         valueBase64: String,
-                                         response: Bool,
                                          transactionId: String,
                                          resolve: @escaping Resolve,
                                          reject: @escaping Reject)
 
-    func writeCharacteristic(  _ characteristicIdentifier: Double,
-                               valueBase64: String,
-                               response: Bool,
+    func monitorCharacteristic(_ characteristicIdentifier: Double,
                                transactionId: String,
                                resolve: @escaping Resolve,
                                reject: @escaping Reject)
-
-    func monitorCharacteristicForDevice(  _ deviceIdentifier: String,
-                                          serviceUUID: String,
-                                          characteristicUUID: String,
-                                          transactionId: String,
-                                          resolve: @escaping Resolve,
-                                          reject: @escaping Reject)
-
-    func monitorCharacteristicForService(  _ serviceIdentifier: Double,
-                                           characteristicUUID: String,
-                                           transactionId: String,
-                                           resolve: @escaping Resolve,
-                                           reject: @escaping Reject)
-
-    func monitorCharacteristic(  _ characteristicIdentifier: Double,
-                                 transactionId: String,
-                                 resolve: @escaping Resolve,
-                                 reject: @escaping Reject)
 }
 
 extension BleClientManager: BleAdapter { }
