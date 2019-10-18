@@ -18,7 +18,7 @@ Pod::Spec.new do |spec|
   spec.source       = { :git => "https://github.com/Polidea/MultiPlatformBleAdapter.git", :tag => "#{spec.version}" }
 
 
-  spec.source_files  = "Classes", "Classes/**/*.{h,m}"
+  spec.source_files  = "classes", "classes/**/*.{h,m,swift}", "RxBluetoothKit", "RxBluetoothKit/**/*.{h,m,swift}", "RxSwift", "RxSwift/**/*.{h,m,swift}"
   spec.exclude_files = "Classes/Exclude"
 
   # spec.public_header_files = "Classes/**/*.h"
