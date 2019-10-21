@@ -12,11 +12,13 @@ Pod::Spec.new do |spec|
   spec.author             = { "Pawel Scibek" => "pawel.scibek@polidea.com", "Tomasz Bogusz" => "tomasz.bogusz@polidea.com" }
   spec.social_media_url   = "https://twitter.com/polidea"
 
+  spec.platform = :ios
   spec.ios.deployment_target = "12.1"
   spec.swift_version = '4.0'
   spec.source       = { :git => "https://github.com/Polidea/MultiPlatformBleAdapter.git", :tag => "#{spec.version}" }
 
-  spec.source_files  = "iOS/classes", "iOS/classes/**/*.{h,m,swift}", "iOS/RxBluetoothKit", "iOS/RxBluetoothKit/**/*.{h,m,swift}", "iOS/RxSwift", "iOS/RxSwift/**/*.{h,m,swift}"
+  spec.source_files  = "iOS/classes/**/*.{h,m,swift}", "iOS/RxBluetoothKit/**/*.{h,m,swift}", "iOS/RxSwift/**/*.{h,m,swift}"
+  spec.exclude_files = 'android/**/*'
 
   spec.frameworks   = 'CoreBluetooth'
 
