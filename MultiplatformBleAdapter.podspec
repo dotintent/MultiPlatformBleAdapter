@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = "MultiplatformBleAdapter"
-  spec.version      = "0.0.1"
+  spec.version      = "0.0.2"
   spec.summary      = "An adapter for RxBluetoothKit that exposes consist API to crossplatform libraries"
 
   spec.description  = <<-DESC
@@ -14,7 +14,7 @@ Pod::Spec.new do |spec|
 
   spec.platform = :ios
   spec.ios.deployment_target = "12.1"
-  spec.swift_version = '4.0'
+  spec.swift_version = '5.0'
   spec.source       = { :git => "https://github.com/Polidea/MultiPlatformBleAdapter.git", :tag => "#{spec.version}" }
 
   spec.source_files  = "iOS/classes/**/*.{h,m,swift}", "iOS/RxBluetoothKit/**/*.{h,m,swift}", "iOS/RxSwift/**/*.{h,m,swift}"
