@@ -175,7 +175,13 @@ public class BleClientManager : NSObject {
         restoredState.peripherals.forEach { peripheral in
             connectedPeripherals[peripheral.identifier] = peripheral
 
-            _ = manager.monitorDisconnection(for: peripheral)
+            _ = manager.rx_state.skip(1).take(1).flatMap { [weak self] state -> Observable<Peripheral> in
+                    if let self = self {
+                        return self.manager.monitorDisconnection(for: peripheral)
+                    } else {
+                        return Observable.error(BleError.init(errorCode: BleErrorCode.UnknownError))
+                    }
+                }
                 .take(1)
                 .subscribe(
                     onNext: { [weak self] peripheral in
