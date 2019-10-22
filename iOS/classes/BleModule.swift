@@ -179,7 +179,7 @@ public class BleClientManager : NSObject {
                     if let self = self {
                         return self.manager.monitorDisconnection(for: peripheral)
                     } else {
-                        return Observable.error(BleError.init(errorCode: BleErrorCode.UnknownError))
+                        return Observable.error(BleError.init(errorCode: BleErrorCode.BluetoothManagerDestroyed))
                     }
                 }
                 .take(1)
