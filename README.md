@@ -1,7 +1,7 @@
 # MultiPlatformBleAdapter
 
-Middle layer between crossplatform BLE frameworks ([react-native-ble-plx](https://github.com/Polidea/react-native-ble-plx)
- and [FlutterBleLib](https://github.com/Polidea/FlutterBleLib)) and iOS/Android system frameworks for manipulating Bluetooth Low Energy peripherals.
+Middle layer between crossplatform BLE libraries ([react-native-ble-plx](https://github.com/Polidea/react-native-ble-plx)
+ and [FlutterBleLib](https://github.com/Polidea/FlutterBleLib)) and iOS/Android system for manipulating Bluetooth Low Energy peripherals.
 Internally uses:
 * [RxAndroidBle](https://github.com/Polidea/RxAndroidBle)
 * [RxBluetoothKit](https://github.com/Polidea/RxBluetoothKit) 
