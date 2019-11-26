@@ -2,6 +2,8 @@ package com.polidea.multiplatformbleadapter;
 
 import com.polidea.multiplatformbleadapter.errors.BleError;
 
+import java.util.List;
+
 public interface BleAdapter {
 
     void createClient(String restoreStateIdentifier,
@@ -84,13 +86,25 @@ public interface BleAdapter {
             OnSuccessCallback<Device> onSuccessCallback,
             OnErrorCallback onErrorCallback);
 
-    Service[] getServicesForDevice(String deviceIdentifier) throws BleError;
+    List<Service> getServicesForDevice(String deviceIdentifier) throws BleError;
 
-    Characteristic[] getCharacteristicsForDevice(
+    List<Characteristic> getCharacteristicsForDevice(
             String deviceIdentifier,
             String serviceUUID) throws BleError;
 
-    Characteristic[] getCharacteristicsForService(int serviceIdentifier) throws BleError;
+    List<Characteristic> getCharacteristicsForService(int serviceIdentifier) throws BleError;
+
+    List<Descriptor> descriptorsForDevice(String deviceIdentifier,
+                                          String serviceUUID,
+                                          String characteristicUUID) throws BleError;
+
+    List<Descriptor> descriptorsForService(int serviceIdentifier,
+                                           String characteristicUUID,
+                                           OnSuccessCallback successCallback,
+                                           OnErrorCallback errorCallback) throws BleError;
+
+    List<Descriptor> descriptorsForCharacteristic(int characteristicIdentifier) throws BleError;
+
 
     void readCharacteristicForDevice(
             String deviceIdentifier,
@@ -160,6 +174,62 @@ public interface BleAdapter {
             String transactionId,
             OnEventCallback<Characteristic> onEventCallback,
             OnErrorCallback onErrorCallback);
+
+    void readDescriptorForDevice(final String deviceId,
+                                 final String serviceUUID,
+                                 final String characteristicUUID,
+                                 final String descriptorUUID,
+                                 final String transactionId,
+                                 OnSuccessCallback<Descriptor> successCallback,
+                                 OnErrorCallback errorCallback);
+
+    void readDescriptorForService(final int serviceIdentifier,
+                                  final String characteristicUUID,
+                                  final String descriptorUUID,
+                                  final String transactionId,
+                                  OnSuccessCallback<Descriptor> successCallback,
+                                  OnErrorCallback errorCallback);
+
+    void readDescriptorForCharacteristic(final int characteristicIdentifier,
+                                         final String descriptorUUID,
+                                         final String transactionId,
+                                         OnSuccessCallback<Descriptor> successCallback,
+                                         OnErrorCallback errorCallback);
+
+    void readDescriptor(final int descriptorIdentifier,
+                        final String transactionId,
+                        OnSuccessCallback<Descriptor> onSuccessCallback,
+                        OnErrorCallback onErrorCallback);
+
+    void writeDescriptorForDevice(final String deviceId,
+                                  final String serviceUUID,
+                                  final String characteristicUUID,
+                                  final String descriptorUUID,
+                                  final String valueBase64,
+                                  final String transactionId,
+                                  OnSuccessCallback<Descriptor> successCallback,
+                                  OnErrorCallback errorCallback);
+
+    void writeDescriptorForService(final int serviceIdentifier,
+                                   final String characteristicUUID,
+                                   final String descriptorUUID,
+                                   final String valueBase64,
+                                   final String transactionId,
+                                   OnSuccessCallback<Descriptor> successCallback,
+                                   OnErrorCallback errorCallback);
+
+    void writeDescriptorForCharacteristic(final int characteristicIdentifier,
+                                          final String descriptorUUID,
+                                          final String valueBase64,
+                                          final String transactionId,
+                                          OnSuccessCallback<Descriptor> successCallback,
+                                          OnErrorCallback errorCallback);
+
+    void writeDescriptor(final int descriptorIdentifier,
+                         final String valueBase64,
+                         final String transactionId,
+                         OnSuccessCallback<Descriptor> successCallback,
+                         OnErrorCallback errorCallback);
 
     void cancelTransaction(String transactionId);
 
