@@ -62,6 +62,9 @@ public class BleClientManager : NSObject {
     // Map of pending read operations.
     private var pendingReads = Dictionary<Double, Int>()
 
+    // Constants
+    static let cccdUUID = CBUUID(string: "2902")
+    
     // MARK: Lifecycle -------------------------------------------------------------------------------------------------
 
     @objc
@@ -1160,6 +1163,9 @@ public class BleClientManager : NSObject {
                                      promise: SafePromise) {
         let disposable = descriptorObservable
             .flatMap { descriptor -> Observable<Descriptor> in
+                if descriptor.uuid.isEqual(BleClientManager.cccdUUID) {
+                    return Observable.error(BleError.descriptorWriteNotAllowed(descriptor.uuid.fullUUIDString))
+                }
                 return descriptor.writeValue(value)
             }
             .subscribe(
