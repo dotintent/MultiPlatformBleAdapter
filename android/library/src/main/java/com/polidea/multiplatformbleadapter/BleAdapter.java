@@ -99,9 +99,7 @@ public interface BleAdapter {
                                           String characteristicUUID) throws BleError;
 
     List<Descriptor> descriptorsForService(int serviceIdentifier,
-                                           String characteristicUUID,
-                                           OnSuccessCallback successCallback,
-                                           OnErrorCallback errorCallback) throws BleError;
+                                           String characteristicUUID) throws BleError;
 
     List<Descriptor> descriptorsForCharacteristic(int characteristicIdentifier) throws BleError;
 

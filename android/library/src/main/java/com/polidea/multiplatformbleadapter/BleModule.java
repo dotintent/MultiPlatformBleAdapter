@@ -562,9 +562,7 @@ public class BleModule implements BleAdapter {
 
     @Override
     public List<Descriptor> descriptorsForService(final int serviceIdentifier,
-                                                  final String characteristicUUID,
-                                                  OnSuccessCallback successCallback,
-                                                  OnErrorCallback errorCallback) throws BleError {
+                                                  final String characteristicUUID) throws BleError {
         final UUID uuid = UUIDConverter.convert(characteristicUUID);
         if (uuid == null) {
             throw BleErrorUtils.invalidIdentifiers(characteristicUUID);
@@ -748,8 +746,6 @@ public class BleModule implements BleAdapter {
 
         safeMonitorCharacteristicForDevice(characteristic, transactionId, onEventCallback, onErrorCallback);
     }
-
-    //===start
 
     @Override
     public void readDescriptorForDevice(final String deviceId,
@@ -1086,8 +1082,6 @@ public class BleModule implements BleAdapter {
 
         return descriptor;
     }
-
-    //===end
 
     @Override
     public void cancelTransaction(String transactionId) {
