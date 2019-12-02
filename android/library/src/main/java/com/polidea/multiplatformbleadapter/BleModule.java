@@ -846,6 +846,7 @@ public class BleModule implements BleAdapter {
                     @Override
                     public void onNext(byte[] bytes) {
                         descriptor.logValue("Read from", bytes);
+                        descriptor.setValue(bytes);
                         safeExecutor.success(descriptor);
                     }
                 });
@@ -988,6 +989,7 @@ public class BleModule implements BleAdapter {
                     @Override
                     public void onNext(byte[] bytes) {
                         descriptor.logValue("Write to", bytes);
+                        descriptor.setValue(bytes);
                         safeExecutor.success(descriptor);
                     }
                 });

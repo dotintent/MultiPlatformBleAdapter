@@ -18,6 +18,8 @@ public class Descriptor {
     private String deviceId;
     private BluetoothGattDescriptor descriptor;
     private int id;
+    private UUID uuid;
+    private byte[] value = null;
 
     public Descriptor(@NonNull Characteristic gattCharacteristic, @NonNull BluetoothGattDescriptor gattDescriptor) {
         this.characteristicId = gattCharacteristic.getId();
@@ -26,6 +28,7 @@ public class Descriptor {
         this.serviceUuid = gattCharacteristic.getServiceUUID();
         this.descriptor = gattDescriptor;
         this.id = IdGenerator.getIdForKey(new IdGeneratorKey(deviceId, descriptor.getUuid(), characteristicId));
+        this.uuid = gattDescriptor.getUuid();
     }
 
     public int getId() {
@@ -50,6 +53,22 @@ public class Descriptor {
 
     public UUID getServiceUuid() {
         return serviceUuid;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public byte[] getValue() {
+        return value;
+    }
+
+    public void setValue(byte[] value) {
+        this.value = value;
+    }
+
+    public void setValueFromCache() {
+        value = descriptor.getValue();
     }
 
     public BluetoothGattDescriptor getNativeDescriptor() {
