@@ -86,22 +86,27 @@ public interface BleAdapter {
             OnSuccessCallback<Device> onSuccessCallback,
             OnErrorCallback onErrorCallback);
 
-    List<Service> getServicesForDevice(String deviceIdentifier) throws BleError;
+    List<Service> getServicesForDevice(
+            String deviceIdentifier) throws BleError;
 
     List<Characteristic> getCharacteristicsForDevice(
             String deviceIdentifier,
             String serviceUUID) throws BleError;
 
-    List<Characteristic> getCharacteristicsForService(int serviceIdentifier) throws BleError;
+    List<Characteristic> getCharacteristicsForService(
+            int serviceIdentifier) throws BleError;
 
-    List<Descriptor> descriptorsForDevice(String deviceIdentifier,
-                                          String serviceUUID,
-                                          String characteristicUUID) throws BleError;
+    List<Descriptor> descriptorsForDevice(
+            String deviceIdentifier,
+            String serviceUUID,
+            String characteristicUUID) throws BleError;
 
-    List<Descriptor> descriptorsForService(int serviceIdentifier,
-                                           String characteristicUUID) throws BleError;
+    List<Descriptor> descriptorsForService(
+            int serviceIdentifier,
+            String characteristicUUID) throws BleError;
 
-    List<Descriptor> descriptorsForCharacteristic(int characteristicIdentifier) throws BleError;
+    List<Descriptor> descriptorsForCharacteristic(
+            int characteristicIdentifier) throws BleError;
 
 
     void readCharacteristicForDevice(
@@ -173,61 +178,69 @@ public interface BleAdapter {
             OnEventCallback<Characteristic> onEventCallback,
             OnErrorCallback onErrorCallback);
 
-    void readDescriptorForDevice(final String deviceId,
-                                 final String serviceUUID,
-                                 final String characteristicUUID,
-                                 final String descriptorUUID,
-                                 final String transactionId,
-                                 OnSuccessCallback<Descriptor> successCallback,
-                                 OnErrorCallback errorCallback);
+    void readDescriptorForDevice(
+            final String deviceId,
+            final String serviceUUID,
+            final String characteristicUUID,
+            final String descriptorUUID,
+            final String transactionId,
+            OnSuccessCallback<Descriptor> successCallback,
+            OnErrorCallback errorCallback);
 
-    void readDescriptorForService(final int serviceIdentifier,
-                                  final String characteristicUUID,
-                                  final String descriptorUUID,
-                                  final String transactionId,
-                                  OnSuccessCallback<Descriptor> successCallback,
-                                  OnErrorCallback errorCallback);
+    void readDescriptorForService(
+            final int serviceIdentifier,
+            final String characteristicUUID,
+            final String descriptorUUID,
+            final String transactionId,
+            OnSuccessCallback<Descriptor> successCallback,
+            OnErrorCallback errorCallback);
 
-    void readDescriptorForCharacteristic(final int characteristicIdentifier,
-                                         final String descriptorUUID,
-                                         final String transactionId,
-                                         OnSuccessCallback<Descriptor> successCallback,
-                                         OnErrorCallback errorCallback);
+    void readDescriptorForCharacteristic(
+            final int characteristicIdentifier,
+            final String descriptorUUID,
+            final String transactionId,
+            OnSuccessCallback<Descriptor> successCallback,
+            OnErrorCallback errorCallback);
 
-    void readDescriptor(final int descriptorIdentifier,
-                        final String transactionId,
-                        OnSuccessCallback<Descriptor> onSuccessCallback,
-                        OnErrorCallback onErrorCallback);
+    void readDescriptor(
+            final int descriptorIdentifier,
+            final String transactionId,
+            OnSuccessCallback<Descriptor> onSuccessCallback,
+            OnErrorCallback onErrorCallback);
 
-    void writeDescriptorForDevice(final String deviceId,
-                                  final String serviceUUID,
-                                  final String characteristicUUID,
-                                  final String descriptorUUID,
-                                  final String valueBase64,
-                                  final String transactionId,
-                                  OnSuccessCallback<Descriptor> successCallback,
-                                  OnErrorCallback errorCallback);
+    void writeDescriptorForDevice(
+            final String deviceId,
+            final String serviceUUID,
+            final String characteristicUUID,
+            final String descriptorUUID,
+            final String valueBase64,
+            final String transactionId,
+            OnSuccessCallback<Descriptor> successCallback,
+            OnErrorCallback errorCallback);
 
-    void writeDescriptorForService(final int serviceIdentifier,
-                                   final String characteristicUUID,
-                                   final String descriptorUUID,
-                                   final String valueBase64,
-                                   final String transactionId,
-                                   OnSuccessCallback<Descriptor> successCallback,
-                                   OnErrorCallback errorCallback);
+    void writeDescriptorForService(
+            final int serviceIdentifier,
+            final String characteristicUUID,
+            final String descriptorUUID,
+            final String valueBase64,
+            final String transactionId,
+            OnSuccessCallback<Descriptor> successCallback,
+            OnErrorCallback errorCallback);
 
-    void writeDescriptorForCharacteristic(final int characteristicIdentifier,
-                                          final String descriptorUUID,
-                                          final String valueBase64,
-                                          final String transactionId,
-                                          OnSuccessCallback<Descriptor> successCallback,
-                                          OnErrorCallback errorCallback);
+    void writeDescriptorForCharacteristic(
+            final int characteristicIdentifier,
+            final String descriptorUUID,
+            final String valueBase64,
+            final String transactionId,
+            OnSuccessCallback<Descriptor> successCallback,
+            OnErrorCallback errorCallback);
 
-    void writeDescriptor(final int descriptorIdentifier,
-                         final String valueBase64,
-                         final String transactionId,
-                         OnSuccessCallback<Descriptor> successCallback,
-                         OnErrorCallback errorCallback);
+    void writeDescriptor(
+            final int descriptorIdentifier,
+            final String valueBase64,
+            final String transactionId,
+            OnSuccessCallback<Descriptor> successCallback,
+            OnErrorCallback errorCallback);
 
     void cancelTransaction(String transactionId);
 
