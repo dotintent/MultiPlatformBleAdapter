@@ -21,12 +21,13 @@ public class Descriptor {
     private UUID uuid;
     private byte[] value = null;
 
-    public Descriptor(@NonNull Characteristic gattCharacteristic, @NonNull BluetoothGattDescriptor gattDescriptor) {
-        this.characteristicId = gattCharacteristic.getId();
-        this.characteristicUuid = gattCharacteristic.getUuid();
-        this.serviceId = gattCharacteristic.getServiceID();
-        this.serviceUuid = gattCharacteristic.getServiceUUID();
+    public Descriptor(@NonNull Characteristic characteristic, @NonNull BluetoothGattDescriptor gattDescriptor) {
+        this.characteristicId = characteristic.getId();
+        this.characteristicUuid = characteristic.getUuid();
+        this.serviceId = characteristic.getServiceID();
+        this.serviceUuid = characteristic.getServiceUUID();
         this.descriptor = gattDescriptor;
+        this.deviceId = characteristic.getDeviceId();
         this.id = IdGenerator.getIdForKey(new IdGeneratorKey(deviceId, descriptor.getUuid(), characteristicId));
         this.uuid = gattDescriptor.getUuid();
     }
