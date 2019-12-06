@@ -13,7 +13,7 @@ Pod::Spec.new do |spec|
   spec.social_media_url   = "https://twitter.com/polidea"
 
   spec.platform = :ios
-  spec.ios.deployment_target = "10.0"
+  spec.ios.deployment_target = "8.0"
   spec.swift_version = '5.0'
   spec.source       = { :git => "https://github.com/Polidea/MultiPlatformBleAdapter.git", :tag => "#{spec.version}" }
 
