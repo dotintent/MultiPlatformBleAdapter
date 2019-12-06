@@ -19,12 +19,12 @@ public class Characteristic {
 
     private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
-    private int id;
-    private int serviceID;
-    private UUID serviceUUID;
-    private String deviceID;
+    final private int id;
+    final private int serviceID;
+    final private UUID serviceUUID;
+    final private String deviceID;
     private byte[] value;
-    private BluetoothGattCharacteristic gattCharacteristic;
+    final private BluetoothGattCharacteristic gattCharacteristic;
 
     public void setValue(byte[] value) {
         this.value = value;

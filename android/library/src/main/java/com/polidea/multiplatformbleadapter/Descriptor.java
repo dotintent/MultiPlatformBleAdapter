@@ -11,14 +11,14 @@ import com.polidea.rxandroidble.internal.RxBleLog;
 import java.util.UUID;
 
 public class Descriptor {
-    private int characteristicId;
-    private int serviceId;
-    private UUID characteristicUuid;
-    private UUID serviceUuid;
-    private String deviceId;
-    private BluetoothGattDescriptor descriptor;
-    private int id;
-    private UUID uuid;
+    final private int characteristicId;
+    final private int serviceId;
+    final private UUID characteristicUuid;
+    final private UUID serviceUuid;
+    final private String deviceId;
+    final private BluetoothGattDescriptor descriptor;
+    final private int id;
+    final private UUID uuid;
     private byte[] value = null;
 
     public Descriptor(@NonNull Characteristic characteristic, @NonNull BluetoothGattDescriptor gattDescriptor) {

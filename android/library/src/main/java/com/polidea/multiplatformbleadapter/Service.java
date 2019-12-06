@@ -11,9 +11,9 @@ import java.util.UUID;
 
 public class Service {
 
-    private int id;
-    private String deviceID;
-    private BluetoothGattService btGattService;
+    final private int id;
+    final private String deviceID;
+    final private BluetoothGattService btGattService;
 
     public Service(int id, String deviceID, BluetoothGattService btGattService) {
         this.id = id;
