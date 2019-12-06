@@ -24,8 +24,8 @@ import com.polidea.multiplatformbleadapter.utils.Constants;
 import com.polidea.multiplatformbleadapter.utils.DisposableMap;
 import com.polidea.multiplatformbleadapter.utils.IdGenerator;
 import com.polidea.multiplatformbleadapter.utils.LogLevel;
-import com.polidea.multiplatformbleadapter.utils.OneTimeActionExecutor;
 import com.polidea.multiplatformbleadapter.utils.RefreshGattCustomOperation;
+import com.polidea.multiplatformbleadapter.utils.SafeExecutor;
 import com.polidea.multiplatformbleadapter.utils.ServiceFactory;
 import com.polidea.multiplatformbleadapter.utils.UUIDConverter;
 import com.polidea.multiplatformbleadapter.utils.mapper.RxBleDeviceToDeviceMapper;
@@ -36,7 +36,6 @@ import com.polidea.rxandroidble.RxBleClient;
 import com.polidea.rxandroidble.RxBleConnection;
 import com.polidea.rxandroidble.RxBleDevice;
 import com.polidea.rxandroidble.RxBleDeviceServices;
-import com.polidea.rxandroidble.exceptions.BleCharacteristicNotFoundException;
 import com.polidea.rxandroidble.internal.RxBleLog;
 import com.polidea.rxandroidble.scan.ScanFilter;
 import com.polidea.rxandroidble.scan.ScanSettings;
@@ -73,6 +72,8 @@ public class BleModule implements BleAdapter {
     private SparseArray<Service> discoveredServices = new SparseArray<>();
 
     private SparseArray<Characteristic> discoveredCharacteristics = new SparseArray<>();
+
+    private SparseArray<Descriptor> discoveredDescriptors = new SparseArray<>();
 
     private final DisposableMap pendingTransactions = new DisposableMap();
 
@@ -132,6 +133,7 @@ public class BleModule implements BleAdapter {
 
         discoveredServices.clear();
         discoveredCharacteristics.clear();
+        discoveredDescriptors.clear();
         connectedDevices.clear();
         activeConnections.clear();
         discoveredDevices.clear();
@@ -217,12 +219,7 @@ public class BleModule implements BleAdapter {
             return;
         }
 
-        final OneTimeActionExecutor<BleError> oneTimeErrorCallback = new OneTimeActionExecutor<BleError>() {
-            @Override
-            public void action(BleError error) {
-                onErrorCallback.onError(error);
-            }
-        };
+        final SafeExecutor<Device> safeExecutor = new SafeExecutor<>(onSuccessCallback, onErrorCallback);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             final Subscription subscription = connection
@@ -230,19 +227,19 @@ public class BleModule implements BleAdapter {
                     .doOnUnsubscribe(new Action0() {
                         @Override
                         public void call() {
-                            oneTimeErrorCallback.execute(BleErrorUtils.cancelled());
+                            safeExecutor.error(BleErrorUtils.cancelled());
                             pendingTransactions.removeSubscription(transactionId);
                         }
                     }).subscribe(new Action0() {
                         @Override
                         public void call() {
-                            onSuccessCallback.onSuccess(device);
+                            safeExecutor.success(device);
                             pendingTransactions.removeSubscription(transactionId);
                         }
                     }, new Action1<Throwable>() {
                         @Override
                         public void call(Throwable error) {
-                            oneTimeErrorCallback.execute(errorConverter.toError(error));
+                            safeExecutor.error(errorConverter.toError(error));
                             pendingTransactions.removeSubscription(transactionId);
                         }
                     });
@@ -270,19 +267,14 @@ public class BleModule implements BleAdapter {
             return;
         }
 
-        final OneTimeActionExecutor<BleError> oneTimeErrorCallback = new OneTimeActionExecutor<BleError>() {
-            @Override
-            public void action(BleError error) {
-                onErrorCallback.onError(error);
-            }
-        };
+        final SafeExecutor<Device> safeExecutor = new SafeExecutor<>(onSuccessCallback, onErrorCallback);
 
         final Subscription subscription = connection
                 .readRssi()
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {
-                        oneTimeErrorCallback.execute(BleErrorUtils.cancelled());
+                        safeExecutor.error(BleErrorUtils.cancelled());
                         pendingTransactions.removeSubscription(transactionId);
                     }
                 })
@@ -294,14 +286,14 @@ public class BleModule implements BleAdapter {
 
                     @Override
                     public void onError(Throwable error) {
-                        oneTimeErrorCallback.execute(errorConverter.toError(error));
+                        safeExecutor.error(errorConverter.toError(error));
                         pendingTransactions.removeSubscription(transactionId);
                     }
 
                     @Override
                     public void onNext(Integer rssi) {
                         device.setRssi(rssi);
-                        onSuccessCallback.onSuccess(device);
+                        safeExecutor.success(device);
                     }
                 });
 
@@ -326,12 +318,7 @@ public class BleModule implements BleAdapter {
             return;
         }
 
-        final OneTimeActionExecutor<BleError> oneTimeErrorCallback = new OneTimeActionExecutor<BleError>() {
-            @Override
-            public void action(BleError error) {
-                onErrorCallback.onError(error);
-            }
-        };
+        final SafeExecutor<Device> safeExecutor = new SafeExecutor<>(onSuccessCallback, onErrorCallback);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             final Subscription subscription = connection
@@ -339,7 +326,7 @@ public class BleModule implements BleAdapter {
                     .doOnUnsubscribe(new Action0() {
                         @Override
                         public void call() {
-                            oneTimeErrorCallback.execute(BleErrorUtils.cancelled());
+                            safeExecutor.error(BleErrorUtils.cancelled());
                             pendingTransactions.removeSubscription(transactionId);
                         }
                     }).subscribe(new Observer<Integer>() {
@@ -350,14 +337,14 @@ public class BleModule implements BleAdapter {
 
                         @Override
                         public void onError(Throwable error) {
-                            oneTimeErrorCallback.execute(errorConverter.toError(error));
+                            safeExecutor.error(errorConverter.toError(error));
                             pendingTransactions.removeSubscription(transactionId);
                         }
 
                         @Override
                         public void onNext(Integer mtu) {
                             device.setMtu(mtu);
-                            onSuccessCallback.onSuccess(device);
+                            safeExecutor.success(device);
                         }
                     });
 
@@ -416,7 +403,7 @@ public class BleModule implements BleAdapter {
             uuids[i] = uuid;
         }
 
-       List<Device> localConnectedDevices = new ArrayList<>();
+        List<Device> localConnectedDevices = new ArrayList<>();
         for (Device device : connectedDevices.values()) {
             for (UUID uuid : uuids) {
                 if (device.getServiceByUUID(uuid) != null) {
@@ -513,18 +500,18 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public Service[] getServicesForDevice(String deviceIdentifier) throws BleError {
+    public List<Service> getServicesForDevice(String deviceIdentifier) throws BleError {
         final Device device = getDeviceById(deviceIdentifier);
         final List<Service> services = device.getServices();
         if (services == null) {
             throw BleErrorUtils.deviceServicesNotDiscovered(device.getId());
         }
-        return services.toArray(new Service[]{});
+        return services;
     }
 
     @Override
-    public Characteristic[] getCharacteristicsForDevice(String deviceIdentifier,
-                                                        String serviceUUID) throws BleError {
+    public List<Characteristic> getCharacteristicsForDevice(String deviceIdentifier,
+                                                            String serviceUUID) throws BleError {
         final UUID convertedServiceUUID = UUIDConverter.convert(serviceUUID);
         if (convertedServiceUUID == null) {
             throw BleErrorUtils.invalidIdentifiers(serviceUUID);
@@ -537,16 +524,71 @@ public class BleModule implements BleAdapter {
             throw BleErrorUtils.serviceNotFound(serviceUUID);
         }
 
-        return service.getCharacteristics().toArray(new Characteristic[]{});
+        return service.getCharacteristics();
     }
 
     @Override
-    public Characteristic[] getCharacteristicsForService(int serviceIdentifier) throws BleError {
+    public List<Characteristic> getCharacteristicsForService(int serviceIdentifier) throws BleError {
         Service service = discoveredServices.get(serviceIdentifier);
         if (service == null) {
             throw BleErrorUtils.serviceNotFound(Integer.toString(serviceIdentifier));
         }
-        return service.getCharacteristics().toArray(new Characteristic[]{});
+        return service.getCharacteristics();
+    }
+
+    @Override
+    public List<Descriptor> descriptorsForDevice(final String deviceIdentifier,
+                                                 final String serviceUUID,
+                                                 final String characteristicUUID) throws BleError {
+        final UUID[] uuids = UUIDConverter.convert(serviceUUID, characteristicUUID);
+        if (uuids == null) {
+            throw BleErrorUtils.invalidIdentifiers(serviceUUID, characteristicUUID);
+        }
+
+        Device device = getDeviceById(deviceIdentifier);
+
+        final Service service = device.getServiceByUUID(uuids[0]);
+        if (service == null) {
+            throw BleErrorUtils.serviceNotFound(serviceUUID);
+        }
+
+        final Characteristic characteristic = service.getCharacteristicByUUID(uuids[1]);
+        if (characteristic == null) {
+            throw BleErrorUtils.characteristicNotFound(characteristicUUID);
+        }
+
+        return characteristic.getDescriptors();
+    }
+
+    @Override
+    public List<Descriptor> descriptorsForService(final int serviceIdentifier,
+                                                  final String characteristicUUID) throws BleError {
+        final UUID uuid = UUIDConverter.convert(characteristicUUID);
+        if (uuid == null) {
+            throw BleErrorUtils.invalidIdentifiers(characteristicUUID);
+        }
+
+        Service service = discoveredServices.get(serviceIdentifier);
+        if (service == null) {
+            throw BleErrorUtils.serviceNotFound(Integer.toString(serviceIdentifier));
+        }
+
+        final Characteristic characteristic = service.getCharacteristicByUUID(uuid);
+        if (characteristic == null) {
+            throw BleErrorUtils.characteristicNotFound(characteristicUUID);
+        }
+
+        return characteristic.getDescriptors();
+    }
+
+    @Override
+    public List<Descriptor> descriptorsForCharacteristic(final int characteristicIdentifier) throws BleError {
+        Characteristic characteristic = discoveredCharacteristics.get(characteristicIdentifier);
+        if (characteristic == null) {
+            throw BleErrorUtils.characteristicNotFound(Integer.toString(characteristicIdentifier));
+        }
+
+        return characteristic.getDescriptors();
     }
 
     @Override
@@ -706,6 +748,342 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
+    public void readDescriptorForDevice(final String deviceId,
+                                        final String serviceUUID,
+                                        final String characteristicUUID,
+                                        final String descriptorUUID,
+                                        final String transactionId,
+                                        OnSuccessCallback<Descriptor> successCallback,
+                                        OnErrorCallback errorCallback) {
+
+        try {
+            Descriptor descriptor = getDescriptor(deviceId, serviceUUID, characteristicUUID, descriptorUUID);
+            safeReadDescriptorForDevice(descriptor, transactionId, successCallback, errorCallback);
+        } catch (BleError error) {
+            errorCallback.onError(error);
+        }
+    }
+
+    @Override
+    public void readDescriptorForService(final int serviceIdentifier,
+                                         final String characteristicUUID,
+                                         final String descriptorUUID,
+                                         final String transactionId,
+                                         OnSuccessCallback<Descriptor> successCallback,
+                                         OnErrorCallback errorCallback) {
+        try {
+            Descriptor descriptor = getDescriptor(serviceIdentifier, characteristicUUID, descriptorUUID);
+            safeReadDescriptorForDevice(descriptor, transactionId, successCallback, errorCallback);
+        } catch (BleError error) {
+            errorCallback.onError(error);
+        }
+    }
+
+    @Override
+    public void readDescriptorForCharacteristic(final int characteristicIdentifier,
+                                                final String descriptorUUID,
+                                                final String transactionId,
+                                                OnSuccessCallback<Descriptor> successCallback,
+                                                OnErrorCallback errorCallback) {
+
+        try {
+            Descriptor descriptor = getDescriptor(characteristicIdentifier, descriptorUUID);
+            safeReadDescriptorForDevice(descriptor, transactionId, successCallback, errorCallback);
+        } catch (BleError error) {
+            errorCallback.onError(error);
+        }
+    }
+
+    @Override
+    public void readDescriptor(final int descriptorIdentifier,
+                               final String transactionId,
+                               OnSuccessCallback<Descriptor> onSuccessCallback,
+                               OnErrorCallback onErrorCallback) {
+        try {
+            Descriptor descriptor = getDescriptor(descriptorIdentifier);
+            safeReadDescriptorForDevice(descriptor, transactionId, onSuccessCallback, onErrorCallback);
+        } catch (BleError error) {
+            onErrorCallback.onError(error);
+        }
+    }
+
+    private void safeReadDescriptorForDevice(final Descriptor descriptor,
+                                             final String transactionId,
+                                             OnSuccessCallback<Descriptor> onSuccessCallback,
+                                             OnErrorCallback onErrorCallback) {
+        final RxBleConnection connection = getConnectionOrEmitError(descriptor.getDeviceId(), onErrorCallback);
+        if (connection == null) {
+            return;
+        }
+
+        final SafeExecutor<Descriptor> safeExecutor = new SafeExecutor<>(onSuccessCallback, onErrorCallback);
+
+        final Subscription subscription = connection
+                .readDescriptor(descriptor.getNativeDescriptor())
+                .doOnUnsubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        safeExecutor.error(BleErrorUtils.cancelled());
+                        pendingTransactions.removeSubscription(transactionId);
+                    }
+                })
+                .subscribe(new Observer<byte[]>() {
+                    @Override
+                    public void onCompleted() {
+                        pendingTransactions.removeSubscription(transactionId);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        safeExecutor.error(errorConverter.toError(e));
+                        pendingTransactions.removeSubscription(transactionId);
+                    }
+
+                    @Override
+                    public void onNext(byte[] bytes) {
+                        descriptor.logValue("Read from", bytes);
+                        descriptor.setValue(bytes);
+                        safeExecutor.success(descriptor);
+                    }
+                });
+
+        pendingTransactions.replaceSubscription(transactionId, subscription);
+    }
+
+    @Override
+    public void writeDescriptorForDevice(final String deviceId,
+                                         final String serviceUUID,
+                                         final String characteristicUUID,
+                                         final String descriptorUUID,
+                                         final String valueBase64,
+                                         final String transactionId,
+                                         OnSuccessCallback<Descriptor> successCallback,
+                                         OnErrorCallback errorCallback) {
+        try {
+            Descriptor descriptor = getDescriptor(deviceId, serviceUUID, characteristicUUID, descriptorUUID);
+            safeWriteDescriptorForDevice(
+                    descriptor,
+                    valueBase64,
+                    transactionId,
+                    successCallback,
+                    errorCallback);
+        } catch (BleError error) {
+            errorCallback.onError(error);
+        }
+    }
+
+    @Override
+    public void writeDescriptorForService(final int serviceIdentifier,
+                                          final String characteristicUUID,
+                                          final String descriptorUUID,
+                                          final String valueBase64,
+                                          final String transactionId,
+                                          OnSuccessCallback<Descriptor> successCallback,
+                                          OnErrorCallback errorCallback) {
+        try {
+            Descriptor descriptor = getDescriptor(serviceIdentifier, characteristicUUID, descriptorUUID);
+            safeWriteDescriptorForDevice(
+                    descriptor,
+                    valueBase64,
+                    transactionId,
+                    successCallback,
+                    errorCallback);
+        } catch (BleError error) {
+            errorCallback.onError(error);
+        }
+    }
+
+    @Override
+    public void writeDescriptorForCharacteristic(final int characteristicIdentifier,
+                                                 final String descriptorUUID,
+                                                 final String valueBase64,
+                                                 final String transactionId,
+                                                 OnSuccessCallback<Descriptor> successCallback,
+                                                 OnErrorCallback errorCallback) {
+        try {
+            Descriptor descriptor = getDescriptor(characteristicIdentifier, descriptorUUID);
+            safeWriteDescriptorForDevice(
+                    descriptor,
+                    valueBase64,
+                    transactionId,
+                    successCallback,
+                    errorCallback);
+        } catch (BleError error) {
+            errorCallback.onError(error);
+        }
+    }
+
+    @Override
+    public void writeDescriptor(final int descriptorIdentifier,
+                                final String valueBase64,
+                                final String transactionId,
+                                OnSuccessCallback<Descriptor> successCallback,
+                                OnErrorCallback errorCallback) {
+        try {
+            Descriptor descriptor = getDescriptor(descriptorIdentifier);
+            safeWriteDescriptorForDevice(
+                    descriptor,
+                    valueBase64,
+                    transactionId,
+                    successCallback,
+                    errorCallback);
+        } catch (BleError error) {
+            errorCallback.onError(error);
+        }
+
+    }
+
+    private void safeWriteDescriptorForDevice(final Descriptor descriptor,
+                                              final String valueBase64,
+                                              final String transactionId,
+                                              OnSuccessCallback<Descriptor> successCallback,
+                                              OnErrorCallback errorCallback) {
+        BluetoothGattDescriptor nativeDescriptor = descriptor.getNativeDescriptor();
+
+        if (nativeDescriptor.getUuid().equals(Constants.CLIENT_CHARACTERISTIC_CONFIG_UUID)) {
+            errorCallback.onError(BleErrorUtils.descriptorWriteNotAllowed(UUIDConverter.fromUUID(nativeDescriptor.getUuid())));
+            return;
+        }
+
+        final RxBleConnection connection = getConnectionOrEmitError(descriptor.getDeviceId(), errorCallback);
+        if (connection == null) {
+            return;
+        }
+
+        final byte[] value;
+        try {
+            value = Base64Converter.decode(valueBase64);
+        } catch (Throwable e) {
+            String uuid = UUIDConverter.fromUUID(nativeDescriptor.getUuid());
+            errorCallback.onError(BleErrorUtils.invalidWriteDataForDescriptor(valueBase64, uuid));
+            return;
+        }
+
+        final SafeExecutor<Descriptor> safeExecutor = new SafeExecutor<>(successCallback, errorCallback);
+
+        final Subscription subscription = connection
+                .writeDescriptor(nativeDescriptor, value)
+                .doOnUnsubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        safeExecutor.error(BleErrorUtils.cancelled());
+                        pendingTransactions.removeSubscription(transactionId);
+                    }
+                })
+                .subscribe(new Observer<byte[]>() {
+                    @Override
+                    public void onCompleted() {
+                        pendingTransactions.removeSubscription(transactionId);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        safeExecutor.error(errorConverter.toError(e));
+                        pendingTransactions.removeSubscription(transactionId);
+                    }
+
+                    @Override
+                    public void onNext(byte[] bytes) {
+                        descriptor.logValue("Write to", bytes);
+                        descriptor.setValue(bytes);
+                        safeExecutor.success(descriptor);
+                    }
+                });
+
+        pendingTransactions.replaceSubscription(transactionId, subscription);
+    }
+
+    // Mark: Descriptors getters -------------------------------------------------------------------
+
+    private Descriptor getDescriptor(@NonNull final String deviceId,
+                                     @NonNull final String serviceUUID,
+                                     @NonNull final String characteristicUUID,
+                                     @NonNull final String descriptorUUID) throws BleError {
+        final UUID[] UUIDs = UUIDConverter.convert(serviceUUID, characteristicUUID, descriptorUUID);
+        if (UUIDs == null) {
+            throw BleErrorUtils.invalidIdentifiers(serviceUUID, characteristicUUID, descriptorUUID);
+        }
+
+        final Device device = connectedDevices.get(deviceId);
+        if (device == null) {
+            throw BleErrorUtils.deviceNotConnected(deviceId);
+        }
+
+        final Service service = device.getServiceByUUID(UUIDs[0]);
+        if (service == null) {
+            throw BleErrorUtils.serviceNotFound(serviceUUID);
+        }
+
+        final Characteristic characteristic = service.getCharacteristicByUUID(UUIDs[1]);
+        if (characteristic == null) {
+            throw BleErrorUtils.characteristicNotFound(characteristicUUID);
+        }
+
+        final Descriptor descriptor = characteristic.getDescriptorByUUID(UUIDs[2]);
+        if (descriptor == null) {
+            throw BleErrorUtils.descriptorNotFound(descriptorUUID);
+        }
+
+        return descriptor;
+    }
+
+    private Descriptor getDescriptor(final int serviceIdentifier,
+                                     @NonNull final String characteristicUUID,
+                                     @NonNull final String descriptorUUID) throws BleError {
+        final UUID[] UUIDs = UUIDConverter.convert(characteristicUUID, descriptorUUID);
+        if (UUIDs == null) {
+            throw BleErrorUtils.invalidIdentifiers(characteristicUUID, descriptorUUID);
+        }
+
+        final Service service = discoveredServices.get(serviceIdentifier);
+        if (service == null) {
+            throw BleErrorUtils.serviceNotFound(Integer.toString(serviceIdentifier));
+        }
+
+        final Characteristic characteristic = service.getCharacteristicByUUID(UUIDs[0]);
+        if (characteristic == null) {
+            throw BleErrorUtils.characteristicNotFound(characteristicUUID);
+        }
+
+        final Descriptor descriptor = characteristic.getDescriptorByUUID(UUIDs[1]);
+        if (descriptor == null) {
+            throw BleErrorUtils.descriptorNotFound(descriptorUUID);
+        }
+
+        return descriptor;
+    }
+
+    private Descriptor getDescriptor(final int characteristicIdentifier,
+                                     @NonNull final String descriptorUUID) throws BleError {
+        final UUID uuid = UUIDConverter.convert(descriptorUUID);
+        if (uuid == null) {
+            throw BleErrorUtils.invalidIdentifiers(descriptorUUID);
+        }
+
+        final Characteristic characteristic = discoveredCharacteristics.get(characteristicIdentifier);
+        if (characteristic == null) {
+            throw BleErrorUtils.characteristicNotFound(Integer.toString(characteristicIdentifier));
+        }
+
+        final Descriptor descriptor = characteristic.getDescriptorByUUID(uuid);
+        if (descriptor == null) {
+            throw BleErrorUtils.descriptorNotFound(descriptorUUID);
+        }
+
+        return descriptor;
+    }
+
+    private Descriptor getDescriptor(final int descriptorIdentifier) throws BleError {
+
+        final Descriptor descriptor = discoveredDescriptors.get(descriptorIdentifier);
+        if (descriptor == null) {
+            throw BleErrorUtils.descriptorNotFound(Integer.toString(descriptorIdentifier));
+        }
+
+        return descriptor;
+    }
+
+    @Override
     public void cancelTransaction(String transactionId) {
         pendingTransactions.removeSubscription(transactionId);
     }
@@ -767,12 +1145,7 @@ public class BleModule implements BleAdapter {
             return;
         }
 
-        final OneTimeActionExecutor<BleError> oneTimeErrorCallback = new OneTimeActionExecutor<BleError>() {
-            @Override
-            public void action(BleError error) {
-                onErrorCallback.onError(error);
-            }
-        };
+        final SafeExecutor<Void> safeExecutor = new SafeExecutor<>(onSuccessCallback, onErrorCallback);
 
         final Subscription subscription = new RxBleAdapterStateObservable(context)
                 .takeUntil(new Func1<RxBleAdapterStateObservable.BleAdapterState, Boolean>() {
@@ -785,20 +1158,20 @@ public class BleModule implements BleAdapter {
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {
-                        oneTimeErrorCallback.execute(BleErrorUtils.cancelled());
+                        safeExecutor.error(BleErrorUtils.cancelled());
                         pendingTransactions.removeSubscription(transactionId);
                     }
                 })
                 .subscribe(new Action0() {
                     @Override
                     public void call() {
-                        onSuccessCallback.onSuccess(null);
+                        safeExecutor.success(null);
                         pendingTransactions.removeSubscription(transactionId);
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable error) {
-                        oneTimeErrorCallback.execute(errorConverter.toError(error));
+                        safeExecutor.error(errorConverter.toError(error));
                         pendingTransactions.removeSubscription(transactionId);
                     }
                 });
@@ -907,12 +1280,7 @@ public class BleModule implements BleAdapter {
                                      final OnEventCallback<ConnectionState> onConnectionStateChangedCallback,
                                      final OnErrorCallback onErrorCallback) {
 
-        final OneTimeActionExecutor<BleError> oneTimeErrorCallback = new OneTimeActionExecutor<BleError>() {
-            @Override
-            public void action(BleError error) {
-                onErrorCallback.onError(error);
-            }
-        };
+        final SafeExecutor<Device> safeExecutor = new SafeExecutor<>(onSuccessCallback, onErrorCallback);
 
         Observable<RxBleConnection> connect = device
                 .establishConnection(autoConnect)
@@ -925,7 +1293,7 @@ public class BleModule implements BleAdapter {
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {
-                        oneTimeErrorCallback.execute(BleErrorUtils.cancelled());
+                        safeExecutor.error(BleErrorUtils.cancelled());
                         onDeviceDisconnected(device);
                         onConnectionStateChangedCallback.onEvent(ConnectionState.DISCONNECTED);
                     }
@@ -1000,7 +1368,7 @@ public class BleModule implements BleAdapter {
                     @Override
                     public void onError(Throwable e) {
                         BleError bleError = errorConverter.toError(e);
-                        oneTimeErrorCallback.execute(bleError);
+                        safeExecutor.error(bleError);
                         onDeviceDisconnected(device);
                     }
 
@@ -1011,7 +1379,7 @@ public class BleModule implements BleAdapter {
                         cleanServicesAndCharacteristicsForDevice(localDevice);
                         connectedDevices.put(device.getMacAddress(), localDevice);
                         activeConnections.put(device.getMacAddress(), connection);
-                        onSuccessCallback.onSuccess(localDevice);
+                        safeExecutor.success(localDevice);
                     }
                 });
 
@@ -1038,32 +1406,27 @@ public class BleModule implements BleAdapter {
             return;
         }
 
-        final OneTimeActionExecutor<BleError> oneTimeErrorCallback = new OneTimeActionExecutor<BleError>() {
-            @Override
-            public void action(BleError error) {
-                onErrorCallback.onError(error);
-            }
-        };
+        final SafeExecutor<Device> safeExecutor = new SafeExecutor<>(onSuccessCallback, onErrorCallback);
 
         final Subscription subscription = connection
                 .discoverServices()
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {
-                        oneTimeErrorCallback.execute(BleErrorUtils.cancelled());
+                        safeExecutor.error(BleErrorUtils.cancelled());
                         pendingTransactions.removeSubscription(transactionId);
                     }
                 })
                 .subscribe(new Observer<RxBleDeviceServices>() {
                     @Override
                     public void onCompleted() {
-                        onSuccessCallback.onSuccess(device);
+                        safeExecutor.success(device);
                         pendingTransactions.removeSubscription(transactionId);
                     }
 
                     @Override
                     public void onError(Throwable error) {
-                        oneTimeErrorCallback.execute(errorConverter.toError(error));
+                        safeExecutor.error(errorConverter.toError(error));
                         pendingTransactions.removeSubscription(transactionId);
                     }
 
@@ -1078,6 +1441,11 @@ public class BleModule implements BleAdapter {
                             for (BluetoothGattCharacteristic gattCharacteristic : gattService.getCharacteristics()) {
                                 Characteristic characteristic = new Characteristic(service, gattCharacteristic);
                                 discoveredCharacteristics.put(characteristic.getId(), characteristic);
+
+                                for (BluetoothGattDescriptor gattDescriptor : gattCharacteristic.getDescriptors()) {
+                                    Descriptor descriptor = new Descriptor(characteristic, gattDescriptor);
+                                    discoveredDescriptors.put(descriptor.getId(), descriptor);
+                                }
                             }
                         }
                         device.setServices(services);
@@ -1091,24 +1459,19 @@ public class BleModule implements BleAdapter {
                                                  final String transactionId,
                                                  final OnSuccessCallback<Characteristic> onSuccessCallback,
                                                  final OnErrorCallback onErrorCallback) {
-        final RxBleConnection connection = getConnectionOrEmitError(characteristic.getDeviceID(), onErrorCallback);
+        final RxBleConnection connection = getConnectionOrEmitError(characteristic.getDeviceId(), onErrorCallback);
         if (connection == null) {
             return;
         }
 
-        final OneTimeActionExecutor<BleError> oneTimeErrorCallback = new OneTimeActionExecutor<BleError>() {
-            @Override
-            public void action(BleError error) {
-                onErrorCallback.onError(error);
-            }
-        };
+        final SafeExecutor<Characteristic> safeExecutor = new SafeExecutor<>(onSuccessCallback, onErrorCallback);
 
         final Subscription subscription = connection
                 .readCharacteristic(characteristic.getUuid())
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {
-                        oneTimeErrorCallback.execute(BleErrorUtils.cancelled());
+                        safeExecutor.error(BleErrorUtils.cancelled());
                         pendingTransactions.removeSubscription(transactionId);
                     }
                 })
@@ -1120,13 +1483,7 @@ public class BleModule implements BleAdapter {
 
                     @Override
                     public void onError(Throwable error) {
-                        if (error instanceof BleCharacteristicNotFoundException) {
-                            oneTimeErrorCallback.execute(
-                                    BleErrorUtils.characteristicNotFound(
-                                            UUIDConverter.fromUUID(characteristic.getUuid())));
-                            return;
-                        }
-                        oneTimeErrorCallback.execute(errorConverter.toError(error));
+                        safeExecutor.error(errorConverter.toError(error));
                         pendingTransactions.removeSubscription(transactionId);
                     }
 
@@ -1134,7 +1491,7 @@ public class BleModule implements BleAdapter {
                     public void onNext(byte[] bytes) {
                         characteristic.logValue("Read from", bytes);
                         characteristic.setValue(bytes);
-                        onSuccessCallback.onSuccess(characteristic);
+                        safeExecutor.success(characteristic);
                     }
                 });
 
@@ -1174,24 +1531,19 @@ public class BleModule implements BleAdapter {
                                                   final String transactionId,
                                                   final OnSuccessCallback<Characteristic> onSuccessCallback,
                                                   final OnErrorCallback onErrorCallback) {
-        final RxBleConnection connection = getConnectionOrEmitError(characteristic.getDeviceID(), onErrorCallback);
+        final RxBleConnection connection = getConnectionOrEmitError(characteristic.getDeviceId(), onErrorCallback);
         if (connection == null) {
             return;
         }
 
-        final OneTimeActionExecutor<BleError> oneTimeErrorCallback = new OneTimeActionExecutor<BleError>() {
-            @Override
-            public void action(BleError error) {
-                onErrorCallback.onError(error);
-            }
-        };
+        final SafeExecutor<Characteristic> safeExecutor = new SafeExecutor<>(onSuccessCallback, onErrorCallback);
 
         final Subscription subscription = connection
                 .writeCharacteristic(characteristic.getUuid(), value)
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {
-                        oneTimeErrorCallback.execute(BleErrorUtils.cancelled());
+                        safeExecutor.error(BleErrorUtils.cancelled());
                         pendingTransactions.removeSubscription(transactionId);
                     }
                 })
@@ -1203,14 +1555,7 @@ public class BleModule implements BleAdapter {
 
                     @Override
                     public void onError(Throwable e) {
-                        if (e instanceof BleCharacteristicNotFoundException) {
-                            oneTimeErrorCallback.execute(
-                                    BleErrorUtils.characteristicNotFound(
-                                            UUIDConverter.fromUUID(
-                                                    characteristic.getUuid())));
-                            return;
-                        }
-                        oneTimeErrorCallback.execute(errorConverter.toError(e));
+                        safeExecutor.error(errorConverter.toError(e));
                         pendingTransactions.removeSubscription(transactionId);
                     }
 
@@ -1218,7 +1563,7 @@ public class BleModule implements BleAdapter {
                     public void onNext(byte[] bytes) {
                         characteristic.logValue("Write to", bytes);
                         characteristic.setValue(bytes);
-                        onSuccessCallback.onSuccess(characteristic);
+                        safeExecutor.success(characteristic);
                     }
                 });
 
@@ -1229,17 +1574,12 @@ public class BleModule implements BleAdapter {
                                                     final String transactionId,
                                                     final OnEventCallback<Characteristic> onEventCallback,
                                                     final OnErrorCallback onErrorCallback) {
-        final RxBleConnection connection = getConnectionOrEmitError(characteristic.getDeviceID(), onErrorCallback);
+        final RxBleConnection connection = getConnectionOrEmitError(characteristic.getDeviceId(), onErrorCallback);
         if (connection == null) {
             return;
         }
 
-        final OneTimeActionExecutor<BleError> oneTimeErrorCallback = new OneTimeActionExecutor<BleError>() {
-            @Override
-            public void action(BleError error) {
-                onErrorCallback.onError(error);
-            }
-        };
+        final SafeExecutor<Void> safeExecutor = new SafeExecutor<>(null, onErrorCallback);
 
         final Subscription subscription = Observable.defer(new Func0<Observable<Observable<byte[]>>>() {
             @Override
@@ -1268,7 +1608,7 @@ public class BleModule implements BleAdapter {
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {
-                        oneTimeErrorCallback.execute(BleErrorUtils.cancelled());
+                        safeExecutor.error(BleErrorUtils.cancelled());
                         pendingTransactions.removeSubscription(transactionId);
                     }
                 })
@@ -1280,7 +1620,7 @@ public class BleModule implements BleAdapter {
 
                     @Override
                     public void onError(Throwable error) {
-                        oneTimeErrorCallback.execute(errorConverter.toError(error));
+                        safeExecutor.error(errorConverter.toError(error));
                         pendingTransactions.removeSubscription(transactionId);
                     }
 
@@ -1380,8 +1720,16 @@ public class BleModule implements BleAdapter {
             int key = discoveredCharacteristics.keyAt(i);
             Characteristic characteristic = discoveredCharacteristics.get(key);
 
-            if (characteristic.getDeviceID().equals(device.getId())) {
+            if (characteristic.getDeviceId().equals(device.getId())) {
                 discoveredCharacteristics.remove(key);
+            }
+        }
+
+        for (int i = discoveredDescriptors.size() - 1; i >= 0; i--) {
+            int key = discoveredDescriptors.keyAt(i);
+            Descriptor descriptor = discoveredDescriptors.get(key);
+            if (descriptor.getDeviceId().equals(device.getId())) {
+                discoveredDescriptors.remove(key);
             }
         }
     }

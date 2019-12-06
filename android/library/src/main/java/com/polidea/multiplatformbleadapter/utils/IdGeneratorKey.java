@@ -17,18 +17,14 @@ public class IdGeneratorKey {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof IdGeneratorKey)) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
         IdGeneratorKey that = (IdGeneratorKey) o;
 
-        return id == that.id &&
-                deviceAddress.equals(that.deviceAddress) &&
-                uuid.equals(that.uuid);
+        if (id != that.id) return false;
+        if (!deviceAddress.equals(that.deviceAddress)) return false;
+        return uuid.equals(that.uuid);
     }
 
     @Override

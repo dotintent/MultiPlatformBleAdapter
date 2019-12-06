@@ -3,24 +3,28 @@ package com.polidea.multiplatformbleadapter;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import com.polidea.multiplatformbleadapter.utils.ByteUtils;
 import com.polidea.multiplatformbleadapter.utils.Constants;
 import com.polidea.multiplatformbleadapter.utils.IdGenerator;
 import com.polidea.multiplatformbleadapter.utils.IdGeneratorKey;
 import com.polidea.rxandroidble.internal.RxBleLog;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class Characteristic {
 
     private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
-    private int id;
-    private int serviceID;
-    private UUID serviceUUID;
-    private String deviceID;
+    final private int id;
+    final private int serviceID;
+    final private UUID serviceUUID;
+    final private String deviceID;
     private byte[] value;
-    private BluetoothGattCharacteristic gattCharacteristic;
+    final private BluetoothGattCharacteristic gattCharacteristic;
 
     public void setValue(byte[] value) {
         this.value = value;
@@ -31,7 +35,7 @@ public class Characteristic {
         this.serviceUUID = service.getUuid();
         this.serviceID = service.getId();
         this.gattCharacteristic = gattCharacteristic;
-        this.id = IdGenerator.getIdForKey(new IdGeneratorKey(service.getDeviceID(), gattCharacteristic.getUuid(), gattCharacteristic.getInstanceId()));
+        this.id = IdGenerator.getIdForKey(new IdGeneratorKey(deviceID, gattCharacteristic.getUuid(), gattCharacteristic.getInstanceId()));
     }
 
     public Characteristic(int id, @NonNull Service service, BluetoothGattCharacteristic gattCharacteristic) {
@@ -58,8 +62,12 @@ public class Characteristic {
         return serviceUUID;
     }
 
-    public String getDeviceID() {
+    public String getDeviceId() {
         return deviceID;
+    }
+
+    public int getInstanceId() {
+        return gattCharacteristic.getInstanceId();
     }
 
     public BluetoothGattDescriptor getGattDescriptor(UUID uuid) {
@@ -86,6 +94,14 @@ public class Characteristic {
         return (gattCharacteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0;
     }
 
+    public List<Descriptor> getDescriptors() {
+        ArrayList<Descriptor> descriptors = new ArrayList<>(gattCharacteristic.getDescriptors().size());
+        for (BluetoothGattDescriptor gattDescriptor : gattCharacteristic.getDescriptors()) {
+            descriptors.add(new Descriptor(this, gattDescriptor));
+        }
+        return descriptors;
+    }
+
     public boolean isNotifying() {
         BluetoothGattDescriptor descriptor = gattCharacteristic.getDescriptor(Constants.CLIENT_CHARACTERISTIC_CONFIG_UUID);
         boolean isNotifying = false;
@@ -106,21 +122,18 @@ public class Characteristic {
         return value;
     }
 
-    private static String bytesToHex(byte[] bytes) {
-        char[] hexChars = new char[bytes.length * 2];
-        for (int j = 0; j < bytes.length; j++) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = hexArray[v >>> 4];
-            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-        }
-        return new String(hexChars);
+    @Nullable
+    public Descriptor getDescriptorByUUID(@NonNull UUID uuid) {
+        BluetoothGattDescriptor descriptor = this.gattCharacteristic.getDescriptor(uuid);
+        if (descriptor == null) return null;
+        return new Descriptor(this, descriptor);
     }
 
     void logValue(String message, byte[] value) {
         if (value == null) {
             value = gattCharacteristic.getValue();
         }
-        String hexValue = value != null ? bytesToHex(value) : "(null)";
+        String hexValue = value != null ? ByteUtils.bytesToHex(value) : "(null)";
         RxBleLog.v(message +
                 " Characteristic(uuid: " + gattCharacteristic.getUuid().toString() +
                 ", id: " + id +
