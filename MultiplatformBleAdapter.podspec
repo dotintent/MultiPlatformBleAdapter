@@ -9,7 +9,7 @@ Pod::Spec.new do |spec|
 
   spec.homepage     = "https://github.com/Polidea/MultiPlatformBleAdapter"
   spec.license      = "Apache License, Version 2.0."
-  spec.author             = { "Pawel Scibek" => "pawel.scibek@polidea.com", "Tomasz Bogusz" => "tomasz.bogusz@polidea.com" }
+  spec.author             = { "Pawel Scibek" => "pawel.scibek@polidea.com", "Tomasz Bogusz" => "tomasz.bogusz@polidea.com", "Przemyslaw Lenart" => "przemyslaw.lenart@polidea.com" }
   spec.social_media_url   = "https://twitter.com/polidea"
 
   spec.platform = :ios
