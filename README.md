@@ -8,9 +8,11 @@ Internally uses:
  
 If you'd like to use it in your own library, you should start from BleAdapter on either platform.
 ## Maintained by
-This library is maintained by [Polidea](http://www.polidea.com)
+This library is maintained by [Polidea](https://www.polidea.com/?utm_source=Github&utm_medium=Npaid&utm_campaign=Main&utm_term=Code&utm_content=GH_NOP_MPG_COD_MPBA001)
 
-[Learn more about Polidea's BLE services](https://www.polidea.com/services/ble).
+[Contact us](https://www.polidea.com/project/?utm_source=Github&utm_medium=Npaid&utm_campaign=Kontakt&utm_term=Code&utm_content=GH_NOP_KKT_COD_MPBA001)
+
+[Learn more about Polidea's BLE services](https://www.polidea.com/services/ble/?utm_source=Github&utm_medium=Npaid&utm_campaign=Tech_BLE&utm_term=Code&utm_content=GH_NOP_BLE_COD_MPBA001).
 
 #### Maintainers
 TBD
