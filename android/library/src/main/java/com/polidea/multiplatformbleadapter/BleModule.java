@@ -53,6 +53,7 @@ import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 import static com.polidea.multiplatformbleadapter.utils.Constants.BluetoothState;
 
@@ -1605,6 +1606,8 @@ public class BleModule implements BleAdapter {
                         return observable;
                     }
                 })
+                .onBackpressureBuffer()
+                .observeOn(Schedulers.computation())
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {
