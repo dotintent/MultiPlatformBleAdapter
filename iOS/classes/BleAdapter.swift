@@ -91,6 +91,22 @@ import Foundation
     func characteristicsForService(_ serviceIdentifier: Double,
                                    resolve: Resolve,
                                    reject: Reject)
+    
+    func descriptorsForDevice(_ deviceIdentifier: String,
+                              serviceUUID: String,
+                              characteristicUUID: String,
+                              resolve: Resolve,
+                              reject: Reject)
+                              
+    func descriptorsForService(_ serviceIdentifier: Double,
+                               characteristicUUID: String,
+                               resolve: Resolve,
+                               reject: Reject)
+    
+    func descriptorsForCharacteristic(_ characteristicIdentifier: Double,
+                                      resolve: Resolve,
+                                      reject: Reject)
+    
 
     func readCharacteristicForDevice(_ deviceIdentifier: String,
                                      serviceUUID: String,
@@ -151,6 +167,62 @@ import Foundation
                                transactionId: String,
                                resolve: @escaping Resolve,
                                reject: @escaping Reject)
+    
+    func readDescriptorForDevice(_ deviceIdentifier: String,
+                                 serviceUUID: String,
+                                 characteristicUUID: String,
+                                 descriptorUUID: String,
+                                 transactionId: String,
+                                 resolve: @escaping Resolve,
+                                 reject: @escaping Reject)
+    
+    func readDescriptorForService(_ serviceId: Double,
+                                  characteristicUUID: String,
+                                  descriptorUUID: String,
+                                  transactionId: String,
+                                  resolve: @escaping Resolve,
+                                  reject: @escaping Reject)
+    
+    func readDescriptorForCharacteristic(_ characteristicID: Double,
+                                         descriptorUUID: String,
+                                         transactionId: String,
+                                         resolve: @escaping Resolve,
+                                         reject: @escaping Reject)
+    
+    func readDescriptor(_ descriptorID: Double,
+                        transactionId: String,
+                        resolve: @escaping Resolve,
+                        reject: @escaping Reject)
+    
+    func writeDescriptorForDevice(_ deviceIdentifier: String,
+                                  serviceUUID: String,
+                                  characteristicUUID: String,
+                                  descriptorUUID: String,
+                                  valueBase64: String,
+                                  transactionId: String,
+                                  resolve: @escaping Resolve,
+                                  reject: @escaping Reject)
+    
+    func writeDescriptorForService(_ serviceID: Double,
+                                   characteristicUUID: String,
+                                   descriptorUUID: String,
+                                   valueBase64: String,
+                                   transactionId: String,
+                                   resolve: @escaping Resolve,
+                                   reject: @escaping Reject)
+    
+    func writeDescriptorForCharacteristic(_ characteristicID: Double,
+                                          descriptorUUID: String,
+                                          valueBase64: String,
+                                          transactionId: String,
+                                          resolve: @escaping Resolve,
+                                          reject: @escaping Reject)
+    
+    func writeDescriptor(_ descriptorID: Double,
+                         valueBase64: String,
+                         transactionId: String,
+                         resolve: @escaping Resolve,
+                         reject: @escaping Reject)
 }
 
 extension BleClientManager: BleAdapter { }
