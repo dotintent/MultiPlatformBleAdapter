@@ -97,6 +97,7 @@ import Foundation
                               characteristicUUID: String,
                               resolve: Resolve,
                               reject: Reject)
+                              
     func descriptorsForService(_ serviceIdentifier: Double,
                                characteristicUUID: String,
                                resolve: Resolve,
