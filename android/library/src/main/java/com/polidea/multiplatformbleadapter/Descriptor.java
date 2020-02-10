@@ -32,6 +32,17 @@ public class Descriptor {
         this.uuid = gattDescriptor.getUuid();
     }
 
+    public Descriptor(int characteristicId, int serviceId, UUID characteristicUuid, UUID serviceUuid, String deviceId, BluetoothGattDescriptor descriptor, int id, UUID uuid) {
+        this.characteristicId = characteristicId;
+        this.serviceId = serviceId;
+        this.characteristicUuid = characteristicUuid;
+        this.serviceUuid = serviceUuid;
+        this.deviceId = deviceId;
+        this.descriptor = descriptor;
+        this.id = id;
+        this.uuid = uuid;
+    }
+
     public int getId() {
         return id;
     }
