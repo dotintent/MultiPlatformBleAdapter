@@ -32,6 +32,7 @@ public class Descriptor {
         this.uuid = gattDescriptor.getUuid();
     }
 
+    //secondary constructor, not used by MBA itself, but which can be used by external plugins (eg. BLEmulator)
     public Descriptor(int characteristicId, int serviceId, UUID characteristicUuid, UUID serviceUuid, String deviceId, BluetoothGattDescriptor descriptor, int id, UUID uuid) {
         this.characteristicId = characteristicId;
         this.serviceId = serviceId;
