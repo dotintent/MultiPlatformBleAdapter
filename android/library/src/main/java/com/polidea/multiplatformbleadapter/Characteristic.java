@@ -46,6 +46,15 @@ public class Characteristic {
         this.gattCharacteristic = gattCharacteristic;
     }
 
+    public Characteristic(Characteristic other) {
+        id = other.id;
+        serviceID = other.serviceID;
+        serviceUUID = other.serviceUUID;
+        deviceID = other.deviceID;
+        if (other.value != null) value = other.value.clone();
+        gattCharacteristic = other.gattCharacteristic;
+    }
+
     public int getId() {
         return this.id;
     }

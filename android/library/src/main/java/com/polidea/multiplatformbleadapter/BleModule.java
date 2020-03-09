@@ -844,7 +844,7 @@ public class BleModule implements BleAdapter {
                     public void onNext(byte[] bytes) {
                         descriptor.logValue("Read from", bytes);
                         descriptor.setValue(bytes);
-                        safeExecutor.success(descriptor);
+                        safeExecutor.success(new Descriptor(descriptor));
                     }
                 });
 
@@ -987,7 +987,7 @@ public class BleModule implements BleAdapter {
                     public void onNext(byte[] bytes) {
                         descriptor.logValue("Write to", bytes);
                         descriptor.setValue(bytes);
-                        safeExecutor.success(descriptor);
+                        safeExecutor.success(new Descriptor(descriptor));
                     }
                 });
 
@@ -1492,7 +1492,7 @@ public class BleModule implements BleAdapter {
                     public void onNext(byte[] bytes) {
                         characteristic.logValue("Read from", bytes);
                         characteristic.setValue(bytes);
-                        safeExecutor.success(characteristic);
+                        safeExecutor.success(new Characteristic(characteristic));
                     }
                 });
 
@@ -1564,7 +1564,7 @@ public class BleModule implements BleAdapter {
                     public void onNext(byte[] bytes) {
                         characteristic.logValue("Write to", bytes);
                         characteristic.setValue(bytes);
-                        safeExecutor.success(characteristic);
+                        safeExecutor.success(new Characteristic(characteristic));
                     }
                 });
 
@@ -1631,7 +1631,7 @@ public class BleModule implements BleAdapter {
                     public void onNext(byte[] bytes) {
                         characteristic.logValue("Notification from", bytes);
                         characteristic.setValue(bytes);
-                        onEventCallback.onEvent(characteristic);
+                        onEventCallback.onEvent(new Characteristic(characteristic));
                     }
                 });
 
