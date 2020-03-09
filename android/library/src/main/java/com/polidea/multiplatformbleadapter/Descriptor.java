@@ -44,6 +44,18 @@ public class Descriptor {
         this.uuid = uuid;
     }
 
+    public Descriptor(Descriptor other) {
+        characteristicUuid = other.characteristicUuid;
+        characteristicId = other.characteristicId;
+        serviceUuid = other.serviceUuid;
+        serviceId = other.serviceId;
+        deviceId = other.deviceId;
+        descriptor = other.descriptor;
+        id = other.id;
+        uuid = other.uuid;
+        if (other.value != null) value = other.value.clone();
+    }
+
     public int getId() {
         return id;
     }
