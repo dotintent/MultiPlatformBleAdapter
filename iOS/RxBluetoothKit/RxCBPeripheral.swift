@@ -61,11 +61,12 @@ class RxCBPeripheral: RxPeripheralType {
         // Although available since iOS 11.0, on versions < iOS 11.2 canSendWriteWithoutResponse will always
         // return false (on first try). We work around this issue by always returning true for < iOS 11.2.
         // See: https://github.com/Polidea/react-native-ble-plx/issues/365
+        #if !targetEnvironment(macCatalyst)
         if #available(iOS 11.2, *) {
             return peripheral.canSendWriteWithoutResponse
-        } else {
-            return true
         }
+        #endif
+        return true
     }
 
     var rx_didUpdateName: Observable<String?> {
@@ -363,11 +364,16 @@ class RxCBPeripheral: RxPeripheralType {
         @objc func peripheralIsReady(toSendWriteWithoutResponse peripheral: CBPeripheral) {
             //resolve build errors with XCode 11 / iOS 13
             let canSendWriteWithoutResponse: Bool
+            #if !targetEnvironment(macCatalyst)
             if #available(iOS 11.2, *) {
                 canSendWriteWithoutResponse = peripheral.canSendWriteWithoutResponse
             } else {
                 canSendWriteWithoutResponse = true
             }
+            #else
+            canSendWriteWithoutResponse = true
+            #endif
+
             RxBluetoothKitLog.d("\(peripheral.logDescription) peripheralIsReady(toSendWriteWithoutResponse:\(canSendWriteWithoutResponse)")
             peripheralIsReadyToSendWriteWithoutResponseSubject.onNext(canSendWriteWithoutResponse)
         }

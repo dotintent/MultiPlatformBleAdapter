@@ -67,11 +67,12 @@ extension ScannedPeripheral {
 
 extension Peripheral {
     var mtu: Int {
+        #if !targetEnvironment(macCatalyst)
         if #available(iOS 9.0, *) {
             return maximumWriteValueLength(for: .withoutResponse) + 3
-        } else {
-            return 23
         }
+        #endif
+        return 23
     }
 
     func asJSObject(withRssi: Int? = nil) -> [AnyHashable: Any] {
