@@ -376,17 +376,34 @@ public class BleClientManager : NSObject {
         }
 
         var timeout: Int? = nil
-
+        
+        var connectOptions: [String: AnyObject] = [:]
+        
+        
         if let options = options {
             timeout = options["timeout"] as? Int
+            
+            if let isConnection = options["notifyOnConnection"] as? Bool {
+                connectOptions[CBConnectPeripheralOptionNotifyOnConnectionKey] = isConnection as AnyObject
+            }
+            if let isDisconnection = options["notifyOnDisconnection"] as? Bool {
+                connectOptions[CBConnectPeripheralOptionNotifyOnDisconnectionKey] = isDisconnection as AnyObject
+            }
+            if let isNotification = options["notifyOnNotification"] as? Bool {
+                connectOptions[CBConnectPeripheralOptionNotifyOnNotificationKey] = isNotification as AnyObject
+            }
         }
 
-        safeConnectToDevice(deviceId, timeout: timeout, promise: SafePromise(resolve: resolve, reject: reject))
+
+        safeConnectToDevice(deviceId, timeout: timeout,
+                            promise: SafePromise(resolve: resolve, reject: reject),
+                            options: connectOptions)
     }
 
     private func safeConnectToDevice(_ deviceId: UUID,
                                         timeout: Int?,
-                                        promise: SafePromise) {
+                                        promise: SafePromise,
+                                        options: [String: AnyObject]) {
 
         var connectionObservable = manager.retrievePeripherals(withIdentifiers: [deviceId])
             .flatMap { devices -> Observable<Peripheral> in
@@ -395,7 +412,7 @@ public class BleClientManager : NSObject {
                 }
                 return Observable.just(device)
             }
-            .flatMap { $0.connect() }
+            .flatMap { $0.connect(options: options) }
 
         if let timeout = timeout {
             connectionObservable = connectionObservable.timeout(Double(timeout) / 1000.0, scheduler: ConcurrentDispatchQueueScheduler(queue: queue))
