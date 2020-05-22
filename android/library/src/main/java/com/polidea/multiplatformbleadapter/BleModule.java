@@ -1468,7 +1468,7 @@ public class BleModule implements BleAdapter {
         final SafeExecutor<Characteristic> safeExecutor = new SafeExecutor<>(onSuccessCallback, onErrorCallback);
 
         final Subscription subscription = connection
-                .readCharacteristic(characteristic.getUuid())
+                .readCharacteristic(characteristic.gattCharacteristic)
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {
@@ -1540,7 +1540,7 @@ public class BleModule implements BleAdapter {
         final SafeExecutor<Characteristic> safeExecutor = new SafeExecutor<>(onSuccessCallback, onErrorCallback);
 
         final Subscription subscription = connection
-                .writeCharacteristic(characteristic.getUuid(), value)
+                .writeCharacteristic(characteristic.gattCharacteristic, value)
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {
@@ -1590,11 +1590,11 @@ public class BleModule implements BleAdapter {
                         ? NotificationSetupMode.QUICK_SETUP
                         : NotificationSetupMode.COMPAT;
                 if (characteristic.isNotifiable()) {
-                    return connection.setupNotification(characteristic.getUuid(), setupMode);
+                    return connection.setupNotification(characteristic.gattCharacteristic, setupMode);
                 }
 
                 if (characteristic.isIndicatable()) {
-                    return connection.setupIndication(characteristic.getUuid(), setupMode);
+                    return connection.setupIndication(characteristic.gattCharacteristic, setupMode);
                 }
 
                 return Observable.error(new CannotMonitorCharacteristicException(characteristic));

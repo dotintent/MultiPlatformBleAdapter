@@ -24,7 +24,7 @@ public class Characteristic {
     final private UUID serviceUUID;
     final private String deviceID;
     private byte[] value;
-    final private BluetoothGattCharacteristic gattCharacteristic;
+    final BluetoothGattCharacteristic gattCharacteristic;
 
     public void setValue(byte[] value) {
         this.value = value;
