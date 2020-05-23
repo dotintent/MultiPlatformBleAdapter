@@ -360,7 +360,7 @@ public class BleModule implements BleAdapter {
                                 OnSuccessCallback<Device[]> onSuccessCallback,
                                 OnErrorCallback onErrorCallback) {
         if (rxBleClient == null) {
-            throw new IllegalStateException("BleManager not created when tried connecting to device");
+            throw new IllegalStateException("BleManager not created when tried to get known devices");
         }
 
         List<Device> knownDevices = new ArrayList<>();
@@ -384,7 +384,7 @@ public class BleModule implements BleAdapter {
                                     OnSuccessCallback<Device[]> onSuccessCallback,
                                     OnErrorCallback onErrorCallback) {
         if (rxBleClient == null) {
-            throw new IllegalStateException("BleManager not created when tried connecting to device");
+            throw new IllegalStateException("BleManager not created when tried to get connected devices");
         }
 
         if (serviceUUIDs.length == 0) {
@@ -425,7 +425,7 @@ public class BleModule implements BleAdapter {
                                 OnEventCallback<ConnectionState> onConnectionStateChangedCallback,
                                 OnErrorCallback onErrorCallback) {
         if (rxBleClient == null) {
-            throw new IllegalStateException("BleManager not created when tried connecting to device");
+            throw new IllegalStateException("BleManager not created when tried to connect to device");
         }
 
         final RxBleDevice device = rxBleClient.getBleDevice(deviceIdentifier);
@@ -449,7 +449,7 @@ public class BleModule implements BleAdapter {
                                        OnSuccessCallback<Device> onSuccessCallback,
                                        OnErrorCallback onErrorCallback) {
         if (rxBleClient == null) {
-            throw new IllegalStateException("BleManager not created when tried cancel device connection");
+            throw new IllegalStateException("BleManager not created when tried to cancel device connection");
         }
 
         final RxBleDevice device = rxBleClient.getBleDevice(deviceIdentifier);
@@ -470,7 +470,7 @@ public class BleModule implements BleAdapter {
                                   OnSuccessCallback<Boolean> onSuccessCallback,
                                   OnErrorCallback onErrorCallback) {
         if (rxBleClient == null) {
-            throw new IllegalStateException("BleManager not created when tried cancel device connection");
+            throw new IllegalStateException("BleManager not created when tried to check if device is connected");
         }
 
         final RxBleDevice device = rxBleClient.getBleDevice(deviceIdentifier);
