@@ -202,6 +202,11 @@ public class BleClientManager : NSObject {
             }
         }
         
+        let identifiers = restoredState.peripherals.compactMap({$0.identifier})
+        if !identifiers.isEmpty {
+            manager.retrievePeripherals(withIdentifiers: identifiers)
+        }
+        
         dispatchEvent(BleEvent.restoreStateEvent, value: restoredState.asJSObject)
     }
     

@@ -168,4 +168,11 @@ class RxCBCentralManager: RxCentralManagerType {
                             """)
         return .just(centralManager.retrievePeripherals(withIdentifiers: identifiers).map(RxCBPeripheral.init))
     }
+    
+    func registerForConnectionEvents(withIdentifiers identifiers: [UUID]) {
+        if #available(iOS 13.0, *) {
+            return centralManager.registerForConnectionEvents(options: [.peripheralUUIDs: identifiers])
+        }
+        return
+    }
 }

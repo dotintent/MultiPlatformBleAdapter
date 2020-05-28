@@ -375,5 +375,9 @@ public class BluetoothManager {
                     return .just(RestoredState(restoredStateDictionary: dict, bluetoothManager: strongSelf))
                 }
         }
+    
+    public func registerForConnectionEvents(withIdentifiers identifiers: [UUID]) {
+        return centralManager.registerForConnectionEvents(withIdentifiers: identifiers)
+    }
     #endif
 }
