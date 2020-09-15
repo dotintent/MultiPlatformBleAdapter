@@ -42,7 +42,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "com.polidea.rxandroidble:rxandroidble:1.7.1"
+    implementation "com.polidea.rxandroidble2:rxandroidble:1.11.1"
     testImplementation 'junit:junit:4.12'
 }
 
