@@ -7,7 +7,15 @@ Internally uses:
 * [RxBluetoothKit](https://github.com/Polidea/RxBluetoothKit) 
  
 If you'd like to use it in your own library, you should start from BleAdapter on either platform.
+
+### Android setup
+
+Make sure to instruct the users of your library about the need to add and configure a global error handler in their application.
+https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0#error-handling
+See: https://github.com/Polidea/RxAndroidBle/wiki/FAQ:-UndeliverableException
+
 ## Maintained by
+
 This library is maintained by [Polidea](https://www.polidea.com/?utm_source=Github&utm_medium=Npaid&utm_campaign=Main&utm_term=Code&utm_content=GH_NOP_MPG_COD_MPBA001)
 
 [Contact us](https://www.polidea.com/project/?utm_source=Github&utm_medium=Npaid&utm_campaign=Kontakt&utm_term=Code&utm_content=GH_NOP_KKT_COD_MPBA001)
@@ -15,9 +23,11 @@ This library is maintained by [Polidea](https://www.polidea.com/?utm_source=Gith
 [Learn more about Polidea's BLE services](https://www.polidea.com/services/ble/?utm_source=Github&utm_medium=Npaid&utm_campaign=Tech_BLE&utm_term=Code&utm_content=GH_NOP_BLE_COD_MPBA001).
 
 #### Maintainers
+
 TBD
 
 ## License
+
 Copyright 2019 Polidea Sp. z o.o
 
 Licensed under the Apache License, Version 2.0 (the "License");

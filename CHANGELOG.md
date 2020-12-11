@@ -1,3 +1,7 @@
+# 1.0.0-beta
+
+* Migrate Android to RxAndroidBle2/RxJava2 (thanks, @JamesMcIntosh!)
+
 # 0.1.7
 
 * Fix lack of disconnection event on iOS when connection fails to be established
