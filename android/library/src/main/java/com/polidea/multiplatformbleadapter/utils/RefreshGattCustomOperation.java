@@ -1,18 +1,18 @@
 package com.polidea.multiplatformbleadapter.utils;
 
 import android.bluetooth.BluetoothGatt;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
-import com.polidea.rxandroidble.RxBleCustomOperation;
-import com.polidea.rxandroidble.internal.RxBleLog;
-import com.polidea.rxandroidble.internal.connection.RxBleGattCallback;
+import com.polidea.rxandroidble2.RxBleCustomOperation;
+import com.polidea.rxandroidble2.internal.RxBleLog;
+import com.polidea.rxandroidble2.internal.connection.RxBleGattCallback;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import rx.Observable;
-import rx.Scheduler;
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
 
 
 public class RefreshGattCustomOperation implements RxBleCustomOperation<Boolean> {
@@ -25,7 +25,7 @@ public class RefreshGattCustomOperation implements RxBleCustomOperation<Boolean>
             final Scheduler scheduler
     ) throws Throwable {
 
-        return Observable.amb(
+        return Observable.ambArray(
                 Observable.fromCallable(new Callable<Boolean>() {
                     @Override
                     public Boolean call() throws Exception {
