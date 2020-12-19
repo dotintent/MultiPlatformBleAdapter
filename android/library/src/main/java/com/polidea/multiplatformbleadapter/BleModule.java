@@ -459,7 +459,7 @@ public class BleModule implements BleAdapter {
         final RxBleDevice device = rxBleClient.getBleDevice(deviceIdentifier);
 
         if (connectingDevices.removeSubscription(deviceIdentifier) && device != null) {
-            onSuccessCallback.onSuccess(rxBleDeviceToDeviceMapper.map(device));
+            onSuccessCallback.onSuccess(rxBleDeviceToDeviceMapper.map(device, null));
         } else {
             if (device == null) {
                 onErrorCallback.onError(BleErrorUtils.deviceNotFound(deviceIdentifier));
@@ -1245,7 +1245,7 @@ public class BleModule implements BleAdapter {
                     public void call(com.polidea.rxandroidble.scan.ScanResult scanResult) {
                         String deviceId = scanResult.getBleDevice().getMacAddress();
                         if (!discoveredDevices.containsKey(deviceId)) {
-                            discoveredDevices.put(deviceId, rxBleDeviceToDeviceMapper.map(scanResult.getBleDevice()));
+                            discoveredDevices.put(deviceId, rxBleDeviceToDeviceMapper.map(scanResult.getBleDevice(), null));
                         }
                         onEventCallback.onEvent(rxScanResultToScanResultMapper.map(scanResult));
                     }
@@ -1381,7 +1381,7 @@ public class BleModule implements BleAdapter {
 
                     @Override
                     public void onNext(RxBleConnection connection) {
-                        Device localDevice = rxBleDeviceToDeviceMapper.map(device);
+                        Device localDevice = rxBleDeviceToDeviceMapper.map(device, connection);
                         onConnectionStateChangedCallback.onEvent(ConnectionState.CONNECTED);
                         cleanServicesAndCharacteristicsForDevice(localDevice);
                         connectedDevices.put(device.getMacAddress(), localDevice);
