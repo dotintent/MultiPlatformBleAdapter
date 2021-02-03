@@ -417,6 +417,8 @@ public class BleClientManager : NSObject {
                 onError: {  [weak self] error in
                     if let peripheral = peripheral {
                         self?.onPeripheralDisconnected(peripheral)
+                    } else {
+                        self?.dispatchEvent(BleEvent.disconnectionEvent, value: [NSNull(), ["id": deviceId.uuidString]])
                     }
                     error.bleError.callReject(promise)
                 },
