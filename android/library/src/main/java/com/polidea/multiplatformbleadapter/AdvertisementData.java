@@ -17,6 +17,7 @@ public class AdvertisementData {
     private String localName;
     private Integer txPowerLevel;
     private List<UUID> solicitedServiceUUIDs;
+    private byte[] rawScanRecord;
 
     private static final long BLUETOOTH_BASE_UUID_LSB = 0x800000805F9B34FBL;
     private static final int BLUETOOTH_BASE_UUID_MSB = 0x00001000;
@@ -43,6 +44,10 @@ public class AdvertisementData {
 
     public List<UUID> getSolicitedServiceUUIDs() {
         return solicitedServiceUUIDs;
+    }
+
+    public List<UUID> getRawScanRecord() {
+        return rawScanRecord;
     }
 
     private AdvertisementData() {}
