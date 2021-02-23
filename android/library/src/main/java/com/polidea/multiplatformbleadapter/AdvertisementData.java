@@ -68,6 +68,8 @@ public class AdvertisementData {
 
     public static AdvertisementData parseScanResponseData(byte[] advertisement) {
         AdvertisementData advData = new AdvertisementData();
+        advData.rawScanRecord = advertisement;
+
         ByteBuffer rawData = ByteBuffer.wrap(advertisement).order(ByteOrder.LITTLE_ENDIAN);
         while (rawData.remaining() >= 2) {
             int adLength = rawData.get() & 0xFF;
