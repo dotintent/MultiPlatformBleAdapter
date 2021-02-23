@@ -46,7 +46,7 @@ public class AdvertisementData {
         return solicitedServiceUUIDs;
     }
 
-    public List<UUID> getRawScanRecord() {
+    public byte[] getRawScanRecord() {
         return rawScanRecord;
     }
 
