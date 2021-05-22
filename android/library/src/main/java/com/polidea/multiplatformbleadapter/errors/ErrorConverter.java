@@ -203,16 +203,22 @@ public class ErrorConverter {
     private BleError toError(BleScanException bleScanException) {
         final int reason = bleScanException.getReason();
         switch (reason) {
-            case BleScanException.BLUETOOTH_CANNOT_START:
-                return new BleError(BleErrorCode.ScanStartFailed, bleScanException.getMessage(), null);
-            case BleScanException.BLUETOOTH_DISABLED:
-                return new BleError(BleErrorCode.BluetoothPoweredOff, bleScanException.getMessage(), null);
             case BleScanException.BLUETOOTH_NOT_AVAILABLE:
                 return new BleError(BleErrorCode.BluetoothUnsupported, bleScanException.getMessage(), null);
             case BleScanException.LOCATION_PERMISSION_MISSING:
                 return new BleError(BleErrorCode.BluetoothUnauthorized, bleScanException.getMessage(), null);
             case BleScanException.LOCATION_SERVICES_DISABLED:
                 return new BleError(BleErrorCode.LocationServicesDisabled, bleScanException.getMessage(), null);
+            case BleScanException.BLUETOOTH_DISABLED:
+                return new BleError(BleErrorCode.BluetoothPoweredOff, bleScanException.getMessage(), null);
+            case BleScanException.BLUETOOTH_CANNOT_START:
+            case BleScanException.SCAN_FAILED_ALREADY_STARTED:
+            case BleScanException.SCAN_FAILED_APPLICATION_REGISTRATION_FAILED:
+            case BleScanException.SCAN_FAILED_FEATURE_UNSUPPORTED:
+            case BleScanException.SCAN_FAILED_INTERNAL_ERROR:
+            case BleScanException.SCAN_FAILED_OUT_OF_HARDWARE_RESOURCES:
+            case BleScanException.UNDOCUMENTED_SCAN_THROTTLE:
+            case BleScanException.UNKNOWN_ERROR_CODE:
             default:
                 return new BleError(BleErrorCode.ScanStartFailed, bleScanException.getMessage(), null);
         }
