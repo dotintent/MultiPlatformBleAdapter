@@ -108,16 +108,16 @@ public class BleModule implements BleAdapter {
 
     private int currentLogLevel = LogConstants.NONE;
 
-    public BleModule(Context context) {
+    public BleModule(final Context context) {
         this.context = context;
         bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
     }
 
     @Override
-    public void createClient(String restoreStateIdentifier,
-                             OnEventCallback<String> onAdapterStateChangeCallback,
-                             OnEventCallback<Integer> onStateRestored) {
+    public void createClient(final String restoreStateIdentifier,
+                             final OnEventCallback<String> onAdapterStateChangeCallback,
+                             final OnEventCallback<Integer> onStateRestored) {
         rxBleClient = RxBleClient.create(context);
         adapterStateChangesSubscription = monitorAdapterStateChanges(context, onAdapterStateChangeCallback);
 
@@ -183,11 +183,11 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public void startDeviceScan(String[] filteredUUIDs,
-                                int scanMode,
-                                int callbackType,
-                                OnEventCallback<ScanResult> onEventCallback,
-                                OnErrorCallback onErrorCallback) {
+    public void startDeviceScan(final String[] filteredUUIDs,
+                                final int scanMode,
+                                final int callbackType,
+                                final OnEventCallback<ScanResult> onEventCallback,
+                                final OnErrorCallback onErrorCallback) {
         UUID[] uuids = null;
 
         if (filteredUUIDs != null) {
@@ -210,15 +210,15 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public void requestConnectionPriorityForDevice(String deviceIdentifier,
-                                                   int connectionPriority,
+    public void requestConnectionPriorityForDevice(final String deviceIdentifier,
+                                                   final int connectionPriority,
                                                    final String transactionId,
                                                    final OnSuccessCallback<Device> onSuccessCallback,
                                                    final OnErrorCallback onErrorCallback) {
         final Device device;
         try {
             device = getDeviceById(deviceIdentifier);
-        } catch (BleError error) {
+        } catch (final BleError error) {
             onErrorCallback.onError(error);
             return;
         }
@@ -247,7 +247,7 @@ public class BleModule implements BleAdapter {
                         }
                     }, new Consumer<Throwable>() {
                         @Override
-                        public void accept(Throwable error) {
+                        public void accept(final Throwable error) {
                             safeExecutor.error(errorConverter.toError(error));
                             pendingTransactions.removeDisposable(transactionId);
                         }
@@ -260,14 +260,14 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public void readRSSIForDevice(String deviceIdentifier,
+    public void readRSSIForDevice(final String deviceIdentifier,
                                   final String transactionId,
                                   final OnSuccessCallback<Device> onSuccessCallback,
                                   final OnErrorCallback onErrorCallback) {
         final Device device;
         try {
             device = getDeviceById(deviceIdentifier);
-        } catch (BleError error) {
+        } catch (final BleError error) {
             onErrorCallback.onError(error);
             return;
         }
@@ -288,16 +288,16 @@ public class BleModule implements BleAdapter {
                     }
                 });
 
-        DisposableSingleObserver<Integer> observer = new DisposableSingleObserver<Integer>() {
+        final DisposableSingleObserver<Integer> observer = new DisposableSingleObserver<Integer>() {
             @Override
-            public void onSuccess(Integer rssi) {
+            public void onSuccess(final Integer rssi) {
                 device.setRssi(rssi);
                 safeExecutor.success(device);
                 pendingTransactions.removeDisposable(transactionId);
             }
 
             @Override
-            public void onError(Throwable error) {
+            public void onError(final Throwable error) {
                 safeExecutor.error(errorConverter.toError(error));
                 pendingTransactions.removeDisposable(transactionId);
             }
@@ -308,14 +308,14 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public void requestMTUForDevice(String deviceIdentifier, int mtu,
+    public void requestMTUForDevice(final String deviceIdentifier, final int mtu,
                                     final String transactionId,
                                     final OnSuccessCallback<Device> onSuccessCallback,
                                     final OnErrorCallback onErrorCallback) {
         final Device device;
         try {
             device = getDeviceById(deviceIdentifier);
-        } catch (BleError error) {
+        } catch (final BleError error) {
             onErrorCallback.onError(error);
             return;
         }
@@ -338,16 +338,16 @@ public class BleModule implements BleAdapter {
                         }
                     });
 
-            DisposableSingleObserver<Integer> observer = new DisposableSingleObserver<Integer>() {
+            final DisposableSingleObserver<Integer> observer = new DisposableSingleObserver<Integer>() {
                 @Override
-                public void onSuccess(Integer mtu) {
+                public void onSuccess(final Integer mtu) {
                     device.setMtu(mtu);
                     safeExecutor.success(device);
                     pendingTransactions.removeDisposable(transactionId);
                 }
 
                 @Override
-                public void onError(Throwable error) {
+                public void onError(final Throwable error) {
                     safeExecutor.error(errorConverter.toError(error));
                     pendingTransactions.removeDisposable(transactionId);
                 }
@@ -361,15 +361,15 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public void getKnownDevices(String[] deviceIdentifiers,
-                                OnSuccessCallback<Device[]> onSuccessCallback,
-                                OnErrorCallback onErrorCallback) {
+    public void getKnownDevices(final String[] deviceIdentifiers,
+                                final OnSuccessCallback<Device[]> onSuccessCallback,
+                                final OnErrorCallback onErrorCallback) {
         if (rxBleClient == null) {
             onErrorCallback.onError(new BleError(BleErrorCode.BluetoothManagerDestroyed, "BleManager not created when tried to get known devices", null));
             return;
         }
 
-        List<Device> knownDevices = new ArrayList<>();
+        final List<Device> knownDevices = new ArrayList<>();
         for (final String deviceId : deviceIdentifiers) {
             if (deviceId == null) {
                 onErrorCallback.onError(BleErrorUtils.invalidIdentifiers(deviceIdentifiers));
@@ -386,9 +386,9 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public void getConnectedDevices(String[] serviceUUIDs,
-                                    OnSuccessCallback<Device[]> onSuccessCallback,
-                                    OnErrorCallback onErrorCallback) {
+    public void getConnectedDevices(final String[] serviceUUIDs,
+                                    final OnSuccessCallback<Device[]> onSuccessCallback,
+                                    final OnErrorCallback onErrorCallback) {
         if (rxBleClient == null) {
             onErrorCallback.onError(new BleError(BleErrorCode.BluetoothManagerDestroyed, "BleManager not created when tried to get connected devices", null));
             return;
@@ -399,9 +399,9 @@ public class BleModule implements BleAdapter {
             return;
         }
 
-        UUID[] uuids = new UUID[serviceUUIDs.length];
+        final UUID[] uuids = new UUID[serviceUUIDs.length];
         for (int i = 0; i < serviceUUIDs.length; i++) {
-            UUID uuid = UUIDConverter.convert(serviceUUIDs[i]);
+            final UUID uuid = UUIDConverter.convert(serviceUUIDs[i]);
 
             if (uuid == null) {
                 onErrorCallback.onError(BleErrorUtils.invalidIdentifiers(serviceUUIDs));
@@ -411,9 +411,9 @@ public class BleModule implements BleAdapter {
             uuids[i] = uuid;
         }
 
-        List<Device> localConnectedDevices = new ArrayList<>();
-        for (Device device : connectedDevices.values()) {
-            for (UUID uuid : uuids) {
+        final List<Device> localConnectedDevices = new ArrayList<>();
+        for (final Device device : connectedDevices.values()) {
+            for (final UUID uuid : uuids) {
                 if (device.getServiceByUUID(uuid) != null) {
                     localConnectedDevices.add(device);
                     break;
@@ -426,11 +426,11 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public void connectToDevice(String deviceIdentifier,
-                                ConnectionOptions connectionOptions,
-                                OnSuccessCallback<Device> onSuccessCallback,
-                                OnEventCallback<ConnectionState> onConnectionStateChangedCallback,
-                                OnErrorCallback onErrorCallback) {
+    public void connectToDevice(final String deviceIdentifier,
+                                final ConnectionOptions connectionOptions,
+                                final OnSuccessCallback<Device> onSuccessCallback,
+                                final OnEventCallback<ConnectionState> onConnectionStateChangedCallback,
+                                final OnErrorCallback onErrorCallback) {
         if (rxBleClient == null) {
             onErrorCallback.onError(new BleError(BleErrorCode.BluetoothManagerDestroyed, "BleManager not created when tried to connect to device", null));
             return;
@@ -453,9 +453,9 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public void cancelDeviceConnection(String deviceIdentifier,
-                                       OnSuccessCallback<Device> onSuccessCallback,
-                                       OnErrorCallback onErrorCallback) {
+    public void cancelDeviceConnection(final String deviceIdentifier,
+                                       final OnSuccessCallback<Device> onSuccessCallback,
+                                       final OnErrorCallback onErrorCallback) {
         if (rxBleClient == null) {
             onErrorCallback.onError(new BleError(BleErrorCode.BluetoothManagerDestroyed, "BleManager not created when tried to cancel device connection", null));
             return;
@@ -475,9 +475,9 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public void isDeviceConnected(String deviceIdentifier,
-                                  OnSuccessCallback<Boolean> onSuccessCallback,
-                                  OnErrorCallback onErrorCallback) {
+    public void isDeviceConnected(final String deviceIdentifier,
+                                  final OnSuccessCallback<Boolean> onSuccessCallback,
+                                  final OnErrorCallback onErrorCallback) {
         if (rxBleClient == null) {
             onErrorCallback.onError(new BleError(BleErrorCode.BluetoothManagerDestroyed, "BleManager not created when tried to check if device is connected", null));
             return;
@@ -489,20 +489,20 @@ public class BleModule implements BleAdapter {
             return;
         }
 
-        boolean connected = device.getConnectionState()
+        final boolean connected = device.getConnectionState()
                 .equals(RxBleConnection.RxBleConnectionState.CONNECTED);
         onSuccessCallback.onSuccess(connected);
     }
 
     @Override
-    public void discoverAllServicesAndCharacteristicsForDevice(String deviceIdentifier,
-                                                               String transactionId,
-                                                               OnSuccessCallback<Device> onSuccessCallback,
-                                                               OnErrorCallback onErrorCallback) {
+    public void discoverAllServicesAndCharacteristicsForDevice(final String deviceIdentifier,
+                                                               final String transactionId,
+                                                               final OnSuccessCallback<Device> onSuccessCallback,
+                                                               final OnErrorCallback onErrorCallback) {
         final Device device;
         try {
             device = getDeviceById(deviceIdentifier);
-        } catch (BleError error) {
+        } catch (final BleError error) {
             onErrorCallback.onError(error);
             return;
         }
@@ -511,7 +511,7 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public List<Service> getServicesForDevice(String deviceIdentifier) throws BleError {
+    public List<Service> getServicesForDevice(final String deviceIdentifier) throws BleError {
         final Device device = getDeviceById(deviceIdentifier);
         final List<Service> services = device.getServices();
         if (services == null) {
@@ -521,8 +521,8 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public List<Characteristic> getCharacteristicsForDevice(String deviceIdentifier,
-                                                            String serviceUUID) throws BleError {
+    public List<Characteristic> getCharacteristicsForDevice(final String deviceIdentifier,
+                                                            final String serviceUUID) throws BleError {
         final UUID convertedServiceUUID = UUIDConverter.convert(serviceUUID);
         if (convertedServiceUUID == null) {
             throw BleErrorUtils.invalidIdentifiers(serviceUUID);
@@ -539,8 +539,8 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public List<Characteristic> getCharacteristicsForService(int serviceIdentifier) throws BleError {
-        Service service = discoveredServices.get(serviceIdentifier);
+    public List<Characteristic> getCharacteristicsForService(final int serviceIdentifier) throws BleError {
+        final Service service = discoveredServices.get(serviceIdentifier);
         if (service == null) {
             throw BleErrorUtils.serviceNotFound(Integer.toString(serviceIdentifier));
         }
@@ -556,7 +556,7 @@ public class BleModule implements BleAdapter {
             throw BleErrorUtils.invalidIdentifiers(serviceUUID, characteristicUUID);
         }
 
-        Device device = getDeviceById(deviceIdentifier);
+        final Device device = getDeviceById(deviceIdentifier);
 
         final Service service = device.getServiceByUUID(uuids[0]);
         if (service == null) {
@@ -579,7 +579,7 @@ public class BleModule implements BleAdapter {
             throw BleErrorUtils.invalidIdentifiers(characteristicUUID);
         }
 
-        Service service = discoveredServices.get(serviceIdentifier);
+        final Service service = discoveredServices.get(serviceIdentifier);
         if (service == null) {
             throw BleErrorUtils.serviceNotFound(Integer.toString(serviceIdentifier));
         }
@@ -594,7 +594,7 @@ public class BleModule implements BleAdapter {
 
     @Override
     public List<Descriptor> descriptorsForCharacteristic(final int characteristicIdentifier) throws BleError {
-        Characteristic characteristic = discoveredCharacteristics.get(characteristicIdentifier);
+        final Characteristic characteristic = discoveredCharacteristics.get(characteristicIdentifier);
         if (characteristic == null) {
             throw BleErrorUtils.characteristicNotFound(Integer.toString(characteristicIdentifier));
         }
@@ -603,12 +603,12 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public void readCharacteristicForDevice(String deviceIdentifier,
-                                            String serviceUUID,
-                                            String characteristicUUID,
-                                            String transactionId,
-                                            OnSuccessCallback<Characteristic> onSuccessCallback,
-                                            OnErrorCallback onErrorCallback) {
+    public void readCharacteristicForDevice(final String deviceIdentifier,
+                                            final String serviceUUID,
+                                            final String characteristicUUID,
+                                            final String transactionId,
+                                            final OnSuccessCallback<Characteristic> onSuccessCallback,
+                                            final OnErrorCallback onErrorCallback) {
         final Characteristic characteristic = getCharacteristicOrEmitError(
                 deviceIdentifier, serviceUUID, characteristicUUID, onErrorCallback);
         if (characteristic == null) {
@@ -619,11 +619,11 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public void readCharacteristicForService(int serviceIdentifier,
-                                             String characteristicUUID,
-                                             String transactionId,
-                                             OnSuccessCallback<Characteristic> onSuccessCallback,
-                                             OnErrorCallback onErrorCallback) {
+    public void readCharacteristicForService(final int serviceIdentifier,
+                                             final String characteristicUUID,
+                                             final String transactionId,
+                                             final OnSuccessCallback<Characteristic> onSuccessCallback,
+                                             final OnErrorCallback onErrorCallback) {
         final Characteristic characteristic = getCharacteristicOrEmitError(
                 serviceIdentifier, characteristicUUID, onErrorCallback);
         if (characteristic == null) {
@@ -634,10 +634,10 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public void readCharacteristic(int characteristicIdentifier,
-                                   String transactionId,
-                                   OnSuccessCallback<Characteristic> onSuccessCallback,
-                                   OnErrorCallback onErrorCallback) {
+    public void readCharacteristic(final int characteristicIdentifier,
+                                   final String transactionId,
+                                   final OnSuccessCallback<Characteristic> onSuccessCallback,
+                                   final OnErrorCallback onErrorCallback) {
         final Characteristic characteristic = getCharacteristicOrEmitError(characteristicIdentifier, onErrorCallback);
         if (characteristic == null) {
             return;
@@ -647,14 +647,14 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public void writeCharacteristicForDevice(String deviceIdentifier,
-                                             String serviceUUID,
-                                             String characteristicUUID,
-                                             String valueBase64,
-                                             boolean withResponse,
-                                             String transactionId,
-                                             OnSuccessCallback<Characteristic> onSuccessCallback,
-                                             OnErrorCallback onErrorCallback) {
+    public void writeCharacteristicForDevice(final String deviceIdentifier,
+                                             final String serviceUUID,
+                                             final String characteristicUUID,
+                                             final String valueBase64,
+                                             final boolean withResponse,
+                                             final String transactionId,
+                                             final OnSuccessCallback<Characteristic> onSuccessCallback,
+                                             final OnErrorCallback onErrorCallback) {
         final Characteristic characteristic = getCharacteristicOrEmitError(
                 deviceIdentifier, serviceUUID, characteristicUUID, onErrorCallback);
         if (characteristic == null) {
@@ -671,13 +671,13 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public void writeCharacteristicForService(int serviceIdentifier,
-                                              String characteristicUUID,
-                                              String valueBase64,
-                                              boolean withResponse,
-                                              String transactionId,
-                                              OnSuccessCallback<Characteristic> onSuccessCallback,
-                                              OnErrorCallback onErrorCallback) {
+    public void writeCharacteristicForService(final int serviceIdentifier,
+                                              final String characteristicUUID,
+                                              final String valueBase64,
+                                              final boolean withResponse,
+                                              final String transactionId,
+                                              final OnSuccessCallback<Characteristic> onSuccessCallback,
+                                              final OnErrorCallback onErrorCallback) {
         final Characteristic characteristic = getCharacteristicOrEmitError(
                 serviceIdentifier, characteristicUUID, onErrorCallback);
         if (characteristic == null) {
@@ -694,12 +694,12 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public void writeCharacteristic(int characteristicIdentifier,
-                                    String valueBase64,
-                                    boolean withResponse,
-                                    String transactionId,
-                                    OnSuccessCallback<Characteristic> onSuccessCallback,
-                                    OnErrorCallback onErrorCallback) {
+    public void writeCharacteristic(final int characteristicIdentifier,
+                                    final String valueBase64,
+                                    final boolean withResponse,
+                                    final String transactionId,
+                                    final OnSuccessCallback<Characteristic> onSuccessCallback,
+                                    final OnErrorCallback onErrorCallback) {
         final Characteristic characteristic = getCharacteristicOrEmitError(characteristicIdentifier, onErrorCallback);
         if (characteristic == null) {
             return;
@@ -716,12 +716,12 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public void monitorCharacteristicForDevice(String deviceIdentifier,
-                                               String serviceUUID,
-                                               String characteristicUUID,
-                                               String transactionId,
-                                               OnEventCallback<Characteristic> onEventCallback,
-                                               OnErrorCallback onErrorCallback) {
+    public void monitorCharacteristicForDevice(final String deviceIdentifier,
+                                               final String serviceUUID,
+                                               final String characteristicUUID,
+                                               final String transactionId,
+                                               final OnEventCallback<Characteristic> onEventCallback,
+                                               final OnErrorCallback onErrorCallback) {
         final Characteristic characteristic = getCharacteristicOrEmitError(
                 deviceIdentifier, serviceUUID, characteristicUUID, onErrorCallback);
         if (characteristic == null) {
@@ -732,11 +732,11 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public void monitorCharacteristicForService(int serviceIdentifier,
-                                                String characteristicUUID,
-                                                String transactionId,
-                                                OnEventCallback<Characteristic> onEventCallback,
-                                                OnErrorCallback onErrorCallback) {
+    public void monitorCharacteristicForService(final int serviceIdentifier,
+                                                final String characteristicUUID,
+                                                final String transactionId,
+                                                final OnEventCallback<Characteristic> onEventCallback,
+                                                final OnErrorCallback onErrorCallback) {
         final Characteristic characteristic = getCharacteristicOrEmitError(
                 serviceIdentifier, characteristicUUID, onErrorCallback);
         if (characteristic == null) {
@@ -747,9 +747,9 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public void monitorCharacteristic(int characteristicIdentifier, String transactionId,
-                                      OnEventCallback<Characteristic> onEventCallback,
-                                      OnErrorCallback onErrorCallback) {
+    public void monitorCharacteristic(final int characteristicIdentifier, final String transactionId,
+                                      final OnEventCallback<Characteristic> onEventCallback,
+                                      final OnErrorCallback onErrorCallback) {
         final Characteristic characteristic = getCharacteristicOrEmitError(characteristicIdentifier, onErrorCallback);
         if (characteristic == null) {
             return;
@@ -764,13 +764,13 @@ public class BleModule implements BleAdapter {
                                         final String characteristicUUID,
                                         final String descriptorUUID,
                                         final String transactionId,
-                                        OnSuccessCallback<Descriptor> successCallback,
-                                        OnErrorCallback errorCallback) {
+                                        final OnSuccessCallback<Descriptor> successCallback,
+                                        final OnErrorCallback errorCallback) {
 
         try {
-            Descriptor descriptor = getDescriptor(deviceId, serviceUUID, characteristicUUID, descriptorUUID);
+            final Descriptor descriptor = getDescriptor(deviceId, serviceUUID, characteristicUUID, descriptorUUID);
             safeReadDescriptorForDevice(descriptor, transactionId, successCallback, errorCallback);
-        } catch (BleError error) {
+        } catch (final BleError error) {
             errorCallback.onError(error);
         }
     }
@@ -780,12 +780,12 @@ public class BleModule implements BleAdapter {
                                          final String characteristicUUID,
                                          final String descriptorUUID,
                                          final String transactionId,
-                                         OnSuccessCallback<Descriptor> successCallback,
-                                         OnErrorCallback errorCallback) {
+                                         final OnSuccessCallback<Descriptor> successCallback,
+                                         final OnErrorCallback errorCallback) {
         try {
-            Descriptor descriptor = getDescriptor(serviceIdentifier, characteristicUUID, descriptorUUID);
+            final Descriptor descriptor = getDescriptor(serviceIdentifier, characteristicUUID, descriptorUUID);
             safeReadDescriptorForDevice(descriptor, transactionId, successCallback, errorCallback);
-        } catch (BleError error) {
+        } catch (final BleError error) {
             errorCallback.onError(error);
         }
     }
@@ -794,13 +794,13 @@ public class BleModule implements BleAdapter {
     public void readDescriptorForCharacteristic(final int characteristicIdentifier,
                                                 final String descriptorUUID,
                                                 final String transactionId,
-                                                OnSuccessCallback<Descriptor> successCallback,
-                                                OnErrorCallback errorCallback) {
+                                                final OnSuccessCallback<Descriptor> successCallback,
+                                                final OnErrorCallback errorCallback) {
 
         try {
-            Descriptor descriptor = getDescriptor(characteristicIdentifier, descriptorUUID);
+            final Descriptor descriptor = getDescriptor(characteristicIdentifier, descriptorUUID);
             safeReadDescriptorForDevice(descriptor, transactionId, successCallback, errorCallback);
-        } catch (BleError error) {
+        } catch (final BleError error) {
             errorCallback.onError(error);
         }
     }
@@ -808,20 +808,20 @@ public class BleModule implements BleAdapter {
     @Override
     public void readDescriptor(final int descriptorIdentifier,
                                final String transactionId,
-                               OnSuccessCallback<Descriptor> onSuccessCallback,
-                               OnErrorCallback onErrorCallback) {
+                               final OnSuccessCallback<Descriptor> onSuccessCallback,
+                               final OnErrorCallback onErrorCallback) {
         try {
-            Descriptor descriptor = getDescriptor(descriptorIdentifier);
+            final Descriptor descriptor = getDescriptor(descriptorIdentifier);
             safeReadDescriptorForDevice(descriptor, transactionId, onSuccessCallback, onErrorCallback);
-        } catch (BleError error) {
+        } catch (final BleError error) {
             onErrorCallback.onError(error);
         }
     }
 
     private void safeReadDescriptorForDevice(final Descriptor descriptor,
                                              final String transactionId,
-                                             OnSuccessCallback<Descriptor> onSuccessCallback,
-                                             OnErrorCallback onErrorCallback) {
+                                             final OnSuccessCallback<Descriptor> onSuccessCallback,
+                                             final OnErrorCallback onErrorCallback) {
         final RxBleConnection connection = getConnectionOrEmitError(descriptor.getDeviceId(), onErrorCallback);
         if (connection == null) {
             return;
@@ -838,9 +838,9 @@ public class BleModule implements BleAdapter {
                         pendingTransactions.removeDisposable(transactionId);
                     }
                 });
-        DisposableSingleObserver<byte[]> observer = new DisposableSingleObserver<byte[]>() {
+        final DisposableSingleObserver<byte[]> observer = new DisposableSingleObserver<byte[]>() {
             @Override
-            public void onSuccess(byte[] bytes) {
+            public void onSuccess(final byte[] bytes) {
                 descriptor.logValue("Read from", bytes);
                 descriptor.setValue(bytes);
                 safeExecutor.success(new Descriptor(descriptor));
@@ -848,7 +848,7 @@ public class BleModule implements BleAdapter {
             }
 
             @Override
-            public void onError(Throwable e) {
+            public void onError(final Throwable e) {
                 safeExecutor.error(errorConverter.toError(e));
                 pendingTransactions.removeDisposable(transactionId);
             }
@@ -865,17 +865,17 @@ public class BleModule implements BleAdapter {
                                          final String descriptorUUID,
                                          final String valueBase64,
                                          final String transactionId,
-                                         OnSuccessCallback<Descriptor> successCallback,
-                                         OnErrorCallback errorCallback) {
+                                         final OnSuccessCallback<Descriptor> successCallback,
+                                         final OnErrorCallback errorCallback) {
         try {
-            Descriptor descriptor = getDescriptor(deviceId, serviceUUID, characteristicUUID, descriptorUUID);
+            final Descriptor descriptor = getDescriptor(deviceId, serviceUUID, characteristicUUID, descriptorUUID);
             safeWriteDescriptorForDevice(
                     descriptor,
                     valueBase64,
                     transactionId,
                     successCallback,
                     errorCallback);
-        } catch (BleError error) {
+        } catch (final BleError error) {
             errorCallback.onError(error);
         }
     }
@@ -886,17 +886,17 @@ public class BleModule implements BleAdapter {
                                           final String descriptorUUID,
                                           final String valueBase64,
                                           final String transactionId,
-                                          OnSuccessCallback<Descriptor> successCallback,
-                                          OnErrorCallback errorCallback) {
+                                          final OnSuccessCallback<Descriptor> successCallback,
+                                          final OnErrorCallback errorCallback) {
         try {
-            Descriptor descriptor = getDescriptor(serviceIdentifier, characteristicUUID, descriptorUUID);
+            final Descriptor descriptor = getDescriptor(serviceIdentifier, characteristicUUID, descriptorUUID);
             safeWriteDescriptorForDevice(
                     descriptor,
                     valueBase64,
                     transactionId,
                     successCallback,
                     errorCallback);
-        } catch (BleError error) {
+        } catch (final BleError error) {
             errorCallback.onError(error);
         }
     }
@@ -906,17 +906,17 @@ public class BleModule implements BleAdapter {
                                                  final String descriptorUUID,
                                                  final String valueBase64,
                                                  final String transactionId,
-                                                 OnSuccessCallback<Descriptor> successCallback,
-                                                 OnErrorCallback errorCallback) {
+                                                 final OnSuccessCallback<Descriptor> successCallback,
+                                                 final OnErrorCallback errorCallback) {
         try {
-            Descriptor descriptor = getDescriptor(characteristicIdentifier, descriptorUUID);
+            final Descriptor descriptor = getDescriptor(characteristicIdentifier, descriptorUUID);
             safeWriteDescriptorForDevice(
                     descriptor,
                     valueBase64,
                     transactionId,
                     successCallback,
                     errorCallback);
-        } catch (BleError error) {
+        } catch (final BleError error) {
             errorCallback.onError(error);
         }
     }
@@ -925,17 +925,17 @@ public class BleModule implements BleAdapter {
     public void writeDescriptor(final int descriptorIdentifier,
                                 final String valueBase64,
                                 final String transactionId,
-                                OnSuccessCallback<Descriptor> successCallback,
-                                OnErrorCallback errorCallback) {
+                                final OnSuccessCallback<Descriptor> successCallback,
+                                final OnErrorCallback errorCallback) {
         try {
-            Descriptor descriptor = getDescriptor(descriptorIdentifier);
+            final Descriptor descriptor = getDescriptor(descriptorIdentifier);
             safeWriteDescriptorForDevice(
                     descriptor,
                     valueBase64,
                     transactionId,
                     successCallback,
                     errorCallback);
-        } catch (BleError error) {
+        } catch (final BleError error) {
             errorCallback.onError(error);
         }
 
@@ -944,9 +944,9 @@ public class BleModule implements BleAdapter {
     private void safeWriteDescriptorForDevice(final Descriptor descriptor,
                                               final String valueBase64,
                                               final String transactionId,
-                                              OnSuccessCallback<Descriptor> successCallback,
-                                              OnErrorCallback errorCallback) {
-        BluetoothGattDescriptor nativeDescriptor = descriptor.getNativeDescriptor();
+                                              final OnSuccessCallback<Descriptor> successCallback,
+                                              final OnErrorCallback errorCallback) {
+        final BluetoothGattDescriptor nativeDescriptor = descriptor.getNativeDescriptor();
 
         if (nativeDescriptor.getUuid().equals(Constants.CLIENT_CHARACTERISTIC_CONFIG_UUID)) {
             errorCallback.onError(BleErrorUtils.descriptorWriteNotAllowed(UUIDConverter.fromUUID(nativeDescriptor.getUuid())));
@@ -961,8 +961,8 @@ public class BleModule implements BleAdapter {
         final byte[] value;
         try {
             value = Base64Converter.decode(valueBase64);
-        } catch (Throwable e) {
-            String uuid = UUIDConverter.fromUUID(nativeDescriptor.getUuid());
+        } catch (final Throwable e) {
+            final String uuid = UUIDConverter.fromUUID(nativeDescriptor.getUuid());
             errorCallback.onError(BleErrorUtils.invalidWriteDataForDescriptor(valueBase64, uuid));
             return;
         }
@@ -979,9 +979,9 @@ public class BleModule implements BleAdapter {
                     }
                 });
 
-        CallbackCompletableObserver observer = new CallbackCompletableObserver(new Consumer<Throwable>() {
+        final CallbackCompletableObserver observer = new CallbackCompletableObserver(new Consumer<Throwable>() {
             @Override
-            public void accept(Throwable e) {
+            public void accept(final Throwable e) {
                 safeExecutor.error(errorConverter.toError(e));
                 pendingTransactions.removeDisposable(transactionId);
             }
@@ -1091,14 +1091,14 @@ public class BleModule implements BleAdapter {
     }
 
     @Override
-    public void cancelTransaction(String transactionId) {
+    public void cancelTransaction(final String transactionId) {
         pendingTransactions.removeDisposable(transactionId);
     }
 
     @Override
-    public void setLogLevel(String logLevel) {
+    public void setLogLevel(final String logLevel) {
         currentLogLevel = LogLevel.toLogLevel(logLevel);
-        LogOptions newLogOptions = new LogOptions.Builder().setLogLevel(currentLogLevel).build();
+        final LogOptions newLogOptions = new LogOptions.Builder().setLogLevel(currentLogLevel).build();
         RxBleLog.updateLogOptions(newLogOptions);
     }
 
@@ -1107,8 +1107,8 @@ public class BleModule implements BleAdapter {
         return LogLevel.fromLogLevel(currentLogLevel);
     }
 
-    private Disposable monitorAdapterStateChanges(Context context,
-                                                    final OnEventCallback<String> onAdapterStateChangeCallback) {
+    private Disposable monitorAdapterStateChanges(final Context context,
+                                                  final OnEventCallback<String> onAdapterStateChangeCallback) {
         if (bluetoothLowEnergyNotSupported()) {
             return null;
         }
@@ -1116,13 +1116,13 @@ public class BleModule implements BleAdapter {
         return new RxBleAdapterStateObservable(context)
                 .map(new Function<RxBleAdapterStateObservable.BleAdapterState, String>() {
                     @Override
-                    public String apply(RxBleAdapterStateObservable.BleAdapterState bleAdapterState) {
+                    public String apply(final RxBleAdapterStateObservable.BleAdapterState bleAdapterState) {
                         return mapRxBleAdapterStateToLocalBluetoothState(bleAdapterState);
                     }
                 })
                 .subscribe(new Consumer<String>() {
                     @Override
-                    public void accept(String state) {
+                    public void accept(final String state) {
                         onAdapterStateChangeCallback.onEvent(state);
                     }
                 });
@@ -1134,7 +1134,7 @@ public class BleModule implements BleAdapter {
 
     @BluetoothState
     private String mapRxBleAdapterStateToLocalBluetoothState(
-            RxBleAdapterStateObservable.BleAdapterState rxBleAdapterState
+        final RxBleAdapterStateObservable.BleAdapterState rxBleAdapterState
     ) {
         if (rxBleAdapterState == RxBleAdapterStateObservable.BleAdapterState.STATE_ON) {
             return BluetoothState.POWERED_ON;
@@ -1159,7 +1159,7 @@ public class BleModule implements BleAdapter {
         final Disposable subscription = new RxBleAdapterStateObservable(context)
                 .takeUntil(new Predicate<RxBleAdapterStateObservable.BleAdapterState>() {
                     @Override
-                    public boolean test(RxBleAdapterStateObservable.BleAdapterState actualAdapterState) {
+                    public boolean test(final RxBleAdapterStateObservable.BleAdapterState actualAdapterState) {
                         return desiredAdapterState == actualAdapterState;
                     }
                 })
@@ -1179,14 +1179,14 @@ public class BleModule implements BleAdapter {
                     }
                 }, new Consumer<Throwable>() {
                     @Override
-                    public void accept(Throwable error) {
+                    public void accept(final Throwable error) {
                         safeExecutor.error(errorConverter.toError(error));
                         pendingTransactions.removeDisposable(transactionId);
                     }
                 });
 
 
-        boolean desiredAndInitialStateAreSame;
+        final boolean desiredAndInitialStateAreSame;
         if (desiredAdapterState == RxBleAdapterStateObservable.BleAdapterState.STATE_ON) {
             desiredAndInitialStateAreSame = !bluetoothAdapter.enable();
         } else {
@@ -1205,7 +1205,7 @@ public class BleModule implements BleAdapter {
     }
 
     @BluetoothState
-    private String mapNativeAdapterStateToLocalBluetoothState(int adapterState) {
+    private String mapNativeAdapterStateToLocalBluetoothState(final int adapterState) {
         switch (adapterState) {
             case BluetoothAdapter.STATE_OFF:
                 return BluetoothState.POWERED_OFF;
@@ -1222,7 +1222,7 @@ public class BleModule implements BleAdapter {
 
     private void safeStartDeviceScan(final UUID[] uuids,
                                      final int scanMode,
-                                     int callbackType,
+                                     final int callbackType,
                                      final OnEventCallback<ScanResult> onEventCallback,
                                      final OnErrorCallback onErrorCallback) {
         if (rxBleClient == null) {
@@ -1230,13 +1230,13 @@ public class BleModule implements BleAdapter {
             return;
         }
 
-        ScanSettings scanSettings = new ScanSettings.Builder()
+        final ScanSettings scanSettings = new ScanSettings.Builder()
                 .setScanMode(scanMode)
                 .setCallbackType(callbackType)
                 .build();
 
-        int length = uuids == null ? 0 : uuids.length;
-        ScanFilter[] filters = new ScanFilter[length];
+        final int length = uuids == null ? 0 : uuids.length;
+        final ScanFilter[] filters = new ScanFilter[length];
         for (int i = 0; i < length; i++) {
             filters[i] = new ScanFilter.Builder().setServiceUuid(ParcelUuid.fromString(uuids[i].toString())).build();
         }
@@ -1245,8 +1245,8 @@ public class BleModule implements BleAdapter {
                 .scanBleDevices(scanSettings, filters)
                 .subscribe(new Consumer<com.polidea.rxandroidble2.scan.ScanResult>() {
                     @Override
-                    public void accept(com.polidea.rxandroidble2.scan.ScanResult scanResult) {
-                        String deviceId = scanResult.getBleDevice().getMacAddress();
+                    public void accept(final com.polidea.rxandroidble2.scan.ScanResult scanResult) {
+                        final String deviceId = scanResult.getBleDevice().getMacAddress();
                         if (!discoveredDevices.containsKey(deviceId)) {
                             discoveredDevices.put(deviceId, rxBleDeviceToDeviceMapper.map(scanResult.getBleDevice()));
                         }
@@ -1254,7 +1254,7 @@ public class BleModule implements BleAdapter {
                     }
                 }, new Consumer<Throwable>() {
                     @Override
-                    public void accept(Throwable throwable) {
+                    public void accept(final Throwable throwable) {
                         onErrorCallback.onError(errorConverter.toError(throwable));
                     }
                 });
@@ -1271,7 +1271,7 @@ public class BleModule implements BleAdapter {
 
     @Nullable
     private RxBleConnection getConnectionOrEmitError(@NonNull final String deviceId,
-                                                     @NonNull OnErrorCallback onErrorCallback) {
+                                                     @NonNull final OnErrorCallback onErrorCallback) {
         final RxBleConnection connection = activeConnections.get(deviceId);
         if (connection == null) {
             onErrorCallback.onError(BleErrorUtils.deviceNotConnected(deviceId));
@@ -1296,7 +1296,7 @@ public class BleModule implements BleAdapter {
                 .establishConnection(autoConnect)
                 .doOnSubscribe(new Consumer<Disposable>() {
                     @Override
-                    public void accept(Disposable disposable) {
+                    public void accept(final Disposable disposable) {
                         onConnectionStateChangedCallback.onEvent(ConnectionState.CONNECTING);
                     }
                 })
@@ -1317,7 +1317,7 @@ public class BleModule implements BleAdapter {
                             .queue(new RefreshGattCustomOperation())
                             .map(new Function<Boolean, RxBleConnection>() {
                                 @Override
-                                public RxBleConnection apply(Boolean refreshGattSuccess) {
+                                public RxBleConnection apply(final Boolean refreshGattSuccess) {
                                     return rxBleConnection;
                                 }
                             });
@@ -1346,7 +1346,7 @@ public class BleModule implements BleAdapter {
                             .requestMtu(requestMtu)
                             .map(new Function<Integer, RxBleConnection>() {
                                 @Override
-                                public RxBleConnection apply(Integer integer) {
+                                public RxBleConnection apply(final Integer integer) {
                                     return rxBleConnection;
                                 }
                             })
@@ -1367,21 +1367,21 @@ public class BleModule implements BleAdapter {
             );
         }
 
-        DisposableObserver<RxBleConnection> observer = new DisposableObserver<RxBleConnection>() {
+        final DisposableObserver<RxBleConnection> observer = new DisposableObserver<RxBleConnection>() {
             @Override
             public void onComplete() {
             }
 
             @Override
-            public void onError(Throwable e) {
-                BleError bleError = errorConverter.toError(e);
+            public void onError(final Throwable e) {
+                final BleError bleError = errorConverter.toError(e);
                 safeExecutor.error(bleError);
                 onDeviceDisconnected(device);
             }
 
             @Override
-            public void onNext(RxBleConnection connection) {
-                Device localDevice = rxBleDeviceToDeviceMapper.map(device);
+            public void onNext(final RxBleConnection connection) {
+                final Device localDevice = rxBleDeviceToDeviceMapper.map(device);
                 onConnectionStateChangedCallback.onEvent(ConnectionState.CONNECTED);
                 cleanServicesAndCharacteristicsForDevice(localDevice);
                 connectedDevices.put(device.getMacAddress(), localDevice);
@@ -1394,9 +1394,9 @@ public class BleModule implements BleAdapter {
         connectingDevices.replaceDisposable(device.getMacAddress(), observer);
     }
 
-    private void onDeviceDisconnected(RxBleDevice rxDevice) {
+    private void onDeviceDisconnected(final RxBleDevice rxDevice) {
         activeConnections.remove(rxDevice.getMacAddress());
-        Device device = connectedDevices.remove(rxDevice.getMacAddress());
+        final Device device = connectedDevices.remove(rxDevice.getMacAddress());
         if (device == null) {
             return;
         }
@@ -1426,21 +1426,21 @@ public class BleModule implements BleAdapter {
                     }
                 });
 
-        DisposableSingleObserver<RxBleDeviceServices> observer = new DisposableSingleObserver<RxBleDeviceServices>() {
+        final DisposableSingleObserver<RxBleDeviceServices> observer = new DisposableSingleObserver<RxBleDeviceServices>() {
             @Override
-            public void onSuccess(RxBleDeviceServices rxBleDeviceServices) {
-                ArrayList<Service> services = new ArrayList<>();
-                for (BluetoothGattService gattService : rxBleDeviceServices.getBluetoothGattServices()) {
-                    Service service = serviceFactory.create(device.getId(), gattService);
+            public void onSuccess(final RxBleDeviceServices rxBleDeviceServices) {
+                final ArrayList<Service> services = new ArrayList<>();
+                for (final BluetoothGattService gattService : rxBleDeviceServices.getBluetoothGattServices()) {
+                    final Service service = serviceFactory.create(device.getId(), gattService);
                     discoveredServices.put(service.getId(), service);
                     services.add(service);
 
-                    for (BluetoothGattCharacteristic gattCharacteristic : gattService.getCharacteristics()) {
-                        Characteristic characteristic = new Characteristic(service, gattCharacteristic);
+                    for (final BluetoothGattCharacteristic gattCharacteristic : gattService.getCharacteristics()) {
+                        final Characteristic characteristic = new Characteristic(service, gattCharacteristic);
                         discoveredCharacteristics.put(characteristic.getId(), characteristic);
 
-                        for (BluetoothGattDescriptor gattDescriptor : gattCharacteristic.getDescriptors()) {
-                            Descriptor descriptor = new Descriptor(characteristic, gattDescriptor);
+                        for (final BluetoothGattDescriptor gattDescriptor : gattCharacteristic.getDescriptors()) {
+                            final Descriptor descriptor = new Descriptor(characteristic, gattDescriptor);
                             discoveredDescriptors.put(descriptor.getId(), descriptor);
                         }
                     }
@@ -1451,7 +1451,7 @@ public class BleModule implements BleAdapter {
             }
 
             @Override
-            public void onError(Throwable error) {
+            public void onError(final Throwable error) {
                 safeExecutor.error(errorConverter.toError(error));
                 pendingTransactions.removeDisposable(transactionId);
             }
@@ -1482,9 +1482,9 @@ public class BleModule implements BleAdapter {
                     }
                 });
 
-        DisposableSingleObserver<byte[]> observer = new DisposableSingleObserver<byte[]>() {
+        final DisposableSingleObserver<byte[]> observer = new DisposableSingleObserver<byte[]>() {
             @Override
-            public void onSuccess(byte[] bytes) {
+            public void onSuccess(final byte[] bytes) {
                 characteristic.logValue("Read from", bytes);
                 characteristic.setValue(bytes);
                 safeExecutor.success(new Characteristic(characteristic));
@@ -1492,7 +1492,7 @@ public class BleModule implements BleAdapter {
             }
 
             @Override
-            public void onError(Throwable error) {
+            public void onError(final Throwable error) {
                 safeExecutor.error(errorConverter.toError(error));
                 pendingTransactions.removeDisposable(transactionId);
             }
@@ -1506,12 +1506,12 @@ public class BleModule implements BleAdapter {
                                               final String valueBase64,
                                               final Boolean response,
                                               final String transactionId,
-                                              OnSuccessCallback<Characteristic> onSuccessCallback,
-                                              OnErrorCallback onErrorCallback) {
+                                              final OnSuccessCallback<Characteristic> onSuccessCallback,
+                                              final OnErrorCallback onErrorCallback) {
         final byte[] value;
         try {
             value = Base64Converter.decode(valueBase64);
-        } catch (Throwable error) {
+        } catch (final Throwable error) {
             onErrorCallback.onError(
                     BleErrorUtils.invalidWriteDataForCharacteristic(valueBase64,
                             UUIDConverter.fromUUID(characteristic.getUuid())));
@@ -1552,9 +1552,9 @@ public class BleModule implements BleAdapter {
                     }
                 });
 
-        DisposableSingleObserver<byte[]> observer = new DisposableSingleObserver<byte[]>() {
+        final DisposableSingleObserver<byte[]> observer = new DisposableSingleObserver<byte[]>() {
             @Override
-            public void onSuccess(byte[] bytes) {
+            public void onSuccess(final byte[] bytes) {
                 characteristic.logValue("Write to", bytes);
                 characteristic.setValue(bytes);
                 safeExecutor.success(new Characteristic(characteristic));
@@ -1562,7 +1562,7 @@ public class BleModule implements BleAdapter {
             }
 
             @Override
-            public void onError(Throwable e) {
+            public void onError(final Throwable e) {
                 safeExecutor.error(errorConverter.toError(e));
                 pendingTransactions.removeDisposable(transactionId);
             }
@@ -1586,8 +1586,8 @@ public class BleModule implements BleAdapter {
         final Observable<byte[]> subscription = Observable.defer(new Callable<Observable<Observable<byte[]>>>() {
             @Override
             public Observable<Observable<byte[]>> call() {
-                BluetoothGattDescriptor cccDescriptor = characteristic.getGattDescriptor(Constants.CLIENT_CHARACTERISTIC_CONFIG_UUID);
-                NotificationSetupMode setupMode = cccDescriptor != null
+                final BluetoothGattDescriptor cccDescriptor = characteristic.getGattDescriptor(Constants.CLIENT_CHARACTERISTIC_CONFIG_UUID);
+                final NotificationSetupMode setupMode = cccDescriptor != null
                         ? NotificationSetupMode.QUICK_SETUP
                         : NotificationSetupMode.COMPAT;
                 if (characteristic.isNotifiable()) {
@@ -1603,7 +1603,7 @@ public class BleModule implements BleAdapter {
         })
                 .flatMap(new Function<Observable<byte[]>, Observable<byte[]>>() {
                     @Override
-                    public Observable<byte[]> apply(Observable<byte[]> observable) {
+                    public Observable<byte[]> apply(final Observable<byte[]> observable) {
                         return observable;
                     }
                 })
@@ -1617,20 +1617,20 @@ public class BleModule implements BleAdapter {
                     }
                 });
 
-        DisposableObserver<byte[]> observer = new DisposableObserver<byte[]>() {
+        final DisposableObserver<byte[]> observer = new DisposableObserver<byte[]>() {
             @Override
             public void onComplete() {
                 pendingTransactions.removeDisposable(transactionId);
             }
 
             @Override
-            public void onError(Throwable error) {
+            public void onError(final Throwable error) {
                 safeExecutor.error(errorConverter.toError(error));
                 pendingTransactions.removeDisposable(transactionId);
             }
 
             @Override
-            public void onNext(byte[] bytes) {
+            public void onNext(final byte[] bytes) {
                 characteristic.logValue("Notification from", bytes);
                 characteristic.setValue(bytes);
                 onEventCallback.onEvent(new Characteristic(characteristic));
@@ -1713,18 +1713,18 @@ public class BleModule implements BleAdapter {
         return characteristic;
     }
 
-    private void cleanServicesAndCharacteristicsForDevice(@NonNull Device device) {
+    private void cleanServicesAndCharacteristicsForDevice(@NonNull final Device device) {
         for (int i = discoveredServices.size() - 1; i >= 0; i--) {
-            int key = discoveredServices.keyAt(i);
-            Service service = discoveredServices.get(key);
+            final int key = discoveredServices.keyAt(i);
+            final Service service = discoveredServices.get(key);
 
             if (service.getDeviceID().equals(device.getId())) {
                 discoveredServices.remove(key);
             }
         }
         for (int i = discoveredCharacteristics.size() - 1; i >= 0; i--) {
-            int key = discoveredCharacteristics.keyAt(i);
-            Characteristic characteristic = discoveredCharacteristics.get(key);
+            final int key = discoveredCharacteristics.keyAt(i);
+            final Characteristic characteristic = discoveredCharacteristics.get(key);
 
             if (characteristic.getDeviceId().equals(device.getId())) {
                 discoveredCharacteristics.remove(key);
@@ -1732,8 +1732,8 @@ public class BleModule implements BleAdapter {
         }
 
         for (int i = discoveredDescriptors.size() - 1; i >= 0; i--) {
-            int key = discoveredDescriptors.keyAt(i);
-            Descriptor descriptor = discoveredDescriptors.get(key);
+            final int key = discoveredDescriptors.keyAt(i);
+            final Descriptor descriptor = discoveredDescriptors.get(key);
             if (descriptor.getDeviceId().equals(device.getId())) {
                 discoveredDescriptors.remove(key);
             }
