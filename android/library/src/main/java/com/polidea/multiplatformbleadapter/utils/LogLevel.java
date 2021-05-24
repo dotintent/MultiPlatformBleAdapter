@@ -1,44 +1,44 @@
 package com.polidea.multiplatformbleadapter.utils;
 
 
-import com.polidea.rxandroidble.internal.RxBleLog;
+import com.polidea.rxandroidble2.LogConstants;
 
 public class LogLevel {
 
-    @RxBleLog.LogLevel
+    @LogConstants.LogLevel
     public static int toLogLevel(String logLevel) {
         switch (logLevel) {
             case Constants.BluetoothLogLevel.VERBOSE:
-                return RxBleLog.VERBOSE;
+                return LogConstants.VERBOSE;
             case Constants.BluetoothLogLevel.DEBUG:
-                return RxBleLog.DEBUG;
+                return LogConstants.DEBUG;
             case Constants.BluetoothLogLevel.INFO:
-                return RxBleLog.INFO;
+                return LogConstants.INFO;
             case Constants.BluetoothLogLevel.WARNING:
-                return RxBleLog.WARN;
+                return LogConstants.WARN;
             case Constants.BluetoothLogLevel.ERROR:
-                return RxBleLog.ERROR;
+                return LogConstants.ERROR;
             case Constants.BluetoothLogLevel.NONE:
                 // fallthrough
             default:
-                return RxBleLog.NONE;
+                return LogConstants.NONE;
         }
     }
 
     @Constants.BluetoothLogLevel
     public static String fromLogLevel(int logLevel) {
         switch (logLevel) {
-            case RxBleLog.VERBOSE:
+            case LogConstants.VERBOSE:
                 return Constants.BluetoothLogLevel.VERBOSE;
-            case RxBleLog.DEBUG:
+            case LogConstants.DEBUG:
                 return Constants.BluetoothLogLevel.DEBUG;
-            case RxBleLog.INFO:
+            case LogConstants.INFO:
                 return Constants.BluetoothLogLevel.INFO;
-            case RxBleLog.WARN:
+            case LogConstants.WARN:
                 return Constants.BluetoothLogLevel.WARNING;
-            case RxBleLog.ERROR:
+            case LogConstants.ERROR:
                 return Constants.BluetoothLogLevel.ERROR;
-            case RxBleLog.NONE:
+            case LogConstants.NONE:
                 // fallthrough
             default:
                 return Constants.BluetoothLogLevel.NONE;

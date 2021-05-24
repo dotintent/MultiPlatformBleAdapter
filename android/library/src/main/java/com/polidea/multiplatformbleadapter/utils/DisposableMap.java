@@ -4,35 +4,36 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import rx.Subscription;
+import io.reactivex.disposables.Disposable;
+
 
 public class DisposableMap {
 
-    final private Map<String, Subscription> subscriptions = new HashMap<>();
+    final private Map<String, Disposable> Disposables = new HashMap<>();
 
-    public synchronized void replaceSubscription(String key, Subscription subscription) {
-        Subscription oldSubscription = subscriptions.put(key, subscription);
-        if (oldSubscription != null && !oldSubscription.isUnsubscribed()) {
-            oldSubscription.unsubscribe();
+    public synchronized void replaceDisposable(String key, Disposable Disposable) {
+        Disposable oldDisposable = Disposables.put(key, Disposable);
+        if (oldDisposable != null && !oldDisposable.isDisposed()) {
+            oldDisposable.dispose();
         }
     }
 
-    public synchronized boolean removeSubscription(String key) {
-        Subscription subscription = subscriptions.remove(key);
-        if (subscription == null) return false;
-        if (!subscription.isUnsubscribed()) {
-            subscription.unsubscribe();
+    public synchronized boolean removeDisposable(String key) {
+        Disposable Disposable = Disposables.remove(key);
+        if (Disposable == null) return false;
+        if (!Disposable.isDisposed()) {
+            Disposable.dispose();
         }
         return true;
     }
 
-    public synchronized void removeAllSubscriptions() {
-        Iterator<Map.Entry<String, Subscription>> it = subscriptions.entrySet().iterator();
+    public synchronized void removeAllDisposables() {
+        Iterator<Map.Entry<String, Disposable>> it = Disposables.entrySet().iterator();
         while (it.hasNext()) {
-            Subscription subscription = it.next().getValue();
+            Disposable Disposable = it.next().getValue();
             it.remove();
-            if (!subscription.isUnsubscribed()) {
-                subscription.unsubscribe();
+            if (!Disposable.isDisposed()) {
+                Disposable.dispose();
             }
         }
     }

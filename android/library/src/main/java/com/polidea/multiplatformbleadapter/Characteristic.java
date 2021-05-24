@@ -2,14 +2,14 @@ package com.polidea.multiplatformbleadapter;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.polidea.multiplatformbleadapter.utils.ByteUtils;
 import com.polidea.multiplatformbleadapter.utils.Constants;
 import com.polidea.multiplatformbleadapter.utils.IdGenerator;
 import com.polidea.multiplatformbleadapter.utils.IdGeneratorKey;
-import com.polidea.rxandroidble.internal.RxBleLog;
+import com.polidea.rxandroidble2.internal.RxBleLog;
 
 import java.util.ArrayList;
 import java.util.List;
