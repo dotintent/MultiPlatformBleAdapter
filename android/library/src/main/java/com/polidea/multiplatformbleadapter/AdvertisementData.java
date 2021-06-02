@@ -18,6 +18,7 @@ public class AdvertisementData {
     private Integer txPowerLevel;
     private List<UUID> solicitedServiceUUIDs;
     private byte[] rawScanRecord;
+    private byte[] deviceId;
 
     private static final long BLUETOOTH_BASE_UUID_LSB = 0x800000805F9B34FBL;
     private static final int BLUETOOTH_BASE_UUID_MSB = 0x00001000;
@@ -48,6 +49,10 @@ public class AdvertisementData {
 
     public byte[] getRawScanRecord() {
         return rawScanRecord;
+    }
+
+    public byte[] getDeviceId() {
+        return deviceId;
     }
 
     private AdvertisementData() {}
@@ -110,6 +115,9 @@ public class AdvertisementData {
             case 0x0A:
                 parseTxPowerLevel(advData, adLength, data);
                 break;
+
+            case 0x10: 
+                parseDeviceId(advData, adLength, data);
 
             case 0x14:
                 parseSolicitedServiceUUIDs(advData, adLength, data, 2);
@@ -198,5 +206,11 @@ public class AdvertisementData {
         if (adLength < 2) return;
         advData.manufacturerData = new byte[adLength];
         data.get(advData.manufacturerData, 0, adLength);
+    }
+
+    private static void parseDeviceId(AdvertisementData advData, int adLength, ByteBuffer data) {
+        if (adLength < 2) return;
+        advData.manufacturerData = new byte[adLength];
+        data.get(advData.deviceId, 0, adLength);
     }
 }
