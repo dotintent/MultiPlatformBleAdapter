@@ -8,9 +8,9 @@ Internally uses:
  
 If you'd like to use it in your own library, you should start from BleAdapter on either platform.
 ## Maintained by
-This library is maintained by [intent](https://withintent.com/?utm_source=Github)
+This library is maintained by [intent](https://withintent.com/?utm_source=github&utm_medium=github&utm_campaign=external_traffic)
 
-[Contact us](https://withintent.com/contact-us/?utm_source=Github)
+[Contact us](https://withintent.com/contact-us/?utm_source=github&utm_medium=github&utm_campaign=external_traffic)
 
 #### Maintainers
 TBD
