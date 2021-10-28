@@ -858,7 +858,9 @@ public class BleClientManager : NSObject {
             }
             .subscribe(
                 onNext: { characteristic in
-                    promise.resolve(characteristic.asJSObject)
+                    var jsObject = characteristic.asJSObject;
+                    jsObject.updateValue(value.base64, forKey: "value")
+                    promise.resolve(jsObject)
                 },
                 onError: { error in
                     error.bleError.callReject(promise)
