@@ -43,7 +43,7 @@ public class Device {
         return rssi;
     }
 
-    public void setRssi(Integer rssi) {
+    public void setRssi(@Nullable Integer rssi) {
         this.rssi = rssi;
     }
 
@@ -52,7 +52,7 @@ public class Device {
         return mtu;
     }
 
-    public void setMtu(Integer mtu) {
+    public void setMtu(@Nullable Integer mtu) {
         this.mtu = mtu;
     }
 

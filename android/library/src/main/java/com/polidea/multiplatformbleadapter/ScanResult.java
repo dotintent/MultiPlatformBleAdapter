@@ -10,13 +10,12 @@ public class ScanResult {
     private String deviceName;
     private int rssi;
     private int mtu;
-    @Nullable
     private boolean isConnectable;
     @Nullable
     private UUID[] overflowServiceUUIDs;
     private AdvertisementData advertisementData;
 
-    public ScanResult(String deviceId, String deviceName, int rssi, int mtu, boolean isConnectable, UUID[] overflowServiceUUIDs, AdvertisementData advertisementData) {
+    public ScanResult(String deviceId, String deviceName, int rssi, int mtu, boolean isConnectable, @Nullable UUID[] overflowServiceUUIDs, AdvertisementData advertisementData) {
         this.deviceId = deviceId;
         this.deviceName = deviceName;
         this.rssi = rssi;
@@ -70,7 +69,7 @@ public class ScanResult {
         return overflowServiceUUIDs;
     }
 
-    public void setOverflowServiceUUIDs(UUID[] overflowServiceUUIDs) {
+    public void setOverflowServiceUUIDs(@Nullable UUID[] overflowServiceUUIDs) {
         this.overflowServiceUUIDs = overflowServiceUUIDs;
     }
 

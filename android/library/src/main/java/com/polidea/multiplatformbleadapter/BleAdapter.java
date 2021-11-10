@@ -125,7 +125,7 @@ public interface BleAdapter {
             OnErrorCallback onErrorCallback);
 
     void readCharacteristic(
-            int characteristicIdentifer,
+            int characteristicIdentifier,
             String transactionId,
             OnSuccessCallback<Characteristic> onSuccessCallback,
             OnErrorCallback onErrorCallback);

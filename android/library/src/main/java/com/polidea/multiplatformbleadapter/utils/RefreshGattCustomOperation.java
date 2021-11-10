@@ -23,20 +23,16 @@ public class RefreshGattCustomOperation implements RxBleCustomOperation<Boolean>
             final BluetoothGatt bluetoothGatt,
             final RxBleGattCallback rxBleGattCallback,
             final Scheduler scheduler
-    ) throws Throwable {
+    ) {
 
         return Observable.amb(
                 Observable.fromCallable(new Callable<Boolean>() {
-                    @Override
-                    public Boolean call() throws Exception {
-                        boolean success = false;
-                        call: try {
-                            Method bluetoothGattRefreshFunction = bluetoothGatt.getClass().getMethod("refresh");
-                            if (bluetoothGattRefreshFunction == null) {
-                                RxBleLog.d("Could not find function BluetoothGatt.refresh()");
-                                break call;
-                            }
 
+                    @Override
+                    public Boolean call() {
+                        Boolean success = false;
+                        try {
+                            Method bluetoothGattRefreshFunction = bluetoothGatt.getClass().getMethod("refresh");
                             success = (Boolean) bluetoothGattRefreshFunction.invoke(bluetoothGatt);
 
                             if (!success) RxBleLog.d("BluetoothGatt.refresh() returned false");

@@ -203,8 +203,6 @@ public class ErrorConverter {
     private BleError toError(BleScanException bleScanException) {
         final int reason = bleScanException.getReason();
         switch (reason) {
-            case BleScanException.BLUETOOTH_CANNOT_START:
-                return new BleError(BleErrorCode.ScanStartFailed, bleScanException.getMessage(), null);
             case BleScanException.BLUETOOTH_DISABLED:
                 return new BleError(BleErrorCode.BluetoothPoweredOff, bleScanException.getMessage(), null);
             case BleScanException.BLUETOOTH_NOT_AVAILABLE:
@@ -213,6 +211,7 @@ public class ErrorConverter {
                 return new BleError(BleErrorCode.BluetoothUnauthorized, bleScanException.getMessage(), null);
             case BleScanException.LOCATION_SERVICES_DISABLED:
                 return new BleError(BleErrorCode.LocationServicesDisabled, bleScanException.getMessage(), null);
+            case BleScanException.BLUETOOTH_CANNOT_START:
             default:
                 return new BleError(BleErrorCode.ScanStartFailed, bleScanException.getMessage(), null);
         }
