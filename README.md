@@ -15,7 +15,7 @@ This library is maintained by [Polidea](https://www.polidea.com/?utm_source=Gith
 [Learn more about Polidea's BLE services](https://www.polidea.com/services/ble/?utm_source=Github&utm_medium=Npaid&utm_campaign=Tech_BLE&utm_term=Code&utm_content=GH_NOP_BLE_COD_MPBA001).
 
 #### Maintainers
-TBD
+ TBD
 
 ## License
 Copyright 2019 Polidea Sp. z o.o
