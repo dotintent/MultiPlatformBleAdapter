@@ -3,9 +3,9 @@ package com.polidea.multiplatformbleadapter.errors;
 
 public class BleError extends Throwable {
 
-    public BleErrorCode errorCode;
-    public Integer androidCode;
-    public String reason;
+    public final BleErrorCode errorCode;
+    public final Integer androidCode;
+    public final String reason;
     public String deviceID;
     public String serviceUUID;
     public String characteristicUUID;

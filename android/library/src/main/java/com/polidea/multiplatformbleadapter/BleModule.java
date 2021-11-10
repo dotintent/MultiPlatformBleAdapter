@@ -64,27 +64,27 @@ public class BleModule implements BleAdapter {
     @Nullable
     private RxBleClient rxBleClient;
 
-    private HashMap<String, Device> discoveredDevices = new HashMap<>();
+    private final HashMap<String, Device> discoveredDevices = new HashMap<>();
 
-    private HashMap<String, Device> connectedDevices = new HashMap<>();
+    private final HashMap<String, Device> connectedDevices = new HashMap<>();
 
-    private HashMap<String, RxBleConnection> activeConnections = new HashMap<>();
+    private final HashMap<String, RxBleConnection> activeConnections = new HashMap<>();
 
-    private SparseArray<Service> discoveredServices = new SparseArray<>();
+    private final SparseArray<Service> discoveredServices = new SparseArray<>();
 
-    private SparseArray<Characteristic> discoveredCharacteristics = new SparseArray<>();
+    private final SparseArray<Characteristic> discoveredCharacteristics = new SparseArray<>();
 
-    private SparseArray<Descriptor> discoveredDescriptors = new SparseArray<>();
+    private final SparseArray<Descriptor> discoveredDescriptors = new SparseArray<>();
 
     private final DisposableMap pendingTransactions = new DisposableMap();
 
     private final DisposableMap connectingDevices = new DisposableMap();
 
-    private BluetoothManager bluetoothManager;
+    private final BluetoothManager bluetoothManager;
 
-    private BluetoothAdapter bluetoothAdapter;
+    private final BluetoothAdapter bluetoothAdapter;
 
-    private Context context;
+    private final Context context;
 
     @Nullable
     private Subscription scanSubscription;
@@ -92,11 +92,11 @@ public class BleModule implements BleAdapter {
     @Nullable
     private Subscription adapterStateChangesSubscription;
 
-    private RxBleDeviceToDeviceMapper rxBleDeviceToDeviceMapper = new RxBleDeviceToDeviceMapper();
+    private final RxBleDeviceToDeviceMapper rxBleDeviceToDeviceMapper = new RxBleDeviceToDeviceMapper();
 
-    private RxScanResultToScanResultMapper rxScanResultToScanResultMapper = new RxScanResultToScanResultMapper();
+    private final RxScanResultToScanResultMapper rxScanResultToScanResultMapper = new RxScanResultToScanResultMapper();
 
-    private ServiceFactory serviceFactory = new ServiceFactory();
+    private final ServiceFactory serviceFactory = new ServiceFactory();
 
     private int currentLogLevel = RxBleLog.NONE;
 

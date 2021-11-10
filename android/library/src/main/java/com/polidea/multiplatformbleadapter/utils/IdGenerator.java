@@ -3,7 +3,7 @@ package com.polidea.multiplatformbleadapter.utils;
 import java.util.HashMap;
 
 public class IdGenerator {
-    private static HashMap<IdGeneratorKey, Integer> idMap = new HashMap<>();
+    private static final HashMap<IdGeneratorKey, Integer> idMap = new HashMap<>();
     private static int nextKey = 0;
 
     public static int getIdForKey(IdGeneratorKey idGeneratorKey) {

@@ -5,8 +5,8 @@ import java.util.UUID;
 
 public class UUIDConverter {
 
-    private static String baseUUIDPrefix = "0000";
-    private static String baseUUIDSuffix = "-0000-1000-8000-00805F9B34FB";
+    private static final String baseUUIDPrefix = "0000";
+    private static final String baseUUIDSuffix = "-0000-1000-8000-00805F9B34FB";
 
     public static UUID convert(String sUUID) {
         if (sUUID == null) return null;

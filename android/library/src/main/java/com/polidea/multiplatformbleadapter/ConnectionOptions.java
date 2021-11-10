@@ -10,20 +10,20 @@ public class ConnectionOptions {
      * Whether to directly connect to the remote device (false) or to automatically connect as soon
      * as the remote device becomes available (true).
      */
-    private boolean autoConnect;
+    private final boolean autoConnect;
 
     /**
      * Whether MTU size will be negotiated to this value. It is not guaranteed to get it after
      * connection is successful.
      */
-    private int requestMTU;
+    private final int requestMTU;
 
     /**
      * Whether action will be taken to reset services cache. This option may be useful when a
      * peripheral's firmware was updated and it's services/characteristics were
      * added/removed/altered. {@link https://stackoverflow.com/questions/22596951/how-to-programmatically-force-bluetooth-low-energy-service-discovery-on-android}
      */
-    private RefreshGattMoment refreshGattMoment;
+    private final RefreshGattMoment refreshGattMoment;
 
     /**
      * Number of milliseconds after connection is automatically timed out. In case of race condition
@@ -31,10 +31,10 @@ public class ConnectionOptions {
      * immediately. Time out may happen earlier then specified due to OS specific behavior.
      */
     @Nullable
-    private Long timeoutInMillis;
+    private final Long timeoutInMillis;
 
     @ConnectionPriority
-    private int connectionPriority;
+    private final int connectionPriority;
 
     public ConnectionOptions(Boolean autoConnect,
                              int requestMTU,

@@ -10,9 +10,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SafeExecutor<T> {
 
-    private OnSuccessCallback<T> successCallback;
-    private OnErrorCallback errorCallback;
-    private AtomicBoolean wasExecuted = new AtomicBoolean(false);
+    private final OnSuccessCallback<T> successCallback;
+    private final OnErrorCallback errorCallback;
+    private final AtomicBoolean wasExecuted = new AtomicBoolean(false);
 
     public SafeExecutor(@Nullable OnSuccessCallback<T> successCallback, @Nullable OnErrorCallback errorCallback) {
         this.successCallback = successCallback;
