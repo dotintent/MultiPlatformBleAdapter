@@ -377,7 +377,7 @@ public class BleModule implements BleAdapter {
             }
         }
 
-        onSuccessCallback.onSuccess(knownDevices.toArray(new Device[0]));
+        onSuccessCallback.onSuccess(knownDevices.toArray(new Device[knownDevices.size()]));
     }
 
     @Override
