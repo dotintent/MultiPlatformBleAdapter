@@ -416,7 +416,7 @@ public class BleModule implements BleAdapter {
             }
         }
 
-        onSuccessCallback.onSuccess(localConnectedDevices.toArray(new Device[0]));
+        onSuccessCallback.onSuccess(localConnectedDevices.toArray(new Device[localConnectedDevices.size()]));
 
     }
 
