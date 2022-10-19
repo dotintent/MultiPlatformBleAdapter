@@ -12,8 +12,7 @@ Pod::Spec.new do |spec|
   spec.author             = { "Pawel Scibek" => "pawel.scibek@polidea.com", "Tomasz Bogusz" => "tomasz.bogusz@polidea.com", "Przemyslaw Lenart" => "przemyslaw.lenart@polidea.com" }
   spec.social_media_url   = "https://twitter.com/polidea"
 
-  spec.platform = :ios
-  spec.ios.deployment_target = "8.0"
+  spec.platforms = { :ios => '8.0', :tvos => '9.0' }
   spec.swift_versions = ['4.0', '4.2', '5.0']
   spec.source       = { :git => "https://github.com/Polidea/MultiPlatformBleAdapter.git", :tag => "#{spec.version}" }
 
