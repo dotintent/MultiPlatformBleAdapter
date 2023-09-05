@@ -1,7 +1,8 @@
 apply plugin: 'com.android.library'
-//apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'maven-publish'
 
 group='com.github.Polidea'
+version='2.0'
 
 buildscript {
     repositories {
@@ -42,6 +43,10 @@ android {
             matchingFallbacks = ['debug', 'release']
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
 }
 
 dependencies {
@@ -51,11 +56,20 @@ dependencies {
 
 }
 
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from android.sourceSets.main.java.sourceFiles
-}
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
 
-artifacts {
-    archives sourcesJar
+                groupId 'com.polidea'
+                artifactId 'multiplatformbleadapter'
+                version '2.0'
+
+                pom {
+                    name = "Multiplatform Ble Adapter"
+                }
+            }
+        }
+    }
 }
