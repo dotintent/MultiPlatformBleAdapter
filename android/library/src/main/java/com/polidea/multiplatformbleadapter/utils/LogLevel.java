@@ -1,7 +1,7 @@
 package com.polidea.multiplatformbleadapter.utils;
 
 
-import com.polidea.rxandroidble.internal.RxBleLog;
+import com.polidea.rxandroidble2.internal.RxBleLog;
 
 public class LogLevel {
 

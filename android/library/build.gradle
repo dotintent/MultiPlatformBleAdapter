@@ -1,33 +1,31 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
+//apply plugin: 'com.github.dcendents.android-maven'
 
 group='com.github.Polidea'
 
 buildscript {
     repositories {
         google()
-        jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.2'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        classpath 'com.android.tools.build:gradle:3.4.3'
     }
 }
 
 repositories {
     google()
-    jcenter()
+    mavenCentral()
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 33
 
     defaultConfig {
-        minSdkVersion 18
-        targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion 22
+        targetSdkVersion 33
+        versionCode 2
+        versionName "2.0"
     }
     buildTypes {
         release {
@@ -42,8 +40,9 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "com.polidea.rxandroidble:rxandroidble:1.7.1"
-    testImplementation 'junit:junit:4.12'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.17'
+    implementation "com.polidea.rxandroidble2:rxandroidble:1.17.2"
+
 }
 
 task sourcesJar(type: Jar) {
