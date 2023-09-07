@@ -3,6 +3,8 @@ package com.polidea.multiplatformbleadapter;
 
 import androidx.annotation.Nullable;
 
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -83,5 +85,48 @@ public class ScanResult {
 
     public void setAdvertisementData(AdvertisementData advertisementData) {
         this.advertisementData = advertisementData;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ScanResult that = (ScanResult) o;
+
+        if (rssi != that.rssi) return false;
+        if (mtu != that.mtu) return false;
+        if (isConnectable != that.isConnectable) return false;
+        if (!deviceId.equals(that.deviceId)) return false;
+        if (!Objects.equals(deviceName, that.deviceName))
+            return false;
+        // Probably incorrect - comparing Object[] arrays with Arrays.equals
+        if (!Arrays.equals(overflowServiceUUIDs, that.overflowServiceUUIDs)) return false;
+        return Objects.equals(advertisementData, that.advertisementData);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = deviceId.hashCode();
+        result = 31 * result + (deviceName != null ? deviceName.hashCode() : 0);
+        result = 31 * result + rssi;
+        result = 31 * result + mtu;
+        result = 31 * result + (isConnectable ? 1 : 0);
+        result = 31 * result + Arrays.hashCode(overflowServiceUUIDs);
+        result = 31 * result + (advertisementData != null ? advertisementData.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "ScanResult{" +
+                "deviceId='" + deviceId + '\'' +
+                ", deviceName='" + deviceName + '\'' +
+                ", rssi=" + rssi +
+                ", mtu=" + mtu +
+                ", isConnectable=" + isConnectable +
+                ", overflowServiceUUIDs=" + Arrays.toString(overflowServiceUUIDs) +
+                ", advertisementData=" + advertisementData +
+                '}';
     }
 }

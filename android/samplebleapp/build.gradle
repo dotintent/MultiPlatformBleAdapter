@@ -47,7 +47,9 @@ android {
 }
 
 dependencies {
-    implementation project(":library")
+//    implementation project(":library")
+    implementation 'com.github.Polidea:MultiPlatformBleAdapter:update_rxandroidble_1_17_2_v2-SNAPSHOT@aar'
+
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
     implementation 'androidx.activity:activity-compose:1.7.2'
