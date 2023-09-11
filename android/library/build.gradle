@@ -67,7 +67,7 @@ tasks.withType(PublishToMavenRepository).configureEach { it.enabled = false }
 publishing {
     publications {
         release(MavenPublication) {
-            groupId 'com.polidea.multiplatformbleadapter2'
+            groupId 'com.polidea.multiplatformbleadapter'
             artifactId 'library'
             version '2.0'
 
