@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
-group='com.github.Polidea'
+group='com.polidea.multiplatformbleadapter'
 version='2.0'
 
 buildscript {
@@ -10,7 +10,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:7.2.2"
+        classpath "com.android.tools.build:gradle:8.0.2"
     }
 }
 
@@ -20,7 +20,7 @@ repositories {
 }
 
 android {
-    compileSdkVersion 33
+    compileSdk 33
     namespace = 'com.polidea.multiplatformbleadapter'
     publishing {
         singleVariant("release") {
@@ -33,7 +33,11 @@ android {
         targetSdkVersion 33
         versionCode 2
         versionName "2.0"
+        aarMetadata {
+            minCompileSdk = 30
+        }
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -53,22 +57,23 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     api 'io.reactivex.rxjava2:rxjava:2.2.17'
     api "com.polidea.rxandroidble2:rxandroidble:1.17.2"
-
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
+
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId 'com.polidea'
+            artifactId 'multiplatformbleadapter'
+            version '2.0'
+
+
+            pom {
+                name = "Multiplatform Ble Adapter"
+            }
+
+            afterEvaluate {
                 from components.release
-
-                groupId 'com.polidea'
-                artifactId 'multiplatformbleadapter'
-                version '2.0'
-
-                pom {
-                    name = "Multiplatform Ble Adapter"
-                }
             }
         }
     }
