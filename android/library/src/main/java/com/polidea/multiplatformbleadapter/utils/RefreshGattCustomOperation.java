@@ -16,6 +16,7 @@ import io.reactivex.Scheduler;
 
 public class RefreshGattCustomOperation implements RxBleCustomOperation<Boolean> {
 
+    /** @noinspection unchecked, JavaReflectionMemberAccess, DataFlowIssue */
     @NonNull
     @Override
     public Observable<Boolean> asObservable(
@@ -41,7 +42,7 @@ public class RefreshGattCustomOperation implements RxBleCustomOperation<Boolean>
                         })
                         .subscribeOn(scheduler)
                         .delay(1, TimeUnit.SECONDS, scheduler),
-                rxBleGattCallback.<Boolean>observeDisconnect()
+                rxBleGattCallback.observeDisconnect()
         );
     }
 }
