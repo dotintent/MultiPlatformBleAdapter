@@ -88,6 +88,11 @@
 		8E63F36E2AB0D6390010A0CB /* Multicast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E63F3272AB0D6380010A0CB /* Multicast.swift */; };
 		8E63F36F2AB0D6390010A0CB /* AsMaybe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E63F3292AB0D6380010A0CB /* AsMaybe.swift */; };
 		8E63F3702AB0D6390010A0CB /* ToArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E63F32A2AB0D6380010A0CB /* ToArray.swift */; };
+		8EF49F392AB1CCF30019E5F9 /* Array+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EF49F382AB1CCF30019E5F9 /* Array+Utils.swift */; };
+		8EF49F3B2AB1CD3E0019E5F9 /* CBCentral+Uuid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EF49F3A2AB1CD3E0019E5F9 /* CBCentral+Uuid.swift */; };
+		8EF49F3D2AB1CD720019E5F9 /* CBCentralManagerDelegateWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EF49F3C2AB1CD720019E5F9 /* CBCentralManagerDelegateWrapper.swift */; };
+		8EF49F412AB1CDDE0019E5F9 /* CBPeripheralDelegateWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EF49F402AB1CDDE0019E5F9 /* CBPeripheralDelegateWrapper.swift */; };
+		8EF49F492AB1CE400019E5F9 /* ManagerType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EF49F482AB1CE400019E5F9 /* ManagerType.swift */; };
 		8EFF12592AB0C09600399069 /* Disposable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EFF11E92AB0C09500399069 /* Disposable.swift */; };
 		8EFF125A2AB0C09600399069 /* Date+Dispatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EFF11EA2AB0C09500399069 /* Date+Dispatch.swift */; };
 		8EFF125B2AB0C09600399069 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EFF11EB2AB0C09500399069 /* Event.swift */; };
@@ -308,6 +313,11 @@
 		8E63F3282AB0D6380010A0CB /* Zip+arity.tt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Zip+arity.tt"; sourceTree = "<group>"; };
 		8E63F3292AB0D6380010A0CB /* AsMaybe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsMaybe.swift; sourceTree = "<group>"; };
 		8E63F32A2AB0D6380010A0CB /* ToArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToArray.swift; sourceTree = "<group>"; };
+		8EF49F382AB1CCF30019E5F9 /* Array+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+Utils.swift"; sourceTree = "<group>"; };
+		8EF49F3A2AB1CD3E0019E5F9 /* CBCentral+Uuid.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CBCentral+Uuid.swift"; sourceTree = "<group>"; };
+		8EF49F3C2AB1CD720019E5F9 /* CBCentralManagerDelegateWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CBCentralManagerDelegateWrapper.swift; sourceTree = "<group>"; };
+		8EF49F402AB1CDDE0019E5F9 /* CBPeripheralDelegateWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CBPeripheralDelegateWrapper.swift; sourceTree = "<group>"; };
+		8EF49F482AB1CE400019E5F9 /* ManagerType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManagerType.swift; sourceTree = "<group>"; };
 		8EFF11E92AB0C09500399069 /* Disposable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Disposable.swift; sourceTree = "<group>"; };
 		8EFF11EA2AB0C09500399069 /* Date+Dispatch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Date+Dispatch.swift"; path = "../../../Downloads/RxSwift-6.6.0 6/RxSwift/Date+Dispatch.swift"; sourceTree = "<group>"; };
 		8EFF11EB2AB0C09500399069 /* Event.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
@@ -739,6 +749,11 @@
 		A8F13C432316AF7600A70E91 /* RxBluetoothKit */ = {
 			isa = PBXGroup;
 			children = (
+				8EF49F482AB1CE400019E5F9 /* ManagerType.swift */,
+				8EF49F3A2AB1CD3E0019E5F9 /* CBCentral+Uuid.swift */,
+				8EF49F3C2AB1CD720019E5F9 /* CBCentralManagerDelegateWrapper.swift */,
+				8EF49F402AB1CDDE0019E5F9 /* CBPeripheralDelegateWrapper.swift */,
+				8EF49F382AB1CCF30019E5F9 /* Array+Utils.swift */,
 				A8F13C442316AF7600A70E91 /* RxCBCharacteristic.swift */,
 				A8F13C452316AF7600A70E91 /* RxCBService.swift */,
 				A8F13C462316AF7600A70E91 /* RxDescriptorType.swift */,
@@ -923,6 +938,7 @@
 				8EFF12EC2AB0C0F200399069 /* Infallible+Create.swift in Sources */,
 				A8F13DFF2316BDFB00A70E91 /* BleModule.swift in Sources */,
 				8E63F3462AB0D6390010A0CB /* AddRef.swift in Sources */,
+				8EF49F412AB1CDDE0019E5F9 /* CBPeripheralDelegateWrapper.swift in Sources */,
 				8E63F32C2AB0D6390010A0CB /* Never.swift in Sources */,
 				8EFF12E92AB0C0F200399069 /* PrimitiveSequence+Concurrency.swift in Sources */,
 				8EFF12B72AB0C09600399069 /* SynchronizedUnsubscribeType.swift in Sources */,
@@ -964,6 +980,7 @@
 				8E63F3402AB0D6390010A0CB /* SkipWhile.swift in Sources */,
 				A8F13E052316BE2F00A70E91 /* SafePromise.swift in Sources */,
 				8E63F3482AB0D6390010A0CB /* CombineLatest+Collection.swift in Sources */,
+				8EF49F492AB1CE400019E5F9 /* ManagerType.swift in Sources */,
 				8EFF12612AB0C09600399069 /* SubscriptionDisposable.swift in Sources */,
 				8E63F36D2AB0D6390010A0CB /* SkipUntil.swift in Sources */,
 				8E63F2D92AB0CF400010A0CB /* RecursiveLock.swift in Sources */,
@@ -992,11 +1009,13 @@
 				8EFF12B82AB0C09600399069 /* Observable+Concurrency.swift in Sources */,
 				8EFF12C82AB0C0A200399069 /* ObserverBase.swift in Sources */,
 				8EFF13202AB0C15500399069 /* ConcurrentMainScheduler.swift in Sources */,
+				8EF49F392AB1CCF30019E5F9 /* Array+Utils.swift in Sources */,
 				8EFF13242AB0C15500399069 /* HistoricalSchedulerTimeConverter.swift in Sources */,
 				A8F13D072316AF7600A70E91 /* RxCBCharacteristic.swift in Sources */,
 				8EFF13002AB0C10D00399069 /* PublishSubject.swift in Sources */,
 				A8F13D122316AF7600A70E91 /* BluetoothError.swift in Sources */,
 				8EFF12C12AB0C09600399069 /* ConnectableObservableType.swift in Sources */,
+				8EF49F3B2AB1CD3E0019E5F9 /* CBCentral+Uuid.swift in Sources */,
 				8E63F3472AB0D6390010A0CB /* AsSingle.swift in Sources */,
 				8EFF12F02AB0C0F200399069 /* Infallible.swift in Sources */,
 				8E63F34A2AB0D6390010A0CB /* Window.swift in Sources */,
@@ -1008,6 +1027,7 @@
 				8E63F3502AB0D6390010A0CB /* Error.swift in Sources */,
 				8EFF12B92AB0C09600399069 /* ImmediateSchedulerType.swift in Sources */,
 				A8F13D152316AF7600A70E91 /* RxCentralManagerType.swift in Sources */,
+				8EF49F3D2AB1CD720019E5F9 /* CBCentralManagerDelegateWrapper.swift in Sources */,
 				8EFF12F52AB0C0FF00399069 /* SwiftSupport.swift in Sources */,
 				8EFF12B52AB0C09600399069 /* Lock.swift in Sources */,
 				8EFF12ED2AB0C0F200399069 /* Infallible+Operators.swift in Sources */,
