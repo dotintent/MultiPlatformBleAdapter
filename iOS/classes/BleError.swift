@@ -3,7 +3,7 @@
 //
 //  Created by Przemysław Lenart on 25/07/16.
 //
-
+//KN - TEST
 import Foundation
 import CoreBluetooth
 
@@ -95,7 +95,7 @@ extension BleError {
     var toJS: String {
         return """
         {
-            "errorCode": \(self.errorCode.rawValue),
+            "errorCode": \(self.errorCode.rawValue) NEW-LIB,
             "attErrorCode": \(self.attErrorCode.map {$0.description} ?? "null"),
             "iosErrorCode": \(self.iosErrorCode.map {$0.description} ?? "null"),
             "androidErrorCode": null,
