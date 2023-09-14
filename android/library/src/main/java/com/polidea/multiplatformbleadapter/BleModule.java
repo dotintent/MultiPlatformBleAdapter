@@ -1412,7 +1412,7 @@ public class BleModule implements BleAdapter {
                 .flatMap(observable -> observable)
                 .toFlowable(BackpressureStrategy.BUFFER)
                 .observeOn(Schedulers.computation())
-                .doOnTerminate(() -> {
+                .doOnCancel(() -> {
                     safeExecutor.error(BleErrorUtils.cancelled());
                     pendingTransactions.removeSubscription(transactionId);
                 })
