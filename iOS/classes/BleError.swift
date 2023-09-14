@@ -95,7 +95,7 @@ extension BleError {
     var toJS: String {
         return """
         {
-            "errorCode": \(self.errorCode.rawValue) NEW-LIB,
+            "errorCode": \(self.errorCode.rawValue),
             "attErrorCode": \(self.attErrorCode.map {$0.description} ?? "null"),
             "iosErrorCode": \(self.iosErrorCode.map {$0.description} ?? "null"),
             "androidErrorCode": null,
