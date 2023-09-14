@@ -1087,7 +1087,6 @@ public class BleModule implements BleAdapter {
                 });
 
 
-        // TODO THIS SHOULD CHECK PERMISSION BEFORE ENABLING/DISABLING BECAUSE IT'LL THROW AN EXCEPTION
         boolean desiredAndInitialStateAreSame;
         if (desiredAdapterState == RxBleAdapterStateObservable.BleAdapterState.STATE_ON) {
             desiredAndInitialStateAreSame = !bluetoothAdapter.enable();
