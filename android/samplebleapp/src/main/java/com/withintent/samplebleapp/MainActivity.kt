@@ -26,18 +26,21 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val bleAdapter = BleAdapterFactory.getNewAdapter(this.applicationContext)
-        bleAdapter.createClient("SampleBleApp",
-            {
-                Log.i("BLE", bleAdapter.currentState)
-                Log.i("BLE", "OnEventCallback $it")
-            },
-            {
-                Log.i("BLE", "OnEventCallback $it")
-            }
-        )
+
 
         setContent {
+            val bleAdapter = BleAdapterFactory.getNewAdapter(this)
+            val bleState = remember { mutableStateOf(bleAdapter.currentState) }
+
+            bleAdapter.createClient("SampleBleApp",
+                {
+                    bleState.value = bleAdapter.currentState;
+                },
+                {
+                    Log.i("BLE", "onStateRestored $it")
+                }
+            )
+
             AndroidTheme {
                 Surface(
                     modifier = Modifier
@@ -47,6 +50,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val devices = remember { mutableStateOf(mapOf<String, ScanResult>()) }
                     val scanStarted = remember { mutableStateOf(false) }
+                    val enableResponse = remember { mutableStateOf("No response") }
 
                     Column {
                         Text(
@@ -56,9 +60,25 @@ class MainActivity : ComponentActivity() {
                             text = "BLE State ${bleAdapter.currentState}"
                         )
 
-                        if (!scanStarted.value) {
+                        if (bleState.value == "PoweredOff") {
                             Button(onClick = {
-                                if (bleAdapter.currentState == "PoweredOn") {
+                                bleAdapter.enable("test", { bleState.value = bleAdapter.currentState }, { enableResponse.value = "Error" });
+                            }) {
+                                Text(text = "Enable BLE")
+                            }
+                        } else {
+                            Button(onClick = {
+                                bleAdapter.disable("test", { enableResponse.value = "Done" }, { enableResponse.value = "Error" });
+                            }) {
+                                Text(text = "Disable BLE")
+                            }
+                        }
+
+
+
+                        if (bleAdapter.currentState == "PoweredOn") {
+                            if (!scanStarted.value) {
+                                Button(onClick = {
                                     devices.value = emptyMap()
                                     scanStarted.value = true
                                     bleAdapter.startDeviceScan(
@@ -72,19 +92,19 @@ class MainActivity : ComponentActivity() {
                                             Log.i("BLE", "OnErrorCallback $it")
                                         }
                                     )
+
+                                }) {
+                                    Text(text = "Start scan")
                                 }
-                            }) {
-                                Text(text = "Start scan")
-                            }
-                        } else {
-                            Button(onClick = {
-                                scanStarted.value = false
-                                bleAdapter.stopDeviceScan()
-                            }) {
-                                Text(text = "Stop scan")
+                            } else {
+                                Button(onClick = {
+                                    scanStarted.value = false
+                                    bleAdapter.stopDeviceScan()
+                                }) {
+                                    Text(text = "Stop scan")
+                                }
                             }
                         }
-
                         Card(modifier = Modifier.padding(8.dp)) {
                             val sorted = devices.value.values.sortedBy { it.deviceId }
                             LazyColumn {

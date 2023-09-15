@@ -31,7 +31,7 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
     buildFeatures {
         compose true
@@ -48,9 +48,7 @@ android {
 
 dependencies {
     implementation project(":library")
-    implementation 'com.github.Polidea:MultiPlatformBleAdapter:0c69186e9b@aar'
-//    implementation files('../library/build/outputs/aar/library-release.aar')
-
+//    implementation 'com.github.Polidea:MultiPlatformBleAdapter:3eba51e3dd'
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
     implementation 'androidx.activity:activity-compose:1.7.2'

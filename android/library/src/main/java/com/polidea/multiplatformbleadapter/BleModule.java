@@ -3,14 +3,18 @@ package com.polidea.multiplatformbleadapter;
 import static com.polidea.multiplatformbleadapter.utils.Constants.BluetoothState;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.ParcelUuid;
+import android.util.Log;
 import android.util.SparseArray;
 
 import androidx.annotation.NonNull;
@@ -1087,9 +1091,16 @@ public class BleModule implements BleAdapter {
                 });
 
 
-        boolean desiredAndInitialStateAreSame;
+        boolean desiredAndInitialStateAreSame = false;
         if (desiredAdapterState == RxBleAdapterStateObservable.BleAdapterState.STATE_ON) {
-            desiredAndInitialStateAreSame = !bluetoothAdapter.enable();
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (context instanceof Activity) {
+                    ((Activity) context).startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1);
+                    desiredAndInitialStateAreSame = true;
+                }
+            } else {
+                desiredAndInitialStateAreSame = !bluetoothAdapter.enable();
+            }
         } else {
             desiredAndInitialStateAreSame = !bluetoothAdapter.disable();
         }
