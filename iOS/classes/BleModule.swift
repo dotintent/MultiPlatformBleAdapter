@@ -948,7 +948,7 @@ public class BleClientManager : NSObject {
 
             }, onDisposed: { [weak self] in
                 self?.transactions.removeDisposable(transactionId)
-                promise.resolve(nil)
+                BleError.cancelled().callReject(promise)
             })
 
         transactions.replaceDisposable(transactionId, disposable: disposable)
