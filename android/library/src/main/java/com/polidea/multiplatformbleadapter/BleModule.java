@@ -1105,11 +1105,19 @@ public class BleModule implements BleAdapter {
                 desiredAndInitialStateAreSame = !bluetoothAdapter.disable();
             }
         } catch (SecurityException e) {
-            onErrorCallback.onError(new BleError(
-                    BleErrorCode.BluetoothStateChangeFailed,
-                    "Method requires BLUETOOTH_ADMIN permission",
-                    null)
-            );
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                onErrorCallback.onError(new BleError(
+                        BleErrorCode.BluetoothUnauthorized,
+                        "Method requires BLUETOOTH_CONNECT permission",
+                        null)
+                );
+            } else {
+                onErrorCallback.onError(new BleError(
+                        BleErrorCode.BluetoothUnauthorized,
+                        "Method requires BLUETOOTH_ADMIN permission",
+                        null)
+                );
+            }
         } catch (Exception e) {
             onErrorCallback.onError(new BleError(
                     BleErrorCode.BluetoothStateChangeFailed,
