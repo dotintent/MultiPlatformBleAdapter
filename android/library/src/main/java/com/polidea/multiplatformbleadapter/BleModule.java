@@ -14,7 +14,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.ParcelUuid;
-import android.util.Log;
 import android.util.SparseArray;
 
 import androidx.annotation.NonNull;
@@ -1092,19 +1091,32 @@ public class BleModule implements BleAdapter {
 
 
         boolean desiredAndInitialStateAreSame = false;
-        if (desiredAdapterState == RxBleAdapterStateObservable.BleAdapterState.STATE_ON) {
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                if (context instanceof Activity) {
-                    ((Activity) context).startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1);
-                    desiredAndInitialStateAreSame = true;
+        try {
+            if (desiredAdapterState == RxBleAdapterStateObservable.BleAdapterState.STATE_ON) {
+                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    if (context instanceof Activity) {
+                        ((Activity) context).startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1);
+                        desiredAndInitialStateAreSame = true;
+                    }
+                } else {
+                    desiredAndInitialStateAreSame = !bluetoothAdapter.enable();
                 }
             } else {
-                desiredAndInitialStateAreSame = !bluetoothAdapter.enable();
+                desiredAndInitialStateAreSame = !bluetoothAdapter.disable();
             }
-        } else {
-            desiredAndInitialStateAreSame = !bluetoothAdapter.disable();
+        } catch (SecurityException e) {
+            onErrorCallback.onError(new BleError(
+                    BleErrorCode.BluetoothStateChangeFailed,
+                    "Method requires BLUETOOTH_ADMIN permission",
+                    null)
+            );
+        } catch (Exception e) {
+            onErrorCallback.onError(new BleError(
+                    BleErrorCode.BluetoothStateChangeFailed,
+                    String.format("Couldn't set bluetooth adapter state because of: %s", e.getMessage() != null ? e.getMessage() : "unknown error"),
+                    null)
+            );
         }
-
         if (desiredAndInitialStateAreSame) {
             subscription.dispose();
             onErrorCallback.onError(new BleError(

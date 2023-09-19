@@ -73,7 +73,9 @@ class MainActivity : ComponentActivity() {
                                 Text(text = "Disable BLE")
                             }
                         }
-
+                        Text(
+                            text = "Response from ble enable/disable ${enableResponse.value}", style = MaterialTheme.typography.bodyMedium
+                        )
 
 
                         if (bleAdapter.currentState == "PoweredOn") {
