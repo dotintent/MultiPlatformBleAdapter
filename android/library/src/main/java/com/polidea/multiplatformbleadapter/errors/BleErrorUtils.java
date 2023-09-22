@@ -1,7 +1,7 @@
 package com.polidea.multiplatformbleadapter.errors;
 
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public class BleErrorUtils {
 

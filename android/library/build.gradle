@@ -1,34 +1,44 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'kotlin-android'
+apply plugin: 'maven-publish'
 
-group='com.github.Polidea'
+group='com.polidea.multiplatformbleadapter'
+version='2.0'
 
 buildscript {
     repositories {
         google()
-        jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.2'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        classpath "com.android.tools.build:gradle:8.0.2"
     }
 }
 
 repositories {
     google()
-    jcenter()
+    mavenCentral()
 }
 
 android {
-    compileSdkVersion 28
+    compileSdk 33
+    namespace = 'com.polidea.multiplatformbleadapter'
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
 
     defaultConfig {
-        minSdkVersion 18
-        targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion 23
+        targetSdkVersion 33
+        versionCode 2
+        versionName "2.0"
+        aarMetadata {
+            minCompileSdk = 30
+        }
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -38,19 +48,37 @@ android {
             matchingFallbacks = ['debug', 'release']
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "com.polidea.rxandroidble:rxandroidble:1.7.1"
-    testImplementation 'junit:junit:4.12'
+    api 'io.reactivex.rxjava2:rxjava:2.2.17'
+    api "com.polidea.rxandroidble2:rxandroidble:1.17.2"
 }
 
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from android.sourceSets.main.java.sourceFiles
-}
+tasks.withType(PublishToMavenRepository).configureEach { it.enabled = false }
 
-artifacts {
-    archives sourcesJar
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId 'com.polidea.multiplatformbleadapter'
+            artifactId 'library'
+            version '2.0'
+
+
+            pom {
+                name = "Multiplatform Ble Adapter"
+            }
+
+            afterEvaluate {
+                from components.release
+            }
+        }
+    }
 }

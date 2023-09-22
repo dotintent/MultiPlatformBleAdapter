@@ -2,13 +2,14 @@ package com.polidea.multiplatformbleadapter;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/** @noinspection unused*/
 public class Service {
 
     final private int id;
