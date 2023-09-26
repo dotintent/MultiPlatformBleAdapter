@@ -6,21 +6,23 @@
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
 //
 
-import class Foundation.OperationQueue
-import class Foundation.BlockOperation
 import Dispatch
+import Foundation
 
 /// Abstracts the work that needs to be performed on a specific `NSOperationQueue`.
 ///
 /// This scheduler is suitable for cases when there is some bigger chunk of work that needs to be performed in background and you want to fine tune concurrent processing using `maxConcurrentOperationCount`.
 public class OperationQueueScheduler: ImmediateSchedulerType {
     public let operationQueue: OperationQueue
+    public let queuePriority: Operation.QueuePriority
     
     /// Constructs new instance of `OperationQueueScheduler` that performs work on `operationQueue`.
     ///
     /// - parameter operationQueue: Operation queue targeted to perform work on.
-    public init(operationQueue: OperationQueue) {
+    /// - parameter queuePriority: Queue priority which will be assigned to new operations.
+    public init(operationQueue: OperationQueue, queuePriority: Operation.QueuePriority = .normal) {
         self.operationQueue = operationQueue
+        self.queuePriority = queuePriority
     }
     
     /**
@@ -41,6 +43,8 @@ public class OperationQueueScheduler: ImmediateSchedulerType {
 
             cancel.setDisposable(action(state))
         }
+
+        operation.queuePriority = self.queuePriority
 
         self.operationQueue.addOperation(operation)
         

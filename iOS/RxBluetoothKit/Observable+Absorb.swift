@@ -27,10 +27,10 @@ extension ObservableType {
     /// - parameter b: Second observable
     /// - returns: New observable which emits all of events from a and b observables.
     /// If error or complete is received on any of the observables, it's propagates immediately to result observable
-    static func absorb(_ a: Observable<E>, _ b: Observable<E>) -> Observable<E> {
+    static func absorb(_ a: Observable<Element>, _ b: Observable<Element>) -> Observable<Element> {
         return .create { observer in
             let disposable = CompositeDisposable()
-            let innerObserver: AnyObserver<E> = AnyObserver { event in
+            let innerObserver: AnyObserver<Element> = AnyObserver { event in
                 observer.on(event)
                 if event.isStopEvent {
                     disposable.dispose()

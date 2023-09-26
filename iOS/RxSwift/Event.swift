@@ -10,7 +10,7 @@
 ///
 /// Sequence grammar: 
 /// **next\* (error | completed)**
-public enum Event<Element> {
+@frozen public enum Event<Element> {
     /// Next element is produced.
     case next(Element)
 
@@ -21,8 +21,8 @@ public enum Event<Element> {
     case completed
 }
 
-extension Event : CustomDebugStringConvertible {
-    /// - returns: Description of event.
+extension Event: CustomDebugStringConvertible {
+    /// Description of event.
     public var debugDescription: String {
         switch self {
         case .next(let value):
@@ -60,7 +60,7 @@ extension Event {
         return nil
     }
 
-    /// If `completed` event, returns true.
+    /// If `completed` event, returns `true`.
     public var isCompleted: Bool {
         if case .completed = self {
             return true
@@ -70,8 +70,8 @@ extension Event {
 }
 
 extension Event {
-    /// Maps sequence elements using transform. If error happens during the transform .error
-    /// will be returned as value
+    /// Maps sequence elements using transform. If error happens during the transform, `.error`
+    /// will be returned as value.
     public func map<Result>(_ transform: (Element) throws -> Result) -> Event<Result> {
         do {
             switch self {
@@ -92,15 +92,13 @@ extension Event {
 /// A type that can be converted to `Event<Element>`.
 public protocol EventConvertible {
     /// Type of element in event
-    associatedtype ElementType
+    associatedtype Element
 
     /// Event representation of this instance
-    var event: Event<ElementType> { get }
+    var event: Event<Element> { get }
 }
 
-extension Event : EventConvertible {
+extension Event: EventConvertible {
     /// Event representation of this instance
-    public var event: Event<Element> {
-        return self
-    }
+    public var event: Event<Element> { self }
 }

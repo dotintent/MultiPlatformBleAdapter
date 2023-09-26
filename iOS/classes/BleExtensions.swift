@@ -22,9 +22,9 @@ extension ScannedPeripheral {
     }
 
     var asJSObject: [AnyHashable: Any] {
-        var serviceData: [String:String]?
+        var serviceData: [String: String]?
         if let advServiceData = advertisementData.serviceData {
-            var data = [String:String]()
+            var data = [String: String]()
             for (key, value) in advServiceData {
                 data[key.fullUUIDString] = value.base64
             }
@@ -134,36 +134,33 @@ extension Characteristic {
 
 extension Descriptor {
     var valueBase64: String? {
-        guard let value = self.value else {
-            return nil
-        }
+        guard let value = self.value else { return nil }
+
         switch uuid.uuidString {
-            // UInt16 types.
-            case CBUUIDCharacteristicExtendedPropertiesString:
-                fallthrough
-            case CBUUIDClientCharacteristicConfigurationString:
-                fallthrough
-            case CBUUIDServerCharacteristicConfigurationString:
-                var data = (value as! NSNumber).uint16Value.littleEndian
-                return Data.init(bytes: &data, count: 2).base64
+        case CBUUIDCharacteristicExtendedPropertiesString,
+             CBUUIDClientCharacteristicConfigurationString,
+             CBUUIDServerCharacteristicConfigurationString:
+            return convertNSNumberToBase64(value)
 
-            // String types.
-            case CBUUIDCharacteristicUserDescriptionString:
-                let data = (value as! String).data(using: String.Encoding.utf8)
-                return data?.base64
+        case CBUUIDCharacteristicUserDescriptionString:
+            return convertStringToBase64(value)
 
-            // Data types.
-            case CBUUIDCharacteristicFormatString:
-                fallthrough
-            case CBUUIDCharacteristicAggregateFormatString:
-                return (value as! Data).base64
+        case CBUUIDCharacteristicFormatString,
+             CBUUIDCharacteristicAggregateFormatString:
+            return convertDataToBase64(value)
+
         default:
+            if Descriptor.Constants.gattDescriptors.keys.contains(uuid.uuidString) {
+                return convertDataToBase64(value)
+            }
             return nil
         }
     }
+
     var jsIdentifier: Double {
         return Double(UInt64(objectId) & ((1 << 53) - 1))
     }
+
     var asJSObject: [AnyHashable: Any] {
         return [
             "id": jsIdentifier,
