@@ -30,10 +30,10 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 23
+        minSdkVersion 21
         targetSdkVersion 33
-        versionCode 2
-        versionName "2.0"
+        versionCode 3
+        versionName "2.1"
         aarMetadata {
             minCompileSdk = 30
         }
@@ -69,7 +69,7 @@ publishing {
         release(MavenPublication) {
             groupId 'com.polidea.multiplatformbleadapter'
             artifactId 'library'
-            version '2.0'
+            version '2.1'
 
 
             pom {
