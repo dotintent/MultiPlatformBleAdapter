@@ -1,24 +1,23 @@
 # MultiPlatformBleAdapter
 
-Middle layer between crossplatform BLE libraries ([react-native-ble-plx](https://github.com/Polidea/react-native-ble-plx)
- and [FlutterBleLib](https://github.com/Polidea/FlutterBleLib)) and iOS/Android system for manipulating Bluetooth Low Energy peripherals.
+Middle layer between crossplatform BLE libraries ([react-native-ble-plx](https://github.com/dotintent/react-native-ble-plx)
+and [FlutterBleLib](https://github.com/dotintent/FlutterBleLib)) and iOS/Android system for manipulating Bluetooth Low Energy peripherals.
 Internally uses:
-* [RxAndroidBle](https://github.com/Polidea/RxAndroidBle)
-* [RxBluetoothKit](https://github.com/Polidea/RxBluetoothKit) 
- 
+
+- [RxAndroidBle](https://github.com/Polidea/RxAndroidBle)
+- [RxBluetoothKit](https://github.com/Polidea/RxBluetoothKit)
+
 If you'd like to use it in your own library, you should start from BleAdapter on either platform.
+
 ## Maintained by
-This library is maintained by [Polidea](https://www.polidea.com/?utm_source=Github&utm_medium=Npaid&utm_campaign=Main&utm_term=Code&utm_content=GH_NOP_MPG_COD_MPBA001)
 
-[Contact us](https://www.polidea.com/project/?utm_source=Github&utm_medium=Npaid&utm_campaign=Kontakt&utm_term=Code&utm_content=GH_NOP_KKT_COD_MPBA001)
+This library is maintained by [Intent](https://withintent.com)
 
-[Learn more about Polidea's BLE services](https://www.polidea.com/services/ble/?utm_source=Github&utm_medium=Npaid&utm_campaign=Tech_BLE&utm_term=Code&utm_content=GH_NOP_BLE_COD_MPBA001).
-
-#### Maintainers
-TBD
+[Contact us](https://withintent.com/contact/)
 
 ## License
-Copyright 2019 Polidea Sp. z o.o
+
+Copyright 2023 intent sp. z o.o
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
