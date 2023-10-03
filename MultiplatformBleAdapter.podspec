@@ -15,7 +15,7 @@ Pod::Spec.new do |spec|
   spec.platform = :ios
   spec.ios.deployment_target = "11.0"
   spec.swift_versions = ['4.0', '4.2', '5.0']
-  spec.source       = { :git => "https://github.com/dotintent/MultiPlatformBleAdapter", :tag => "#{spec.version}" }
+  spec.source       = { :git => "https://github.com/dotintent/MultiPlatformBleAdapter.git", :tag => "#{spec.version}" }
 
   spec.source_files  = "iOS/classes/**/*.{h,m,swift}", "iOS/RxBluetoothKit/**/*.{h,m,swift}", "iOS/RxSwift/**/*.{h,m,swift}"
   spec.exclude_files = 'android/**/*'
