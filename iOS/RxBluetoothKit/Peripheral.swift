@@ -156,7 +156,7 @@ public class Peripheral {
             .flatMap { [weak self] (rxservice, error) -> Observable<[Service]> in
                 guard let strongSelf = self else { throw BluetoothError.destroyed }
                 guard let includedRxServices = rxservice.includedServices, error == nil else {
-                    throw BluetoothError.includedServicesDiscoveryFailed(service, error)
+                    throw BluetoothError.includedServicesDiscoveryFailed(strongSelf, error)
                 }
                 let includedServices = includedRxServices.map { Service(peripheral: strongSelf, service: $0) }
                 if let filteredServices = filterUUIDItems(uuids: includedServiceUUIDs, items: includedServices) {

@@ -6,19 +6,19 @@ import android.bluetooth.BluetoothGattService;
 import com.polidea.multiplatformbleadapter.Characteristic;
 import com.polidea.multiplatformbleadapter.exceptions.CannotMonitorCharacteristicException;
 import com.polidea.multiplatformbleadapter.utils.UUIDConverter;
-import com.polidea.rxandroidble.exceptions.BleAlreadyConnectedException;
-import com.polidea.rxandroidble.exceptions.BleCannotSetCharacteristicNotificationException;
-import com.polidea.rxandroidble.exceptions.BleCharacteristicNotFoundException;
-import com.polidea.rxandroidble.exceptions.BleConflictingNotificationAlreadySetException;
-import com.polidea.rxandroidble.exceptions.BleDisconnectedException;
-import com.polidea.rxandroidble.exceptions.BleGattCallbackTimeoutException;
-import com.polidea.rxandroidble.exceptions.BleGattCannotStartException;
-import com.polidea.rxandroidble.exceptions.BleGattCharacteristicException;
-import com.polidea.rxandroidble.exceptions.BleGattDescriptorException;
-import com.polidea.rxandroidble.exceptions.BleGattException;
-import com.polidea.rxandroidble.exceptions.BleGattOperationType;
-import com.polidea.rxandroidble.exceptions.BleScanException;
-import com.polidea.rxandroidble.exceptions.BleServiceNotFoundException;
+import com.polidea.rxandroidble2.exceptions.BleAlreadyConnectedException;
+import com.polidea.rxandroidble2.exceptions.BleCannotSetCharacteristicNotificationException;
+import com.polidea.rxandroidble2.exceptions.BleCharacteristicNotFoundException;
+import com.polidea.rxandroidble2.exceptions.BleConflictingNotificationAlreadySetException;
+import com.polidea.rxandroidble2.exceptions.BleDisconnectedException;
+import com.polidea.rxandroidble2.exceptions.BleGattCallbackTimeoutException;
+import com.polidea.rxandroidble2.exceptions.BleGattCannotStartException;
+import com.polidea.rxandroidble2.exceptions.BleGattCharacteristicException;
+import com.polidea.rxandroidble2.exceptions.BleGattDescriptorException;
+import com.polidea.rxandroidble2.exceptions.BleGattException;
+import com.polidea.rxandroidble2.exceptions.BleGattOperationType;
+import com.polidea.rxandroidble2.exceptions.BleScanException;
+import com.polidea.rxandroidble2.exceptions.BleServiceNotFoundException;
 
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
@@ -66,7 +66,7 @@ public class ErrorConverter {
 
 
         if (throwable instanceof BleCharacteristicNotFoundException) {
-            UUID uuid = ((BleCharacteristicNotFoundException) throwable).getCharactersisticUUID();
+            UUID uuid = ((BleCharacteristicNotFoundException) throwable).getCharacteristicUUID();
             BleError bleError = new BleError(BleErrorCode.CharacteristicNotFound, throwable.getMessage(), null);
             bleError.characteristicUUID = UUIDConverter.fromUUID(uuid);
             return bleError;
@@ -203,8 +203,6 @@ public class ErrorConverter {
     private BleError toError(BleScanException bleScanException) {
         final int reason = bleScanException.getReason();
         switch (reason) {
-            case BleScanException.BLUETOOTH_CANNOT_START:
-                return new BleError(BleErrorCode.ScanStartFailed, bleScanException.getMessage(), null);
             case BleScanException.BLUETOOTH_DISABLED:
                 return new BleError(BleErrorCode.BluetoothPoweredOff, bleScanException.getMessage(), null);
             case BleScanException.BLUETOOTH_NOT_AVAILABLE:
@@ -213,6 +211,7 @@ public class ErrorConverter {
                 return new BleError(BleErrorCode.BluetoothUnauthorized, bleScanException.getMessage(), null);
             case BleScanException.LOCATION_SERVICES_DISABLED:
                 return new BleError(BleErrorCode.LocationServicesDisabled, bleScanException.getMessage(), null);
+            case BleScanException.BLUETOOTH_CANNOT_START:
             default:
                 return new BleError(BleErrorCode.ScanStartFailed, bleScanException.getMessage(), null);
         }

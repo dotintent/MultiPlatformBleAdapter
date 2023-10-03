@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = "MultiplatformBleAdapter"
-  spec.version      = "0.1.9"
+  spec.version      = "0.2.0"
   spec.summary      = "An adapter for RxBluetoothKit that exposes consist API to crossplatform libraries"
 
   spec.description  = <<-DESC
@@ -12,7 +12,8 @@ Pod::Spec.new do |spec|
   spec.author             = { "Pawel Scibek" => "pawel.scibek@polidea.com", "Tomasz Bogusz" => "tomasz.bogusz@polidea.com", "Przemyslaw Lenart" => "przemyslaw.lenart@polidea.com" }
   spec.social_media_url   = "https://twitter.com/polidea"
 
-  spec.platforms = { :ios => '8.0', :tvos => '9.0' }
+  spec.platforms = { :ios => '11.0', :tvos => '11.0' }
+
   spec.swift_versions = ['4.0', '4.2', '5.0']
   spec.source       = { :git => "https://github.com/Polidea/MultiPlatformBleAdapter.git", :tag => "#{spec.version}" }
 

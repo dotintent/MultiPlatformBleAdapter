@@ -3,7 +3,7 @@
 //
 //  Created by Przemysław Lenart on 25/07/16.
 //
-
+//KN - TEST
 import Foundation
 import CoreBluetooth
 
@@ -240,7 +240,7 @@ extension BluetoothError {
         case let .includedServicesDiscoveryFailed(service, error):
             return error.bleError(errorCode: .IncludedServicesDiscoveryFailed,
                                   deviceID: service.peripheral.identifier.uuidString,
-                                  serviceUUID: service.uuid.fullUUIDString)
+                                  serviceUUID: service.identifier.uuidString)
 
         case let .characteristicsDiscoveryFailed(service, error):
             return error.bleError(errorCode: .CharacteristicsDiscoveryFailed,
@@ -281,6 +281,8 @@ extension BluetoothError {
                                   descriptorUUID: descriptor.uuid.fullUUIDString)
         case .destroyed:
             return BleError(errorCode: .BluetoothManagerDestroyed)
+        default:
+            return BleError(errorCode: .UnknownError)
         }
     }
 }

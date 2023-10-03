@@ -400,7 +400,8 @@ public class BleClientManager : NSObject {
             .flatMap { $0.connect() }
 
         if let timeout = timeout {
-            connectionObservable = connectionObservable.timeout(Double(timeout) / 1000.0, scheduler: ConcurrentDispatchQueueScheduler(queue: queue))
+            let timeoutInterval = RxTimeInterval.milliseconds(Int(timeout))
+            connectionObservable = connectionObservable.timeout(timeoutInterval, scheduler: ConcurrentDispatchQueueScheduler(queue: queue))
         }
 
         let connectionDisposable = connectionObservable
@@ -947,7 +948,7 @@ public class BleClientManager : NSObject {
 
             }, onDisposed: { [weak self] in
                 self?.transactions.removeDisposable(transactionId)
-                promise.resolve(nil)
+                BleError.cancelled().callReject(promise)
             })
 
         transactions.replaceDisposable(transactionId, disposable: disposable)
