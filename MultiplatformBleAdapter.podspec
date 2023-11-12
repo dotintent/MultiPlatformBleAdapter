@@ -12,7 +12,7 @@ Pod::Spec.new do |spec|
   spec.author             = { "Michał Tuszyński" => "srgtuszy@gmail.com", "Kamil Natonek" => "kamil.natonek@withintent.com" }
   spec.social_media_url   = "https://withintent.com"
 
-  spec.platforms = { :ios => '11.0', :tvos => '11.0' }
+  spec.platforms = { :ios => '11.0' }
 
   spec.swift_versions = ['4.0', '4.2', '5.0']
   spec.source       = { :git => "https://github.com/dotintent/MultiPlatformBleAdapter.git", :tag => "#{spec.version}" }
